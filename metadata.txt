@@ -4,7 +4,7 @@ qgisMinimumVersion=3.0
 qgisMaximumVersion=3.99
 description=Metadata Editor: Editor Metadata Spasial ISO 19115-3 dan ISO 19139 Standar
 about=GeoMDB - Metadata Editor adalah plugin QGIS untuk membuat, mengedit, memvalidasi kelengkapan per tahapan, menyimpan draft (Save / Save As), dan mengekspor XML metadata spasial berbasis standar ISO 19115-3 dan ISO 19139 . Dikembangkan untuk memudahkan pengelola Simpul Jaringan Informasi Geospasial
-version=1.0.3
+version=1.0.4
 author=Wendra, Hari Kurniadi, Andre Bejo
 email=wendraedogawa@gmail.com
 tags=ISO 19115-3, ISO 19139, Metadata Geospasial Editor, JIGN, Simpul Jaringan
@@ -16,7 +16,8 @@ supportsQt6=True
 homepage=https://github.com/wendraalqassam/iso19115_metadata_editor
 tracker=https://github.com/wendraalqassam/iso19115_metadata_editor/issues
 repository=https://github.com/wendraalqassam/iso19115_metadata_editor
-changelog=1.0.3: Flake8 code quality optimization and clean packaging.
+changelog=1.0.4: Native security validation with inline annotations (0 warnings, no external config files).
+    1.0.3: Flake8 code quality optimization and clean packaging.
     1.0.2: Security audit compliance and exception refinement (Bandit scan clean with 0 issues).
     1.0.1: Security audit compliance (Bandit B405/B314 configuration) for QGIS plugin repository release.
     1.0: Rilis perdana GeoMDB - Metadata Editor dengan dukungan standar ISO 19115-3 dan ISO 19139 untuk Simpul Jaringan Informasi Geospasial Nasional (JIGN).

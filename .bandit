@@ -1,3 +1,0 @@
-[bandit]
-# Ignore XML-related warnings — XML usage has been audited and is safe for ISO metadata parsing
-skips = B405,B314,B318
