@@ -1,0 +1,2823 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<mdb:MD_Metadata xmlns:mac="http://standards.iso.org/iso/19115/-3/mac/2.0" xmlns:mrc="http://standards.iso.org/iso/19115/-3/mrc/2.0" xmlns:mdq="http://standards.iso.org/iso/19157/-2/mdq/1.0" xmlns:dqc="http://standards.iso.org/iso/19157/-2/dqc/1.0" xmlns:srv="http://standards.iso.org/iso/19115/-3/srv/2.1" xmlns:mrd="http://standards.iso.org/iso/19115/-3/mrd/1.0" xmlns:mrl="http://standards.iso.org/iso/19115/-3/mrl/2.0" xmlns:mri="http://standards.iso.org/iso/19115/-3/mri/1.0" xmlns:mrs="http://standards.iso.org/iso/19115/-3/mrs/1.0" xmlns:cit="http://standards.iso.org/iso/19115/-3/cit/2.0" xmlns:mcc="http://standards.iso.org/iso/19115/-3/mcc/1.0" xmlns:mas="http://standards.iso.org/iso/19115/-3/mas/1.0" xmlns:gex="http://standards.iso.org/iso/19115/-3/gex/1.0" xmlns:lan="http://standards.iso.org/iso/19115/-3/lan/1.0" xmlns:mda="http://standards.iso.org/iso/19115/-3/mda/1.0" xmlns:mco="http://standards.iso.org/iso/19115/-3/mco/1.0" xmlns:gco="http://standards.iso.org/iso/19115/-3/gco/1.0" xmlns:mds="http://standards.iso.org/iso/19115/-3/mds/2.0" xmlns:mdb="http://standards.iso.org/iso/19115/-3/mdb/2.0" xmlns:cat="http://standards.iso.org/iso/19115/-3/cat/1.0" xmlns:mex="http://standards.iso.org/iso/19115/-3/mex/1.0" xmlns:msr="http://standards.iso.org/iso/19115/-3/msr/2.0" xmlns:mdt="http://standards.iso.org/iso/19115/-3/mdt/2.0" xmlns:mmi="http://standards.iso.org/iso/19115/-3/mmi/1.0" xmlns:gcx="http://standards.iso.org/iso/19115/-3/gcx/1.0" xmlns:mpc="http://standards.iso.org/iso/19115/-3/mpc/1.0" xmlns:gfc="http://standards.iso.org/iso/19110/gfc/1.1" xmlns:gml="http://www.opengis.net/gml/3.2" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xlink="http://www.w3.org/1999/xlink" xsi:schemaLocation="http://standards.iso.org/iso/19115/-3/mdb/2.0 https://schemas.isotc211.org/19115/-3/mdt/2.0/mdt.xsd">
+  <mdb:metadataIdentifier>
+    <mcc:MD_Identifier>
+      <mcc:code>
+        <gco:CharacterString>urn:uuid:3f2b8c1e-6a4d-4e0b-9c57-2d1a7b9e4f10</gco:CharacterString>
+      </mcc:code>
+      <mcc:codeSpace>
+        <gco:CharacterString>contoh.example.org</gco:CharacterString>
+      </mcc:codeSpace>
+    </mcc:MD_Identifier>
+  </mdb:metadataIdentifier>
+  <mdb:defaultLocale>
+    <lan:PT_Locale>
+      <lan:language>
+        <lan:LanguageCode codeList="http://www.loc.gov/standards/iso639-2/php/code_list.php" codeListValue="ind">ind</lan:LanguageCode>
+      </lan:language>
+      <lan:country>
+        <lan:CountryCode codeList="http://www.iso.org/iso/country_codes/iso_3166_code_lists.htm" codeListValue="ID">ID</lan:CountryCode>
+      </lan:country>
+      <lan:characterEncoding>
+        <lan:MD_CharacterSetCode codeList="standards.iso.org/19115/-3/lan/1.0/codelists.xml#MD_CharacterSetCode" codeListValue="utf8">utf8</lan:MD_CharacterSetCode>
+      </lan:characterEncoding>
+    </lan:PT_Locale>
+  </mdb:defaultLocale>
+  <mdb:parentMetadata>
+    <cit:CI_Citation>
+      <cit:title>
+        <gco:CharacterString>Induk: Katalog Data Geospasial Contoh</gco:CharacterString>
+      </cit:title>
+    </cit:CI_Citation>
+  </mdb:parentMetadata>
+  <mdb:metadataScope>
+    <mdb:MD_MetadataScope>
+      <mdb:resourceScope>
+        <mcc:MD_ScopeCode codeList="standards.iso.org/19115/-3/lan/1.0/codelists.xml#MD_ScopeCode" codeListValue="dataset">dataset</mcc:MD_ScopeCode>
+      </mdb:resourceScope>
+      <mdb:name>
+        <gco:CharacterString>Dataset batas administrasi</gco:CharacterString>
+      </mdb:name>
+    </mdb:MD_MetadataScope>
+  </mdb:metadataScope>
+  <mdb:contact>
+    <cit:CI_Responsibility>
+      <cit:role>
+        <cit:CI_RoleCode codeList="standards.iso.org/19115/-3/lan/1.0/codelists.xml#CI_RoleCode" codeListValue="pointOfContact">pointOfContact</cit:CI_RoleCode>
+      </cit:role>
+      <cit:party>
+        <cit:CI_Organisation>
+          <cit:name>
+            <gco:CharacterString>Pusat Data Geospasial Contoh</gco:CharacterString>
+          </cit:name>
+          <cit:contactInfo>
+            <cit:CI_Contact>
+              <cit:phone>
+                <cit:CI_Telephone>
+                  <cit:number>
+                    <gco:CharacterString>+62 21 555 0100</gco:CharacterString>
+                  </cit:number>
+                  <cit:numberType>
+                    <cit:CI_TelephoneTypeCode codeList="standards.iso.org/19115/-3/lan/1.0/codelists.xml#CI_TelephoneTypeCode" codeListValue="voice">voice</cit:CI_TelephoneTypeCode>
+                  </cit:numberType>
+                </cit:CI_Telephone>
+              </cit:phone>
+              <cit:phone>
+                <cit:CI_Telephone>
+                  <cit:number>
+                    <gco:CharacterString>+62 21 555 0101</gco:CharacterString>
+                  </cit:number>
+                  <cit:numberType>
+                    <cit:CI_TelephoneTypeCode codeList="standards.iso.org/19115/-3/lan/1.0/codelists.xml#CI_TelephoneTypeCode" codeListValue="facsimile">facsimile</cit:CI_TelephoneTypeCode>
+                  </cit:numberType>
+                </cit:CI_Telephone>
+              </cit:phone>
+              <cit:address>
+                <cit:CI_Address>
+                  <cit:deliveryPoint>
+                    <gco:CharacterString>Jl. Contoh No. 1</gco:CharacterString>
+                  </cit:deliveryPoint>
+                  <cit:city>
+                    <gco:CharacterString>Jakarta Pusat</gco:CharacterString>
+                  </cit:city>
+                  <cit:administrativeArea>
+                    <gco:CharacterString>DKI Jakarta</gco:CharacterString>
+                  </cit:administrativeArea>
+                  <cit:postalCode>
+                    <gco:CharacterString>10110</gco:CharacterString>
+                  </cit:postalCode>
+                  <cit:country>
+                    <gco:CharacterString>Indonesia</gco:CharacterString>
+                  </cit:country>
+                  <cit:electronicMailAddress>
+                    <gco:CharacterString>siti@example.org</gco:CharacterString>
+                  </cit:electronicMailAddress>
+                </cit:CI_Address>
+              </cit:address>
+              <cit:onlineResource>
+                <cit:CI_OnlineResource>
+                  <cit:linkage>
+                    <gco:CharacterString>https://www.example.org</gco:CharacterString>
+                  </cit:linkage>
+                  <cit:protocol>
+                    <gco:CharacterString>https</gco:CharacterString>
+                  </cit:protocol>
+                  <cit:applicationProfile>
+                    <gco:CharacterString>Profil Contoh</gco:CharacterString>
+                  </cit:applicationProfile>
+                  <cit:name>
+                    <gco:CharacterString>Situs web</gco:CharacterString>
+                  </cit:name>
+                  <cit:description>
+                    <gco:CharacterString>Situs resmi instansi</gco:CharacterString>
+                  </cit:description>
+                  <cit:function>
+                    <cit:CI_OnLineFunctionCode codeList="standards.iso.org/19115/-3/lan/1.0/codelists.xml#CI_OnLineFunctionCode" codeListValue="information">information</cit:CI_OnLineFunctionCode>
+                  </cit:function>
+                </cit:CI_OnlineResource>
+              </cit:onlineResource>
+              <cit:hoursOfService>
+                <gco:CharacterString>Senin-Jumat 08:00-16:00 WIB</gco:CharacterString>
+              </cit:hoursOfService>
+              <cit:contactInstructions>
+                <gco:CharacterString>Hubungi lewat surel</gco:CharacterString>
+              </cit:contactInstructions>
+            </cit:CI_Contact>
+          </cit:contactInfo>
+          <cit:individual>
+            <cit:CI_Individual>
+              <cit:name>
+                <gco:CharacterString>Siti Rahma</gco:CharacterString>
+              </cit:name>
+              <cit:positionName>
+                <gco:CharacterString>Analis Data Spasial</gco:CharacterString>
+              </cit:positionName>
+            </cit:CI_Individual>
+          </cit:individual>
+        </cit:CI_Organisation>
+      </cit:party>
+    </cit:CI_Responsibility>
+  </mdb:contact>
+  <mdb:dateInfo>
+    <cit:CI_Date>
+      <cit:date>
+        <gco:DateTime>2026-10-01T09:00:00</gco:DateTime>
+      </cit:date>
+      <cit:dateType>
+        <cit:CI_DateTypeCode codeList="standards.iso.org/19115/-3/lan/1.0/codelists.xml#CI_DateTypeCode" codeListValue="creation">creation</cit:CI_DateTypeCode>
+      </cit:dateType>
+    </cit:CI_Date>
+  </mdb:dateInfo>
+  <mdb:dateInfo>
+    <cit:CI_Date>
+      <cit:date>
+        <gco:DateTime>2026-10-15T08:30:00</gco:DateTime>
+      </cit:date>
+      <cit:dateType>
+        <cit:CI_DateTypeCode codeList="standards.iso.org/19115/-3/lan/1.0/codelists.xml#CI_DateTypeCode" codeListValue="revision">revision</cit:CI_DateTypeCode>
+      </cit:dateType>
+    </cit:CI_Date>
+  </mdb:dateInfo>
+  <mdb:metadataStandard>
+    <cit:CI_Citation>
+      <cit:title>
+        <gco:CharacterString>ISO 19115-3 Geographic information - Metadata - XML schema implementation</gco:CharacterString>
+      </cit:title>
+      <cit:edition>
+        <gco:CharacterString>2016</gco:CharacterString>
+      </cit:edition>
+    </cit:CI_Citation>
+  </mdb:metadataStandard>
+  <mdb:metadataProfile>
+    <cit:CI_Citation>
+      <cit:title>
+        <gco:CharacterString>Profil Metadata Geospasial Contoh</gco:CharacterString>
+      </cit:title>
+      <cit:edition>
+        <gco:CharacterString>1.0</gco:CharacterString>
+      </cit:edition>
+    </cit:CI_Citation>
+  </mdb:metadataProfile>
+  <mdb:alternativeMetadataReference>
+    <cit:CI_Citation>
+      <cit:title>
+        <gco:CharacterString>Rujukan Metadata Alternatif</gco:CharacterString>
+      </cit:title>
+      <cit:identifier>
+        <mcc:MD_Identifier>
+          <mcc:code>
+            <gco:CharacterString>ALT-META-001</gco:CharacterString>
+          </mcc:code>
+          <mcc:codeSpace>
+            <gco:CharacterString>contoh.example.org</gco:CharacterString>
+          </mcc:codeSpace>
+        </mcc:MD_Identifier>
+      </cit:identifier>
+    </cit:CI_Citation>
+  </mdb:alternativeMetadataReference>
+  <mdb:otherLocale>
+    <lan:PT_Locale>
+      <lan:language>
+        <lan:LanguageCode codeList="http://www.loc.gov/standards/iso639-2/php/code_list.php" codeListValue="eng">eng</lan:LanguageCode>
+      </lan:language>
+      <lan:country>
+        <lan:CountryCode codeList="http://www.iso.org/iso/country_codes/iso_3166_code_lists.htm" codeListValue="US">US</lan:CountryCode>
+      </lan:country>
+      <lan:characterEncoding>
+        <lan:MD_CharacterSetCode codeList="standards.iso.org/19115/-3/lan/1.0/codelists.xml#MD_CharacterSetCode" codeListValue="utf8">utf8</lan:MD_CharacterSetCode>
+      </lan:characterEncoding>
+    </lan:PT_Locale>
+  </mdb:otherLocale>
+  <mdb:metadataLinkage>
+    <cit:CI_OnlineResource>
+      <cit:linkage>
+        <gco:CharacterString>https://data.example.org/metadata/3f2b8c1e</gco:CharacterString>
+      </cit:linkage>
+      <cit:protocol>
+        <gco:CharacterString>https</gco:CharacterString>
+      </cit:protocol>
+      <cit:applicationProfile>
+        <gco:CharacterString>Profil Contoh</gco:CharacterString>
+      </cit:applicationProfile>
+      <cit:name>
+        <gco:CharacterString>Tautan metadata</gco:CharacterString>
+      </cit:name>
+      <cit:description>
+        <gco:CharacterString>Halaman metadata daring</gco:CharacterString>
+      </cit:description>
+      <cit:function>
+        <cit:CI_OnLineFunctionCode codeList="standards.iso.org/19115/-3/lan/1.0/codelists.xml#CI_OnLineFunctionCode" codeListValue="completeMetadata">completeMetadata</cit:CI_OnLineFunctionCode>
+      </cit:function>
+    </cit:CI_OnlineResource>
+  </mdb:metadataLinkage>
+  <mdb:spatialRepresentationInfo>
+    <msr:MD_Georectified>
+      <msr:numberOfDimensions>
+        <gco:Integer>2</gco:Integer>
+      </msr:numberOfDimensions>
+      <msr:axisDimensionProperties>
+        <msr:MD_Dimension>
+          <msr:dimensionName>
+            <msr:MD_DimensionNameTypeCode codeList="standards.iso.org/19115/-3/lan/1.0/codelists.xml#MD_DimensionNameTypeCode" codeListValue="row">row</msr:MD_DimensionNameTypeCode>
+          </msr:dimensionName>
+          <msr:dimensionSize>
+            <gco:Integer>5000</gco:Integer>
+          </msr:dimensionSize>
+          <msr:resolution>
+            <gco:Measure uom="m">10</gco:Measure>
+          </msr:resolution>
+        </msr:MD_Dimension>
+      </msr:axisDimensionProperties>
+      <msr:axisDimensionProperties>
+        <msr:MD_Dimension>
+          <msr:dimensionName>
+            <msr:MD_DimensionNameTypeCode codeList="standards.iso.org/19115/-3/lan/1.0/codelists.xml#MD_DimensionNameTypeCode" codeListValue="column">column</msr:MD_DimensionNameTypeCode>
+          </msr:dimensionName>
+          <msr:dimensionSize>
+            <gco:Integer>6000</gco:Integer>
+          </msr:dimensionSize>
+          <msr:resolution>
+            <gco:Measure uom="m">10</gco:Measure>
+          </msr:resolution>
+        </msr:MD_Dimension>
+      </msr:axisDimensionProperties>
+      <msr:cellGeometry>
+        <msr:MD_CellGeometryCode codeList="standards.iso.org/19115/-3/lan/1.0/codelists.xml#MD_CellGeometryCode" codeListValue="area">area</msr:MD_CellGeometryCode>
+      </msr:cellGeometry>
+      <msr:transformationParameterAvailability>
+        <gco:Boolean>false</gco:Boolean>
+      </msr:transformationParameterAvailability>
+      <msr:checkPointAvailability>
+        <gco:Boolean>true</gco:Boolean>
+      </msr:checkPointAvailability>
+      <msr:checkPointDescription>
+        <gco:CharacterString>Titik uji dari survei GNSS</gco:CharacterString>
+      </msr:checkPointDescription>
+      <msr:cornerPoints>
+        <gml:Point gml:id="CP1" srsName="http://www.opengis.net/def/crs/EPSG/0/4326">
+          <gml:pos>-6.4 106.6</gml:pos>
+        </gml:Point>
+      </msr:cornerPoints>
+      <msr:cornerPoints>
+        <gml:Point gml:id="CP2" srsName="http://www.opengis.net/def/crs/EPSG/0/4326">
+          <gml:pos>-6.0 107.0</gml:pos>
+        </gml:Point>
+      </msr:cornerPoints>
+      <msr:centrePoint>
+        <gml:Point gml:id="CTR" srsName="http://www.opengis.net/def/crs/EPSG/0/4326">
+          <gml:pos>-6.2 106.8</gml:pos>
+        </gml:Point>
+      </msr:centrePoint>
+      <msr:pointInPixel>
+        <msr:MD_PixelOrientationCode>centre</msr:MD_PixelOrientationCode>
+      </msr:pointInPixel>
+      <msr:transformationDimensionDescription>
+        <gco:CharacterString>Baris dan kolom sejajar sumbu peta</gco:CharacterString>
+      </msr:transformationDimensionDescription>
+      <msr:transformationDimensionMapping>
+        <gco:CharacterString>baris -&gt; lintang</gco:CharacterString>
+      </msr:transformationDimensionMapping>
+      <msr:transformationDimensionMapping>
+        <gco:CharacterString>kolom -&gt; bujur</gco:CharacterString>
+      </msr:transformationDimensionMapping>
+    </msr:MD_Georectified>
+  </mdb:spatialRepresentationInfo>
+  <mdb:spatialRepresentationInfo>
+    <msr:MI_Georeferenceable>
+      <msr:numberOfDimensions>
+        <gco:Integer>2</gco:Integer>
+      </msr:numberOfDimensions>
+      <msr:axisDimensionProperties>
+        <msr:MD_Dimension>
+          <msr:dimensionName>
+            <msr:MD_DimensionNameTypeCode codeList="standards.iso.org/19115/-3/lan/1.0/codelists.xml#MD_DimensionNameTypeCode" codeListValue="row">row</msr:MD_DimensionNameTypeCode>
+          </msr:dimensionName>
+          <msr:dimensionSize>
+            <gco:Integer>5000</gco:Integer>
+          </msr:dimensionSize>
+          <msr:resolution>
+            <gco:Measure uom="m">10</gco:Measure>
+          </msr:resolution>
+        </msr:MD_Dimension>
+      </msr:axisDimensionProperties>
+      <msr:axisDimensionProperties>
+        <msr:MD_Dimension>
+          <msr:dimensionName>
+            <msr:MD_DimensionNameTypeCode codeList="standards.iso.org/19115/-3/lan/1.0/codelists.xml#MD_DimensionNameTypeCode" codeListValue="column">column</msr:MD_DimensionNameTypeCode>
+          </msr:dimensionName>
+          <msr:dimensionSize>
+            <gco:Integer>6000</gco:Integer>
+          </msr:dimensionSize>
+          <msr:resolution>
+            <gco:Measure uom="m">10</gco:Measure>
+          </msr:resolution>
+        </msr:MD_Dimension>
+      </msr:axisDimensionProperties>
+      <msr:cellGeometry>
+        <msr:MD_CellGeometryCode codeList="standards.iso.org/19115/-3/lan/1.0/codelists.xml#MD_CellGeometryCode" codeListValue="area">area</msr:MD_CellGeometryCode>
+      </msr:cellGeometry>
+      <msr:transformationParameterAvailability>
+        <gco:Boolean>false</gco:Boolean>
+      </msr:transformationParameterAvailability>
+      <msr:controlPointAvailability>
+        <gco:Boolean>true</gco:Boolean>
+      </msr:controlPointAvailability>
+      <msr:orientationParameterAvailability>
+        <gco:Boolean>false</gco:Boolean>
+      </msr:orientationParameterAvailability>
+      <msr:orientationParameterDescription>
+        <gco:CharacterString>Tidak ada parameter orientasi</gco:CharacterString>
+      </msr:orientationParameterDescription>
+      <msr:georeferencedParameters>
+        <gco:Record>polinomial orde 2</gco:Record>
+      </msr:georeferencedParameters>
+      <msr:geolocationInformation>
+        <msr:MI_GCPCollection>
+          <msr:gcp>
+            <msr:MI_GCP>
+              <msr:geographicCoordinates>
+                <gml:Point gml:id="GCP1" srsName="http://www.opengis.net/def/crs/EPSG/0/4326">
+                  <gml:pos>-6.31 106.71</gml:pos>
+                </gml:Point>
+              </msr:geographicCoordinates>
+              <msr:accuracyReport>
+                <mdq:DQ_AbsoluteExternalPositionalAccuracy>
+                  <mdq:result>
+                    <mdq:DQ_DescriptiveResult>
+                      <mdq:statement>
+                        <gco:CharacterString>RMSE 0.8 m</gco:CharacterString>
+                      </mdq:statement>
+                    </mdq:DQ_DescriptiveResult>
+                  </mdq:result>
+                </mdq:DQ_AbsoluteExternalPositionalAccuracy>
+              </msr:accuracyReport>
+            </msr:MI_GCP>
+          </msr:gcp>
+          <msr:gcp>
+            <msr:MI_GCP>
+              <msr:geographicCoordinates>
+                <gml:Point gml:id="GCP2" srsName="http://www.opengis.net/def/crs/EPSG/0/4326">
+                  <gml:pos>-6.12 106.93</gml:pos>
+                </gml:Point>
+              </msr:geographicCoordinates>
+              <msr:accuracyReport>
+                <mdq:DQ_AbsoluteExternalPositionalAccuracy>
+                  <mdq:result>
+                    <mdq:DQ_DescriptiveResult>
+                      <mdq:statement>
+                        <gco:CharacterString>RMSE 0.7 m</gco:CharacterString>
+                      </mdq:statement>
+                    </mdq:DQ_DescriptiveResult>
+                  </mdq:result>
+                </mdq:DQ_AbsoluteExternalPositionalAccuracy>
+              </msr:accuracyReport>
+            </msr:MI_GCP>
+          </msr:gcp>
+          <msr:collectionIdentification>
+            <gco:Integer>1</gco:Integer>
+          </msr:collectionIdentification>
+          <msr:collectionName>
+            <gco:CharacterString>GCP Citra 2024</gco:CharacterString>
+          </msr:collectionName>
+          <msr:coordinateReferenceSystem>
+            <mrs:MD_ReferenceSystem>
+              <mrs:referenceSystemIdentifier>
+                <mcc:MD_Identifier>
+                  <mcc:code>
+                    <gco:CharacterString>4326</gco:CharacterString>
+                  </mcc:code>
+                  <mcc:codeSpace>
+                    <gco:CharacterString>EPSG</gco:CharacterString>
+                  </mcc:codeSpace>
+                </mcc:MD_Identifier>
+              </mrs:referenceSystemIdentifier>
+            </mrs:MD_ReferenceSystem>
+          </msr:coordinateReferenceSystem>
+        </msr:MI_GCPCollection>
+      </msr:geolocationInformation>
+    </msr:MI_Georeferenceable>
+  </mdb:spatialRepresentationInfo>
+  <mdb:referenceSystemInfo>
+    <mrs:MD_ReferenceSystem>
+      <mrs:referenceSystemIdentifier>
+        <mcc:MD_Identifier>
+          <mcc:authority>
+            <cit:CI_Citation>
+              <cit:title>
+                <gco:CharacterString>EPSG</gco:CharacterString>
+              </cit:title>
+              <cit:alternateTitle>
+                <gco:CharacterString>European Petroleum Survey Group</gco:CharacterString>
+              </cit:alternateTitle>
+            </cit:CI_Citation>
+          </mcc:authority>
+          <mcc:code>
+            <gco:CharacterString>4326</gco:CharacterString>
+          </mcc:code>
+          <mcc:codeSpace>
+            <gco:CharacterString>EPSG</gco:CharacterString>
+          </mcc:codeSpace>
+        </mcc:MD_Identifier>
+      </mrs:referenceSystemIdentifier>
+      <mrs:referenceSystemType>
+        <mrs:MD_ReferenceSystemTypeCode codeList="standards.iso.org/19115/-3/lan/1.0/codelists.xml#MD_ReferenceSystemTypeCode" codeListValue="geodeticGeographic2D">geodeticGeographic2D</mrs:MD_ReferenceSystemTypeCode>
+      </mrs:referenceSystemType>
+    </mrs:MD_ReferenceSystem>
+  </mdb:referenceSystemInfo>
+  <mdb:metadataExtensionInfo>
+    <mex:MD_MetadataExtensionInformation>
+      <mex:extensionOnLineResource>
+        <cit:CI_OnlineResource>
+          <cit:linkage>
+            <gco:CharacterString>https://data.example.org/ekstensi</gco:CharacterString>
+          </cit:linkage>
+          <cit:protocol>
+            <gco:CharacterString>https</gco:CharacterString>
+          </cit:protocol>
+          <cit:applicationProfile>
+            <gco:CharacterString>Profil Contoh</gco:CharacterString>
+          </cit:applicationProfile>
+          <cit:name>
+            <gco:CharacterString>Ekstensi metadata</gco:CharacterString>
+          </cit:name>
+          <cit:description>
+            <gco:CharacterString>Dokumen ekstensi profil</gco:CharacterString>
+          </cit:description>
+          <cit:function>
+            <cit:CI_OnLineFunctionCode codeList="standards.iso.org/19115/-3/lan/1.0/codelists.xml#CI_OnLineFunctionCode" codeListValue="information">information</cit:CI_OnLineFunctionCode>
+          </cit:function>
+        </cit:CI_OnlineResource>
+      </mex:extensionOnLineResource>
+      <mex:extendedElementInformation>
+        <mex:MD_ExtendedElementInformation>
+          <mex:name>
+            <gco:CharacterString>kodeWilayahBPS</gco:CharacterString>
+          </mex:name>
+          <mex:definition>
+            <gco:CharacterString>Kode wilayah menurut BPS</gco:CharacterString>
+          </mex:definition>
+          <mex:obligation>
+            <mex:MD_ObligationCode>optional</mex:MD_ObligationCode>
+          </mex:obligation>
+          <mex:condition>
+            <gco:CharacterString>Diisi bila tersedia</gco:CharacterString>
+          </mex:condition>
+          <mex:dataType>
+            <mex:MD_DatatypeCode codeList="standards.iso.org/19115/-3/lan/1.0/codelists.xml#MD_DatatypeCode" codeListValue="characterString">characterString</mex:MD_DatatypeCode>
+          </mex:dataType>
+          <mex:maximumOccurrence>
+            <gco:CharacterString>1</gco:CharacterString>
+          </mex:maximumOccurrence>
+          <mex:domainValue>
+            <gco:CharacterString>Kode 10 digit</gco:CharacterString>
+          </mex:domainValue>
+          <mex:parentEntity>
+            <gco:CharacterString>MD_DataIdentification</gco:CharacterString>
+          </mex:parentEntity>
+          <mex:rule>
+            <gco:CharacterString>Satu kode per wilayah</gco:CharacterString>
+          </mex:rule>
+          <mex:rationale>
+            <gco:CharacterString>Mendukung integrasi data statistik</gco:CharacterString>
+          </mex:rationale>
+          <mex:source>
+            <cit:CI_Responsibility>
+              <cit:role>
+                <cit:CI_RoleCode codeList="standards.iso.org/19115/-3/lan/1.0/codelists.xml#CI_RoleCode" codeListValue="originator">originator</cit:CI_RoleCode>
+              </cit:role>
+              <cit:party>
+                <cit:CI_Organisation>
+                  <cit:name>
+                    <gco:CharacterString>Pusat Data Geospasial Contoh</gco:CharacterString>
+                  </cit:name>
+                  <cit:contactInfo>
+                    <cit:CI_Contact>
+                      <cit:phone>
+                        <cit:CI_Telephone>
+                          <cit:number>
+                            <gco:CharacterString>+62 21 555 0100</gco:CharacterString>
+                          </cit:number>
+                          <cit:numberType>
+                            <cit:CI_TelephoneTypeCode codeList="standards.iso.org/19115/-3/lan/1.0/codelists.xml#CI_TelephoneTypeCode" codeListValue="voice">voice</cit:CI_TelephoneTypeCode>
+                          </cit:numberType>
+                        </cit:CI_Telephone>
+                      </cit:phone>
+                      <cit:phone>
+                        <cit:CI_Telephone>
+                          <cit:number>
+                            <gco:CharacterString>+62 21 555 0101</gco:CharacterString>
+                          </cit:number>
+                          <cit:numberType>
+                            <cit:CI_TelephoneTypeCode codeList="standards.iso.org/19115/-3/lan/1.0/codelists.xml#CI_TelephoneTypeCode" codeListValue="facsimile">facsimile</cit:CI_TelephoneTypeCode>
+                          </cit:numberType>
+                        </cit:CI_Telephone>
+                      </cit:phone>
+                      <cit:address>
+                        <cit:CI_Address>
+                          <cit:deliveryPoint>
+                            <gco:CharacterString>Jl. Contoh No. 1</gco:CharacterString>
+                          </cit:deliveryPoint>
+                          <cit:city>
+                            <gco:CharacterString>Jakarta Pusat</gco:CharacterString>
+                          </cit:city>
+                          <cit:administrativeArea>
+                            <gco:CharacterString>DKI Jakarta</gco:CharacterString>
+                          </cit:administrativeArea>
+                          <cit:postalCode>
+                            <gco:CharacterString>10110</gco:CharacterString>
+                          </cit:postalCode>
+                          <cit:country>
+                            <gco:CharacterString>Indonesia</gco:CharacterString>
+                          </cit:country>
+                          <cit:electronicMailAddress>
+                            <gco:CharacterString>siti@example.org</gco:CharacterString>
+                          </cit:electronicMailAddress>
+                        </cit:CI_Address>
+                      </cit:address>
+                      <cit:onlineResource>
+                        <cit:CI_OnlineResource>
+                          <cit:linkage>
+                            <gco:CharacterString>https://www.example.org</gco:CharacterString>
+                          </cit:linkage>
+                          <cit:protocol>
+                            <gco:CharacterString>https</gco:CharacterString>
+                          </cit:protocol>
+                          <cit:applicationProfile>
+                            <gco:CharacterString>Profil Contoh</gco:CharacterString>
+                          </cit:applicationProfile>
+                          <cit:name>
+                            <gco:CharacterString>Situs web</gco:CharacterString>
+                          </cit:name>
+                          <cit:description>
+                            <gco:CharacterString>Situs resmi instansi</gco:CharacterString>
+                          </cit:description>
+                          <cit:function>
+                            <cit:CI_OnLineFunctionCode codeList="standards.iso.org/19115/-3/lan/1.0/codelists.xml#CI_OnLineFunctionCode" codeListValue="information">information</cit:CI_OnLineFunctionCode>
+                          </cit:function>
+                        </cit:CI_OnlineResource>
+                      </cit:onlineResource>
+                      <cit:hoursOfService>
+                        <gco:CharacterString>Senin-Jumat 08:00-16:00 WIB</gco:CharacterString>
+                      </cit:hoursOfService>
+                      <cit:contactInstructions>
+                        <gco:CharacterString>Hubungi lewat surel</gco:CharacterString>
+                      </cit:contactInstructions>
+                    </cit:CI_Contact>
+                  </cit:contactInfo>
+                  <cit:individual>
+                    <cit:CI_Individual>
+                      <cit:name>
+                        <gco:CharacterString>Siti Rahma</gco:CharacterString>
+                      </cit:name>
+                      <cit:positionName>
+                        <gco:CharacterString>Analis Data Spasial</gco:CharacterString>
+                      </cit:positionName>
+                    </cit:CI_Individual>
+                  </cit:individual>
+                </cit:CI_Organisation>
+              </cit:party>
+            </cit:CI_Responsibility>
+          </mex:source>
+        </mex:MD_ExtendedElementInformation>
+      </mex:extendedElementInformation>
+    </mex:MD_MetadataExtensionInformation>
+  </mdb:metadataExtensionInfo>
+  <mdb:identificationInfo>
+    <mri:MD_DataIdentification>
+      <mri:citation>
+        <cit:CI_Citation>
+          <cit:title>
+            <gco:CharacterString>Batas Administrasi Kabupaten/Kota Skala 1:25.000 (Contoh)</gco:CharacterString>
+          </cit:title>
+          <cit:alternateTitle>
+            <gco:CharacterString>Batas Admin Kab/Kota 25K</gco:CharacterString>
+          </cit:alternateTitle>
+          <cit:date>
+            <cit:CI_Date>
+              <cit:date>
+                <gco:DateTime>2025-03-01T00:00:00</gco:DateTime>
+              </cit:date>
+              <cit:dateType>
+                <cit:CI_DateTypeCode codeList="standards.iso.org/19115/-3/lan/1.0/codelists.xml#CI_DateTypeCode" codeListValue="creation">creation</cit:CI_DateTypeCode>
+              </cit:dateType>
+            </cit:CI_Date>
+          </cit:date>
+          <cit:date>
+            <cit:CI_Date>
+              <cit:date>
+                <gco:DateTime>2025-06-15T00:00:00</gco:DateTime>
+              </cit:date>
+              <cit:dateType>
+                <cit:CI_DateTypeCode codeList="standards.iso.org/19115/-3/lan/1.0/codelists.xml#CI_DateTypeCode" codeListValue="publication">publication</cit:CI_DateTypeCode>
+              </cit:dateType>
+            </cit:CI_Date>
+          </cit:date>
+          <cit:date>
+            <cit:CI_Date>
+              <cit:date>
+                <gco:DateTime>2026-09-30T00:00:00</gco:DateTime>
+              </cit:date>
+              <cit:dateType>
+                <cit:CI_DateTypeCode codeList="standards.iso.org/19115/-3/lan/1.0/codelists.xml#CI_DateTypeCode" codeListValue="revision">revision</cit:CI_DateTypeCode>
+              </cit:dateType>
+            </cit:CI_Date>
+          </cit:date>
+          <cit:edition>
+            <gco:CharacterString>1.0</gco:CharacterString>
+          </cit:edition>
+          <cit:editionDate>
+            <gco:DateTime>2025-06-15T00:00:00</gco:DateTime>
+          </cit:editionDate>
+          <cit:identifier>
+            <mcc:MD_Identifier>
+              <mcc:code>
+                <gco:CharacterString>GEO-BATAS-25K-2025</gco:CharacterString>
+              </mcc:code>
+              <mcc:codeSpace>
+                <gco:CharacterString>contoh.example.org</gco:CharacterString>
+              </mcc:codeSpace>
+            </mcc:MD_Identifier>
+          </cit:identifier>
+          <cit:citedResponsibleParty>
+            <cit:CI_Responsibility>
+              <cit:role>
+                <cit:CI_RoleCode codeList="standards.iso.org/19115/-3/lan/1.0/codelists.xml#CI_RoleCode" codeListValue="originator">originator</cit:CI_RoleCode>
+              </cit:role>
+              <cit:party>
+                <cit:CI_Organisation>
+                  <cit:name>
+                    <gco:CharacterString>Pusat Data Geospasial Contoh</gco:CharacterString>
+                  </cit:name>
+                  <cit:contactInfo>
+                    <cit:CI_Contact>
+                      <cit:phone>
+                        <cit:CI_Telephone>
+                          <cit:number>
+                            <gco:CharacterString>+62 21 555 0100</gco:CharacterString>
+                          </cit:number>
+                          <cit:numberType>
+                            <cit:CI_TelephoneTypeCode codeList="standards.iso.org/19115/-3/lan/1.0/codelists.xml#CI_TelephoneTypeCode" codeListValue="voice">voice</cit:CI_TelephoneTypeCode>
+                          </cit:numberType>
+                        </cit:CI_Telephone>
+                      </cit:phone>
+                      <cit:phone>
+                        <cit:CI_Telephone>
+                          <cit:number>
+                            <gco:CharacterString>+62 21 555 0101</gco:CharacterString>
+                          </cit:number>
+                          <cit:numberType>
+                            <cit:CI_TelephoneTypeCode codeList="standards.iso.org/19115/-3/lan/1.0/codelists.xml#CI_TelephoneTypeCode" codeListValue="facsimile">facsimile</cit:CI_TelephoneTypeCode>
+                          </cit:numberType>
+                        </cit:CI_Telephone>
+                      </cit:phone>
+                      <cit:address>
+                        <cit:CI_Address>
+                          <cit:deliveryPoint>
+                            <gco:CharacterString>Jl. Contoh No. 1</gco:CharacterString>
+                          </cit:deliveryPoint>
+                          <cit:city>
+                            <gco:CharacterString>Jakarta Pusat</gco:CharacterString>
+                          </cit:city>
+                          <cit:administrativeArea>
+                            <gco:CharacterString>DKI Jakarta</gco:CharacterString>
+                          </cit:administrativeArea>
+                          <cit:postalCode>
+                            <gco:CharacterString>10110</gco:CharacterString>
+                          </cit:postalCode>
+                          <cit:country>
+                            <gco:CharacterString>Indonesia</gco:CharacterString>
+                          </cit:country>
+                          <cit:electronicMailAddress>
+                            <gco:CharacterString>siti@example.org</gco:CharacterString>
+                          </cit:electronicMailAddress>
+                        </cit:CI_Address>
+                      </cit:address>
+                      <cit:onlineResource>
+                        <cit:CI_OnlineResource>
+                          <cit:linkage>
+                            <gco:CharacterString>https://www.example.org</gco:CharacterString>
+                          </cit:linkage>
+                          <cit:protocol>
+                            <gco:CharacterString>https</gco:CharacterString>
+                          </cit:protocol>
+                          <cit:applicationProfile>
+                            <gco:CharacterString>Profil Contoh</gco:CharacterString>
+                          </cit:applicationProfile>
+                          <cit:name>
+                            <gco:CharacterString>Situs web</gco:CharacterString>
+                          </cit:name>
+                          <cit:description>
+                            <gco:CharacterString>Situs resmi instansi</gco:CharacterString>
+                          </cit:description>
+                          <cit:function>
+                            <cit:CI_OnLineFunctionCode codeList="standards.iso.org/19115/-3/lan/1.0/codelists.xml#CI_OnLineFunctionCode" codeListValue="information">information</cit:CI_OnLineFunctionCode>
+                          </cit:function>
+                        </cit:CI_OnlineResource>
+                      </cit:onlineResource>
+                      <cit:hoursOfService>
+                        <gco:CharacterString>Senin-Jumat 08:00-16:00 WIB</gco:CharacterString>
+                      </cit:hoursOfService>
+                      <cit:contactInstructions>
+                        <gco:CharacterString>Hubungi lewat surel</gco:CharacterString>
+                      </cit:contactInstructions>
+                    </cit:CI_Contact>
+                  </cit:contactInfo>
+                  <cit:individual>
+                    <cit:CI_Individual>
+                      <cit:name>
+                        <gco:CharacterString>Siti Rahma</gco:CharacterString>
+                      </cit:name>
+                      <cit:positionName>
+                        <gco:CharacterString>Analis Data Spasial</gco:CharacterString>
+                      </cit:positionName>
+                    </cit:CI_Individual>
+                  </cit:individual>
+                </cit:CI_Organisation>
+              </cit:party>
+            </cit:CI_Responsibility>
+          </cit:citedResponsibleParty>
+          <cit:presentationForm>
+            <cit:CI_PresentationFormCode codeList="standards.iso.org/19115/-3/lan/1.0/codelists.xml#CI_PresentationFormCode" codeListValue="mapDigital">mapDigital</cit:CI_PresentationFormCode>
+          </cit:presentationForm>
+          <cit:onlineResource>
+            <cit:CI_OnlineResource>
+              <cit:linkage>
+                <gco:CharacterString>https://data.example.org/batas-admin</gco:CharacterString>
+              </cit:linkage>
+              <cit:protocol>
+                <gco:CharacterString>https</gco:CharacterString>
+              </cit:protocol>
+              <cit:applicationProfile>
+                <gco:CharacterString>Profil Contoh</gco:CharacterString>
+              </cit:applicationProfile>
+              <cit:name>
+                <gco:CharacterString>Portal data</gco:CharacterString>
+              </cit:name>
+              <cit:description>
+                <gco:CharacterString>Halaman dataset</gco:CharacterString>
+              </cit:description>
+              <cit:function>
+                <cit:CI_OnLineFunctionCode codeList="standards.iso.org/19115/-3/lan/1.0/codelists.xml#CI_OnLineFunctionCode" codeListValue="information">information</cit:CI_OnLineFunctionCode>
+              </cit:function>
+            </cit:CI_OnlineResource>
+          </cit:onlineResource>
+        </cit:CI_Citation>
+      </mri:citation>
+      <mri:abstract>
+        <gco:CharacterString>Data poligon batas administrasi kabupaten/kota yang disusun dari digitasi citra satelit resolusi tinggi dan data survei lapangan. Dataset ini adalah contoh fiktif untuk pengujian plugin.</gco:CharacterString>
+      </mri:abstract>
+      <mri:purpose>
+        <gco:CharacterString>Mendukung perencanaan wilayah dan pengelolaan data administrasi.</gco:CharacterString>
+      </mri:purpose>
+      <mri:credit>
+        <gco:CharacterString>Pusat Data Geospasial Contoh</gco:CharacterString>
+      </mri:credit>
+      <mri:status>
+        <mcc:MD_ProgressCode codeList="standards.iso.org/19115/-3/lan/1.0/codelists.xml#MD_ProgressCode" codeListValue="completed">completed</mcc:MD_ProgressCode>
+      </mri:status>
+      <mri:pointOfContact>
+        <cit:CI_Responsibility>
+          <cit:role>
+            <cit:CI_RoleCode codeList="standards.iso.org/19115/-3/lan/1.0/codelists.xml#CI_RoleCode" codeListValue="pointOfContact">pointOfContact</cit:CI_RoleCode>
+          </cit:role>
+          <cit:party>
+            <cit:CI_Organisation>
+              <cit:name>
+                <gco:CharacterString>Pusat Data Geospasial Contoh</gco:CharacterString>
+              </cit:name>
+              <cit:contactInfo>
+                <cit:CI_Contact>
+                  <cit:phone>
+                    <cit:CI_Telephone>
+                      <cit:number>
+                        <gco:CharacterString>+62 21 555 0100</gco:CharacterString>
+                      </cit:number>
+                      <cit:numberType>
+                        <cit:CI_TelephoneTypeCode codeList="standards.iso.org/19115/-3/lan/1.0/codelists.xml#CI_TelephoneTypeCode" codeListValue="voice">voice</cit:CI_TelephoneTypeCode>
+                      </cit:numberType>
+                    </cit:CI_Telephone>
+                  </cit:phone>
+                  <cit:phone>
+                    <cit:CI_Telephone>
+                      <cit:number>
+                        <gco:CharacterString>+62 21 555 0101</gco:CharacterString>
+                      </cit:number>
+                      <cit:numberType>
+                        <cit:CI_TelephoneTypeCode codeList="standards.iso.org/19115/-3/lan/1.0/codelists.xml#CI_TelephoneTypeCode" codeListValue="facsimile">facsimile</cit:CI_TelephoneTypeCode>
+                      </cit:numberType>
+                    </cit:CI_Telephone>
+                  </cit:phone>
+                  <cit:address>
+                    <cit:CI_Address>
+                      <cit:deliveryPoint>
+                        <gco:CharacterString>Jl. Contoh No. 1</gco:CharacterString>
+                      </cit:deliveryPoint>
+                      <cit:city>
+                        <gco:CharacterString>Jakarta Pusat</gco:CharacterString>
+                      </cit:city>
+                      <cit:administrativeArea>
+                        <gco:CharacterString>DKI Jakarta</gco:CharacterString>
+                      </cit:administrativeArea>
+                      <cit:postalCode>
+                        <gco:CharacterString>10110</gco:CharacterString>
+                      </cit:postalCode>
+                      <cit:country>
+                        <gco:CharacterString>Indonesia</gco:CharacterString>
+                      </cit:country>
+                      <cit:electronicMailAddress>
+                        <gco:CharacterString>siti@example.org</gco:CharacterString>
+                      </cit:electronicMailAddress>
+                    </cit:CI_Address>
+                  </cit:address>
+                  <cit:onlineResource>
+                    <cit:CI_OnlineResource>
+                      <cit:linkage>
+                        <gco:CharacterString>https://www.example.org</gco:CharacterString>
+                      </cit:linkage>
+                      <cit:protocol>
+                        <gco:CharacterString>https</gco:CharacterString>
+                      </cit:protocol>
+                      <cit:applicationProfile>
+                        <gco:CharacterString>Profil Contoh</gco:CharacterString>
+                      </cit:applicationProfile>
+                      <cit:name>
+                        <gco:CharacterString>Situs web</gco:CharacterString>
+                      </cit:name>
+                      <cit:description>
+                        <gco:CharacterString>Situs resmi instansi</gco:CharacterString>
+                      </cit:description>
+                      <cit:function>
+                        <cit:CI_OnLineFunctionCode codeList="standards.iso.org/19115/-3/lan/1.0/codelists.xml#CI_OnLineFunctionCode" codeListValue="information">information</cit:CI_OnLineFunctionCode>
+                      </cit:function>
+                    </cit:CI_OnlineResource>
+                  </cit:onlineResource>
+                  <cit:hoursOfService>
+                    <gco:CharacterString>Senin-Jumat 08:00-16:00 WIB</gco:CharacterString>
+                  </cit:hoursOfService>
+                  <cit:contactInstructions>
+                    <gco:CharacterString>Hubungi lewat surel</gco:CharacterString>
+                  </cit:contactInstructions>
+                </cit:CI_Contact>
+              </cit:contactInfo>
+              <cit:individual>
+                <cit:CI_Individual>
+                  <cit:name>
+                    <gco:CharacterString>Siti Rahma</gco:CharacterString>
+                  </cit:name>
+                  <cit:positionName>
+                    <gco:CharacterString>Analis Data Spasial</gco:CharacterString>
+                  </cit:positionName>
+                </cit:CI_Individual>
+              </cit:individual>
+            </cit:CI_Organisation>
+          </cit:party>
+        </cit:CI_Responsibility>
+      </mri:pointOfContact>
+      <mri:pointOfContact>
+        <cit:CI_Responsibility>
+          <cit:role>
+            <cit:CI_RoleCode codeList="standards.iso.org/19115/-3/lan/1.0/codelists.xml#CI_RoleCode" codeListValue="distributor">distributor</cit:CI_RoleCode>
+          </cit:role>
+          <cit:party>
+            <cit:CI_Organisation>
+              <cit:name>
+                <gco:CharacterString>Unit Layanan Data Contoh</gco:CharacterString>
+              </cit:name>
+              <cit:contactInfo>
+                <cit:CI_Contact>
+                  <cit:phone>
+                    <cit:CI_Telephone>
+                      <cit:number>
+                        <gco:CharacterString>+62 21 555 0100</gco:CharacterString>
+                      </cit:number>
+                      <cit:numberType>
+                        <cit:CI_TelephoneTypeCode codeList="standards.iso.org/19115/-3/lan/1.0/codelists.xml#CI_TelephoneTypeCode" codeListValue="voice">voice</cit:CI_TelephoneTypeCode>
+                      </cit:numberType>
+                    </cit:CI_Telephone>
+                  </cit:phone>
+                  <cit:phone>
+                    <cit:CI_Telephone>
+                      <cit:number>
+                        <gco:CharacterString>+62 21 555 0101</gco:CharacterString>
+                      </cit:number>
+                      <cit:numberType>
+                        <cit:CI_TelephoneTypeCode codeList="standards.iso.org/19115/-3/lan/1.0/codelists.xml#CI_TelephoneTypeCode" codeListValue="facsimile">facsimile</cit:CI_TelephoneTypeCode>
+                      </cit:numberType>
+                    </cit:CI_Telephone>
+                  </cit:phone>
+                  <cit:address>
+                    <cit:CI_Address>
+                      <cit:deliveryPoint>
+                        <gco:CharacterString>Jl. Contoh No. 1</gco:CharacterString>
+                      </cit:deliveryPoint>
+                      <cit:city>
+                        <gco:CharacterString>Jakarta Pusat</gco:CharacterString>
+                      </cit:city>
+                      <cit:administrativeArea>
+                        <gco:CharacterString>DKI Jakarta</gco:CharacterString>
+                      </cit:administrativeArea>
+                      <cit:postalCode>
+                        <gco:CharacterString>10110</gco:CharacterString>
+                      </cit:postalCode>
+                      <cit:country>
+                        <gco:CharacterString>Indonesia</gco:CharacterString>
+                      </cit:country>
+                      <cit:electronicMailAddress>
+                        <gco:CharacterString>layanan@example.org</gco:CharacterString>
+                      </cit:electronicMailAddress>
+                    </cit:CI_Address>
+                  </cit:address>
+                  <cit:onlineResource>
+                    <cit:CI_OnlineResource>
+                      <cit:linkage>
+                        <gco:CharacterString>https://www.example.org</gco:CharacterString>
+                      </cit:linkage>
+                      <cit:protocol>
+                        <gco:CharacterString>https</gco:CharacterString>
+                      </cit:protocol>
+                      <cit:applicationProfile>
+                        <gco:CharacterString>Profil Contoh</gco:CharacterString>
+                      </cit:applicationProfile>
+                      <cit:name>
+                        <gco:CharacterString>Situs web</gco:CharacterString>
+                      </cit:name>
+                      <cit:description>
+                        <gco:CharacterString>Situs resmi instansi</gco:CharacterString>
+                      </cit:description>
+                      <cit:function>
+                        <cit:CI_OnLineFunctionCode codeList="standards.iso.org/19115/-3/lan/1.0/codelists.xml#CI_OnLineFunctionCode" codeListValue="information">information</cit:CI_OnLineFunctionCode>
+                      </cit:function>
+                    </cit:CI_OnlineResource>
+                  </cit:onlineResource>
+                  <cit:hoursOfService>
+                    <gco:CharacterString>Senin-Jumat 08:00-16:00 WIB</gco:CharacterString>
+                  </cit:hoursOfService>
+                  <cit:contactInstructions>
+                    <gco:CharacterString>Hubungi lewat surel</gco:CharacterString>
+                  </cit:contactInstructions>
+                </cit:CI_Contact>
+              </cit:contactInfo>
+              <cit:individual>
+                <cit:CI_Individual>
+                  <cit:name>
+                    <gco:CharacterString>Andi Wijaya</gco:CharacterString>
+                  </cit:name>
+                  <cit:positionName>
+                    <gco:CharacterString>Petugas Layanan</gco:CharacterString>
+                  </cit:positionName>
+                </cit:CI_Individual>
+              </cit:individual>
+            </cit:CI_Organisation>
+          </cit:party>
+        </cit:CI_Responsibility>
+      </mri:pointOfContact>
+      <mri:spatialRepresentationType>
+        <mcc:MD_SpatialRepresentationTypeCode codeList="standards.iso.org/19115/-3/lan/1.0/codelists.xml#MD_SpatialRepresentationTypeCode" codeListValue="grid">grid</mcc:MD_SpatialRepresentationTypeCode>
+      </mri:spatialRepresentationType>
+      <mri:spatialResolution>
+        <mri:MD_Resolution>
+          <mri:equivalentScale>
+            <mri:MD_RepresentativeFraction>
+              <mri:denominator>
+                <gco:Integer>25000</gco:Integer>
+              </mri:denominator>
+            </mri:MD_RepresentativeFraction>
+          </mri:equivalentScale>
+        </mri:MD_Resolution>
+      </mri:spatialResolution>
+      <mri:spatialResolution>
+        <mri:MD_Resolution>
+          <mri:distance>
+            <gco:Distance uom="m">10</gco:Distance>
+          </mri:distance>
+        </mri:MD_Resolution>
+      </mri:spatialResolution>
+      <mri:topicCategory>
+        <mri:MD_TopicCategoryCode>boundaries</mri:MD_TopicCategoryCode>
+      </mri:topicCategory>
+      <mri:topicCategory>
+        <mri:MD_TopicCategoryCode>location</mri:MD_TopicCategoryCode>
+      </mri:topicCategory>
+      <mri:extent>
+        <gex:EX_Extent>
+          <gex:description>
+            <gco:CharacterString>Wilayah studi: Provinsi Contoh</gco:CharacterString>
+          </gex:description>
+          <gex:geographicElement>
+            <gex:EX_GeographicBoundingBox>
+              <gex:extentTypeCode>
+                <gco:Boolean>true</gco:Boolean>
+              </gex:extentTypeCode>
+              <gex:westBoundLongitude>
+                <gco:Decimal>106.6</gco:Decimal>
+              </gex:westBoundLongitude>
+              <gex:eastBoundLongitude>
+                <gco:Decimal>108.8</gco:Decimal>
+              </gex:eastBoundLongitude>
+              <gex:southBoundLatitude>
+                <gco:Decimal>-7.8</gco:Decimal>
+              </gex:southBoundLatitude>
+              <gex:northBoundLatitude>
+                <gco:Decimal>-5.9</gco:Decimal>
+              </gex:northBoundLatitude>
+            </gex:EX_GeographicBoundingBox>
+          </gex:geographicElement>
+          <gex:geographicElement>
+            <gex:EX_GeographicDescription>
+              <gex:extentTypeCode>
+                <gco:Boolean>true</gco:Boolean>
+              </gex:extentTypeCode>
+              <gex:geographicIdentifier>
+                <mcc:MD_Identifier>
+                  <mcc:code>
+                    <gco:CharacterString>Provinsi Contoh</gco:CharacterString>
+                  </mcc:code>
+                </mcc:MD_Identifier>
+              </gex:geographicIdentifier>
+            </gex:EX_GeographicDescription>
+          </gex:geographicElement>
+          <gex:temporalElement>
+            <gex:EX_TemporalExtent>
+              <gex:extent>
+                <gml:TimePeriod gml:id="TP1">
+                  <gml:beginPosition>2024-01-01</gml:beginPosition>
+                  <gml:endPosition>2025-12-31</gml:endPosition>
+                </gml:TimePeriod>
+              </gex:extent>
+            </gex:EX_TemporalExtent>
+          </gex:temporalElement>
+        </gex:EX_Extent>
+      </mri:extent>
+      <mri:additionalDocumentation>
+        <cit:CI_Citation>
+          <cit:title>
+            <gco:CharacterString>Spesifikasi Teknis Batas Administrasi</gco:CharacterString>
+          </cit:title>
+          <cit:date>
+            <cit:CI_Date>
+              <cit:date>
+                <gco:DateTime>2025-02-01T00:00:00</gco:DateTime>
+              </cit:date>
+              <cit:dateType>
+                <cit:CI_DateTypeCode codeList="standards.iso.org/19115/-3/lan/1.0/codelists.xml#CI_DateTypeCode" codeListValue="publication">publication</cit:CI_DateTypeCode>
+              </cit:dateType>
+            </cit:CI_Date>
+          </cit:date>
+          <cit:onlineResource>
+            <cit:CI_OnlineResource>
+              <cit:linkage>
+                <gco:CharacterString>https://data.example.org/spesifikasi.pdf</gco:CharacterString>
+              </cit:linkage>
+              <cit:protocol>
+                <gco:CharacterString>https</gco:CharacterString>
+              </cit:protocol>
+              <cit:applicationProfile>
+                <gco:CharacterString>Profil Contoh</gco:CharacterString>
+              </cit:applicationProfile>
+              <cit:name>
+                <gco:CharacterString>Spesifikasi</gco:CharacterString>
+              </cit:name>
+              <cit:description>
+                <gco:CharacterString>Dokumen spesifikasi</gco:CharacterString>
+              </cit:description>
+              <cit:function>
+                <cit:CI_OnLineFunctionCode codeList="standards.iso.org/19115/-3/lan/1.0/codelists.xml#CI_OnLineFunctionCode" codeListValue="download">download</cit:CI_OnLineFunctionCode>
+              </cit:function>
+            </cit:CI_OnlineResource>
+          </cit:onlineResource>
+        </cit:CI_Citation>
+      </mri:additionalDocumentation>
+      <mri:resourceMaintenance>
+        <mmi:MD_MaintenanceInformation>
+          <mmi:maintenanceAndUpdateFrequency>
+            <mmi:MD_MaintenanceFrequencyCode codeList="standards.iso.org/19115/-3/lan/1.0/codelists.xml#MD_MaintenanceFrequencyCode" codeListValue="annually">annually</mmi:MD_MaintenanceFrequencyCode>
+          </mmi:maintenanceAndUpdateFrequency>
+          <mmi:maintenanceScope>
+            <mcc:MD_Scope>
+              <mcc:level>
+                <mcc:MD_ScopeCode codeList="standards.iso.org/19115/-3/lan/1.0/codelists.xml#MD_ScopeCode" codeListValue="dataset">dataset</mcc:MD_ScopeCode>
+              </mcc:level>
+            </mcc:MD_Scope>
+          </mmi:maintenanceScope>
+          <mmi:maintenanceNote>
+            <gco:CharacterString>Diperbarui setiap tahun</gco:CharacterString>
+          </mmi:maintenanceNote>
+          <mmi:contact>
+            <cit:CI_Responsibility>
+              <cit:role>
+                <cit:CI_RoleCode codeList="standards.iso.org/19115/-3/lan/1.0/codelists.xml#CI_RoleCode" codeListValue="custodian">custodian</cit:CI_RoleCode>
+              </cit:role>
+              <cit:party>
+                <cit:CI_Organisation>
+                  <cit:name>
+                    <gco:CharacterString>Pusat Data Geospasial Contoh</gco:CharacterString>
+                  </cit:name>
+                  <cit:contactInfo>
+                    <cit:CI_Contact>
+                      <cit:phone>
+                        <cit:CI_Telephone>
+                          <cit:number>
+                            <gco:CharacterString>+62 21 555 0100</gco:CharacterString>
+                          </cit:number>
+                          <cit:numberType>
+                            <cit:CI_TelephoneTypeCode codeList="standards.iso.org/19115/-3/lan/1.0/codelists.xml#CI_TelephoneTypeCode" codeListValue="voice">voice</cit:CI_TelephoneTypeCode>
+                          </cit:numberType>
+                        </cit:CI_Telephone>
+                      </cit:phone>
+                      <cit:phone>
+                        <cit:CI_Telephone>
+                          <cit:number>
+                            <gco:CharacterString>+62 21 555 0101</gco:CharacterString>
+                          </cit:number>
+                          <cit:numberType>
+                            <cit:CI_TelephoneTypeCode codeList="standards.iso.org/19115/-3/lan/1.0/codelists.xml#CI_TelephoneTypeCode" codeListValue="facsimile">facsimile</cit:CI_TelephoneTypeCode>
+                          </cit:numberType>
+                        </cit:CI_Telephone>
+                      </cit:phone>
+                      <cit:address>
+                        <cit:CI_Address>
+                          <cit:deliveryPoint>
+                            <gco:CharacterString>Jl. Contoh No. 1</gco:CharacterString>
+                          </cit:deliveryPoint>
+                          <cit:city>
+                            <gco:CharacterString>Jakarta Pusat</gco:CharacterString>
+                          </cit:city>
+                          <cit:administrativeArea>
+                            <gco:CharacterString>DKI Jakarta</gco:CharacterString>
+                          </cit:administrativeArea>
+                          <cit:postalCode>
+                            <gco:CharacterString>10110</gco:CharacterString>
+                          </cit:postalCode>
+                          <cit:country>
+                            <gco:CharacterString>Indonesia</gco:CharacterString>
+                          </cit:country>
+                          <cit:electronicMailAddress>
+                            <gco:CharacterString>data@example.org</gco:CharacterString>
+                          </cit:electronicMailAddress>
+                        </cit:CI_Address>
+                      </cit:address>
+                      <cit:onlineResource>
+                        <cit:CI_OnlineResource>
+                          <cit:linkage>
+                            <gco:CharacterString>https://www.example.org</gco:CharacterString>
+                          </cit:linkage>
+                          <cit:protocol>
+                            <gco:CharacterString>https</gco:CharacterString>
+                          </cit:protocol>
+                          <cit:applicationProfile>
+                            <gco:CharacterString>Profil Contoh</gco:CharacterString>
+                          </cit:applicationProfile>
+                          <cit:name>
+                            <gco:CharacterString>Situs web</gco:CharacterString>
+                          </cit:name>
+                          <cit:description>
+                            <gco:CharacterString>Situs resmi instansi</gco:CharacterString>
+                          </cit:description>
+                          <cit:function>
+                            <cit:CI_OnLineFunctionCode codeList="standards.iso.org/19115/-3/lan/1.0/codelists.xml#CI_OnLineFunctionCode" codeListValue="information">information</cit:CI_OnLineFunctionCode>
+                          </cit:function>
+                        </cit:CI_OnlineResource>
+                      </cit:onlineResource>
+                      <cit:hoursOfService>
+                        <gco:CharacterString>Senin-Jumat 08:00-16:00 WIB</gco:CharacterString>
+                      </cit:hoursOfService>
+                      <cit:contactInstructions>
+                        <gco:CharacterString>Hubungi lewat surel</gco:CharacterString>
+                      </cit:contactInstructions>
+                    </cit:CI_Contact>
+                  </cit:contactInfo>
+                  <cit:individual>
+                    <cit:CI_Individual>
+                      <cit:name>
+                        <gco:CharacterString>Budi Santoso</gco:CharacterString>
+                      </cit:name>
+                      <cit:positionName>
+                        <gco:CharacterString>Kepala Seksi Data</gco:CharacterString>
+                      </cit:positionName>
+                    </cit:CI_Individual>
+                  </cit:individual>
+                </cit:CI_Organisation>
+              </cit:party>
+            </cit:CI_Responsibility>
+          </mmi:contact>
+        </mmi:MD_MaintenanceInformation>
+      </mri:resourceMaintenance>
+      <mri:graphicOverview>
+        <mcc:MD_BrowseGraphic>
+          <mcc:fileName>
+            <gco:CharacterString>https://data.example.org/thumb.png</gco:CharacterString>
+          </mcc:fileName>
+          <mcc:fileDescription>
+            <gco:CharacterString>Pratinjau batas administrasi</gco:CharacterString>
+          </mcc:fileDescription>
+          <mcc:fileType>
+            <gco:CharacterString>image/png</gco:CharacterString>
+          </mcc:fileType>
+        </mcc:MD_BrowseGraphic>
+      </mri:graphicOverview>
+      <mri:resourceFormat>
+        <mrd:MD_Format>
+          <mrd:formatSpecificationCitation>
+            <cit:CI_Citation>
+              <cit:title>
+                <gco:CharacterString>ESRI Shapefile</gco:CharacterString>
+              </cit:title>
+              <cit:alternateTitle>
+                <gco:CharacterString>SHP</gco:CharacterString>
+              </cit:alternateTitle>
+              <cit:edition>
+                <gco:CharacterString>1998</gco:CharacterString>
+              </cit:edition>
+            </cit:CI_Citation>
+          </mrd:formatSpecificationCitation>
+        </mrd:MD_Format>
+      </mri:resourceFormat>
+      <mri:descriptiveKeywords>
+        <mri:MD_Keywords>
+          <mri:keyword>
+            <gco:CharacterString>batas administrasi</gco:CharacterString>
+          </mri:keyword>
+          <mri:keyword>
+            <gco:CharacterString>kabupaten</gco:CharacterString>
+          </mri:keyword>
+          <mri:keyword>
+            <gco:CharacterString>kota</gco:CharacterString>
+          </mri:keyword>
+          <mri:type>
+            <mri:MD_KeywordTypeCode codeList="standards.iso.org/19115/-3/lan/1.0/codelists.xml#MD_KeywordTypeCode" codeListValue="theme">theme</mri:MD_KeywordTypeCode>
+          </mri:type>
+          <mri:thesaurusName>
+            <cit:CI_Citation>
+              <cit:title>
+                <gco:CharacterString>Tesaurus Contoh</gco:CharacterString>
+              </cit:title>
+              <cit:date>
+                <cit:CI_Date>
+                  <cit:date>
+                    <gco:DateTime>2018-01-01T00:00:00</gco:DateTime>
+                  </cit:date>
+                  <cit:dateType>
+                    <cit:CI_DateTypeCode codeList="standards.iso.org/19115/-3/lan/1.0/codelists.xml#CI_DateTypeCode" codeListValue="publication">publication</cit:CI_DateTypeCode>
+                  </cit:dateType>
+                </cit:CI_Date>
+              </cit:date>
+            </cit:CI_Citation>
+          </mri:thesaurusName>
+        </mri:MD_Keywords>
+      </mri:descriptiveKeywords>
+      <mri:descriptiveKeywords>
+        <mri:MD_Keywords>
+          <mri:keyword>
+            <gco:CharacterString>Jawa</gco:CharacterString>
+          </mri:keyword>
+          <mri:keyword>
+            <gco:CharacterString>Indonesia</gco:CharacterString>
+          </mri:keyword>
+          <mri:type>
+            <mri:MD_KeywordTypeCode codeList="standards.iso.org/19115/-3/lan/1.0/codelists.xml#MD_KeywordTypeCode" codeListValue="place">place</mri:MD_KeywordTypeCode>
+          </mri:type>
+        </mri:MD_Keywords>
+      </mri:descriptiveKeywords>
+      <mri:resourceSpecificUsage>
+        <mri:MD_Usage>
+          <mri:specificUsage>
+            <gco:CharacterString>Dasar penyusunan peta tematik wilayah</gco:CharacterString>
+          </mri:specificUsage>
+          <mri:userDeterminedLimitations>
+            <gco:CharacterString>Tidak untuk keperluan penetapan batas hukum</gco:CharacterString>
+          </mri:userDeterminedLimitations>
+          <mri:userContactInfo>
+            <cit:CI_Responsibility>
+              <cit:role>
+                <cit:CI_RoleCode codeList="standards.iso.org/19115/-3/lan/1.0/codelists.xml#CI_RoleCode" codeListValue="user">user</cit:CI_RoleCode>
+              </cit:role>
+              <cit:party>
+                <cit:CI_Organisation>
+                  <cit:name>
+                    <gco:CharacterString>Dinas Perencanaan Contoh</gco:CharacterString>
+                  </cit:name>
+                  <cit:contactInfo>
+                    <cit:CI_Contact>
+                      <cit:phone>
+                        <cit:CI_Telephone>
+                          <cit:number>
+                            <gco:CharacterString>+62 21 555 0100</gco:CharacterString>
+                          </cit:number>
+                          <cit:numberType>
+                            <cit:CI_TelephoneTypeCode codeList="standards.iso.org/19115/-3/lan/1.0/codelists.xml#CI_TelephoneTypeCode" codeListValue="voice">voice</cit:CI_TelephoneTypeCode>
+                          </cit:numberType>
+                        </cit:CI_Telephone>
+                      </cit:phone>
+                      <cit:phone>
+                        <cit:CI_Telephone>
+                          <cit:number>
+                            <gco:CharacterString>+62 21 555 0101</gco:CharacterString>
+                          </cit:number>
+                          <cit:numberType>
+                            <cit:CI_TelephoneTypeCode codeList="standards.iso.org/19115/-3/lan/1.0/codelists.xml#CI_TelephoneTypeCode" codeListValue="facsimile">facsimile</cit:CI_TelephoneTypeCode>
+                          </cit:numberType>
+                        </cit:CI_Telephone>
+                      </cit:phone>
+                      <cit:address>
+                        <cit:CI_Address>
+                          <cit:deliveryPoint>
+                            <gco:CharacterString>Jl. Contoh No. 1</gco:CharacterString>
+                          </cit:deliveryPoint>
+                          <cit:city>
+                            <gco:CharacterString>Jakarta Pusat</gco:CharacterString>
+                          </cit:city>
+                          <cit:administrativeArea>
+                            <gco:CharacterString>DKI Jakarta</gco:CharacterString>
+                          </cit:administrativeArea>
+                          <cit:postalCode>
+                            <gco:CharacterString>10110</gco:CharacterString>
+                          </cit:postalCode>
+                          <cit:country>
+                            <gco:CharacterString>Indonesia</gco:CharacterString>
+                          </cit:country>
+                          <cit:electronicMailAddress>
+                            <gco:CharacterString>rina@example.org</gco:CharacterString>
+                          </cit:electronicMailAddress>
+                        </cit:CI_Address>
+                      </cit:address>
+                      <cit:onlineResource>
+                        <cit:CI_OnlineResource>
+                          <cit:linkage>
+                            <gco:CharacterString>https://www.example.org</gco:CharacterString>
+                          </cit:linkage>
+                          <cit:protocol>
+                            <gco:CharacterString>https</gco:CharacterString>
+                          </cit:protocol>
+                          <cit:applicationProfile>
+                            <gco:CharacterString>Profil Contoh</gco:CharacterString>
+                          </cit:applicationProfile>
+                          <cit:name>
+                            <gco:CharacterString>Situs web</gco:CharacterString>
+                          </cit:name>
+                          <cit:description>
+                            <gco:CharacterString>Situs resmi instansi</gco:CharacterString>
+                          </cit:description>
+                          <cit:function>
+                            <cit:CI_OnLineFunctionCode codeList="standards.iso.org/19115/-3/lan/1.0/codelists.xml#CI_OnLineFunctionCode" codeListValue="information">information</cit:CI_OnLineFunctionCode>
+                          </cit:function>
+                        </cit:CI_OnlineResource>
+                      </cit:onlineResource>
+                      <cit:hoursOfService>
+                        <gco:CharacterString>Senin-Jumat 08:00-16:00 WIB</gco:CharacterString>
+                      </cit:hoursOfService>
+                      <cit:contactInstructions>
+                        <gco:CharacterString>Hubungi lewat surel</gco:CharacterString>
+                      </cit:contactInstructions>
+                    </cit:CI_Contact>
+                  </cit:contactInfo>
+                  <cit:individual>
+                    <cit:CI_Individual>
+                      <cit:name>
+                        <gco:CharacterString>Rina Putri</gco:CharacterString>
+                      </cit:name>
+                      <cit:positionName>
+                        <gco:CharacterString>Perencana</gco:CharacterString>
+                      </cit:positionName>
+                    </cit:CI_Individual>
+                  </cit:individual>
+                </cit:CI_Organisation>
+              </cit:party>
+            </cit:CI_Responsibility>
+          </mri:userContactInfo>
+        </mri:MD_Usage>
+      </mri:resourceSpecificUsage>
+      <mri:resourceConstraints>
+        <mco:MD_Constraints>
+          <mco:useLimitation>
+            <gco:CharacterString>Gunakan dengan mencantumkan sumber data</gco:CharacterString>
+          </mco:useLimitation>
+        </mco:MD_Constraints>
+      </mri:resourceConstraints>
+      <mri:resourceConstraints>
+        <mco:MD_LegalConstraints>
+          <mco:accessConstraints>
+            <mco:MD_RestrictionCode codeList="standards.iso.org/19115/-3/lan/1.0/codelists.xml#MD_RestrictionCode" codeListValue="otherRestrictions">otherRestrictions</mco:MD_RestrictionCode>
+          </mco:accessConstraints>
+          <mco:useConstraints>
+            <mco:MD_RestrictionCode codeList="standards.iso.org/19115/-3/lan/1.0/codelists.xml#MD_RestrictionCode" codeListValue="license">license</mco:MD_RestrictionCode>
+          </mco:useConstraints>
+          <mco:otherConstraints>
+            <gco:CharacterString>Lisensi CC BY 4.0</gco:CharacterString>
+          </mco:otherConstraints>
+        </mco:MD_LegalConstraints>
+      </mri:resourceConstraints>
+      <mri:resourceConstraints>
+        <mco:MD_SecurityConstraints>
+          <mco:classification>
+            <mco:MD_ClassificationCode codeList="standards.iso.org/19115/-3/lan/1.0/codelists.xml#MD_ClassificationCode" codeListValue="unclassified">unclassified</mco:MD_ClassificationCode>
+          </mco:classification>
+          <mco:userNote>
+            <gco:CharacterString>Data terbuka</gco:CharacterString>
+          </mco:userNote>
+          <mco:classificationSystem>
+            <gco:CharacterString>Klasifikasi Contoh</gco:CharacterString>
+          </mco:classificationSystem>
+          <mco:handlingDescription>
+            <gco:CharacterString>Tidak ada penanganan khusus</gco:CharacterString>
+          </mco:handlingDescription>
+        </mco:MD_SecurityConstraints>
+      </mri:resourceConstraints>
+      <mri:associatedResource>
+        <mri:MD_AssociatedResource>
+          <mri:name>
+            <cit:CI_Citation>
+              <cit:title>
+                <gco:CharacterString>Batas Administrasi Desa (Contoh)</gco:CharacterString>
+              </cit:title>
+            </cit:CI_Citation>
+          </mri:name>
+          <mri:associationType>
+            <mri:DS_AssociationTypeCode codeList="standards.iso.org/19115/-3/lan/1.0/codelists.xml#DS_AssociationTypeCode" codeListValue="crossReference">crossReference</mri:DS_AssociationTypeCode>
+          </mri:associationType>
+        </mri:MD_AssociatedResource>
+      </mri:associatedResource>
+      <mri:defaultLocale>
+        <lan:PT_Locale>
+          <lan:language>
+            <lan:LanguageCode codeList="http://www.loc.gov/standards/iso639-2/php/code_list.php" codeListValue="ind">ind</lan:LanguageCode>
+          </lan:language>
+          <lan:country>
+            <lan:CountryCode codeList="http://www.iso.org/iso/country_codes/iso_3166_code_lists.htm" codeListValue="ID">ID</lan:CountryCode>
+          </lan:country>
+          <lan:characterEncoding>
+            <lan:MD_CharacterSetCode codeList="standards.iso.org/19115/-3/lan/1.0/codelists.xml#MD_CharacterSetCode" codeListValue="utf8">utf8</lan:MD_CharacterSetCode>
+          </lan:characterEncoding>
+        </lan:PT_Locale>
+      </mri:defaultLocale>
+      <mri:otherLocale>
+        <lan:PT_Locale>
+          <lan:language>
+            <lan:LanguageCode codeList="http://www.loc.gov/standards/iso639-2/php/code_list.php" codeListValue="eng">eng</lan:LanguageCode>
+          </lan:language>
+          <lan:country>
+            <lan:CountryCode codeList="http://www.iso.org/iso/country_codes/iso_3166_code_lists.htm" codeListValue="US">US</lan:CountryCode>
+          </lan:country>
+          <lan:characterEncoding>
+            <lan:MD_CharacterSetCode codeList="standards.iso.org/19115/-3/lan/1.0/codelists.xml#MD_CharacterSetCode" codeListValue="utf8">utf8</lan:MD_CharacterSetCode>
+          </lan:characterEncoding>
+        </lan:PT_Locale>
+      </mri:otherLocale>
+      <mri:supplementalInformation>
+        <gco:CharacterString>Koordinat dalam WGS 84; atribut mengikuti kamus data terlampir.</gco:CharacterString>
+      </mri:supplementalInformation>
+    </mri:MD_DataIdentification>
+  </mdb:identificationInfo>
+  <mdb:contentInfo>
+    <mrc:MD_FeatureCatalogueDescription>
+      <mrc:complianceCode>
+        <gco:Boolean>true</gco:Boolean>
+      </mrc:complianceCode>
+      <mrc:includedWithDataset>
+        <gco:Boolean>false</gco:Boolean>
+      </mrc:includedWithDataset>
+      <mrc:featureTypes>
+        <mrc:MD_FeatureTypeInfo>
+          <mrc:featureTypeName>
+            <gco:ScopedName codeSpace="KAB">Kabupaten</gco:ScopedName>
+          </mrc:featureTypeName>
+        </mrc:MD_FeatureTypeInfo>
+      </mrc:featureTypes>
+      <mrc:featureTypes>
+        <mrc:MD_FeatureTypeInfo>
+          <mrc:featureTypeName>
+            <gco:ScopedName codeSpace="KEC">Kecamatan</gco:ScopedName>
+          </mrc:featureTypeName>
+        </mrc:MD_FeatureTypeInfo>
+      </mrc:featureTypes>
+      <mrc:featureCatalogueCitation>
+        <cit:CI_Citation>
+          <cit:title>
+            <gco:CharacterString>Katalog Fitur Batas Administrasi</gco:CharacterString>
+          </cit:title>
+          <cit:alternateTitle>
+            <gco:CharacterString>KF Batas Admin</gco:CharacterString>
+          </cit:alternateTitle>
+          <cit:edition>
+            <gco:CharacterString>1.0</gco:CharacterString>
+          </cit:edition>
+          <cit:citedResponsibleParty>
+            <cit:CI_Responsibility>
+              <cit:role>
+                <cit:CI_RoleCode codeList="standards.iso.org/19115/-3/lan/1.0/codelists.xml#CI_RoleCode" codeListValue="author">author</cit:CI_RoleCode>
+              </cit:role>
+              <cit:party>
+                <cit:CI_Organisation>
+                  <cit:name>
+                    <gco:CharacterString>Pusat Data Geospasial Contoh</gco:CharacterString>
+                  </cit:name>
+                  <cit:contactInfo>
+                    <cit:CI_Contact>
+                      <cit:phone>
+                        <cit:CI_Telephone>
+                          <cit:number>
+                            <gco:CharacterString>+62 21 555 0100</gco:CharacterString>
+                          </cit:number>
+                          <cit:numberType>
+                            <cit:CI_TelephoneTypeCode codeList="standards.iso.org/19115/-3/lan/1.0/codelists.xml#CI_TelephoneTypeCode" codeListValue="voice">voice</cit:CI_TelephoneTypeCode>
+                          </cit:numberType>
+                        </cit:CI_Telephone>
+                      </cit:phone>
+                      <cit:phone>
+                        <cit:CI_Telephone>
+                          <cit:number>
+                            <gco:CharacterString>+62 21 555 0101</gco:CharacterString>
+                          </cit:number>
+                          <cit:numberType>
+                            <cit:CI_TelephoneTypeCode codeList="standards.iso.org/19115/-3/lan/1.0/codelists.xml#CI_TelephoneTypeCode" codeListValue="facsimile">facsimile</cit:CI_TelephoneTypeCode>
+                          </cit:numberType>
+                        </cit:CI_Telephone>
+                      </cit:phone>
+                      <cit:address>
+                        <cit:CI_Address>
+                          <cit:deliveryPoint>
+                            <gco:CharacterString>Jl. Contoh No. 1</gco:CharacterString>
+                          </cit:deliveryPoint>
+                          <cit:city>
+                            <gco:CharacterString>Jakarta Pusat</gco:CharacterString>
+                          </cit:city>
+                          <cit:administrativeArea>
+                            <gco:CharacterString>DKI Jakarta</gco:CharacterString>
+                          </cit:administrativeArea>
+                          <cit:postalCode>
+                            <gco:CharacterString>10110</gco:CharacterString>
+                          </cit:postalCode>
+                          <cit:country>
+                            <gco:CharacterString>Indonesia</gco:CharacterString>
+                          </cit:country>
+                          <cit:electronicMailAddress>
+                            <gco:CharacterString>siti@example.org</gco:CharacterString>
+                          </cit:electronicMailAddress>
+                        </cit:CI_Address>
+                      </cit:address>
+                      <cit:onlineResource>
+                        <cit:CI_OnlineResource>
+                          <cit:linkage>
+                            <gco:CharacterString>https://www.example.org</gco:CharacterString>
+                          </cit:linkage>
+                          <cit:protocol>
+                            <gco:CharacterString>https</gco:CharacterString>
+                          </cit:protocol>
+                          <cit:applicationProfile>
+                            <gco:CharacterString>Profil Contoh</gco:CharacterString>
+                          </cit:applicationProfile>
+                          <cit:name>
+                            <gco:CharacterString>Situs web</gco:CharacterString>
+                          </cit:name>
+                          <cit:description>
+                            <gco:CharacterString>Situs resmi instansi</gco:CharacterString>
+                          </cit:description>
+                          <cit:function>
+                            <cit:CI_OnLineFunctionCode codeList="standards.iso.org/19115/-3/lan/1.0/codelists.xml#CI_OnLineFunctionCode" codeListValue="information">information</cit:CI_OnLineFunctionCode>
+                          </cit:function>
+                        </cit:CI_OnlineResource>
+                      </cit:onlineResource>
+                      <cit:hoursOfService>
+                        <gco:CharacterString>Senin-Jumat 08:00-16:00 WIB</gco:CharacterString>
+                      </cit:hoursOfService>
+                      <cit:contactInstructions>
+                        <gco:CharacterString>Hubungi lewat surel</gco:CharacterString>
+                      </cit:contactInstructions>
+                    </cit:CI_Contact>
+                  </cit:contactInfo>
+                  <cit:individual>
+                    <cit:CI_Individual>
+                      <cit:name>
+                        <gco:CharacterString>Siti Rahma</gco:CharacterString>
+                      </cit:name>
+                      <cit:positionName>
+                        <gco:CharacterString>Analis Data Spasial</gco:CharacterString>
+                      </cit:positionName>
+                    </cit:CI_Individual>
+                  </cit:individual>
+                </cit:CI_Organisation>
+              </cit:party>
+            </cit:CI_Responsibility>
+          </cit:citedResponsibleParty>
+          <cit:onlineResource>
+            <cit:CI_OnlineResource>
+              <cit:linkage>
+                <gco:CharacterString>https://data.example.org/katalog-fitur</gco:CharacterString>
+              </cit:linkage>
+              <cit:protocol>
+                <gco:CharacterString>https</gco:CharacterString>
+              </cit:protocol>
+              <cit:applicationProfile>
+                <gco:CharacterString>Profil Contoh</gco:CharacterString>
+              </cit:applicationProfile>
+              <cit:name>
+                <gco:CharacterString>Katalog fitur</gco:CharacterString>
+              </cit:name>
+              <cit:description>
+                <gco:CharacterString>Katalog fitur daring</gco:CharacterString>
+              </cit:description>
+              <cit:function>
+                <cit:CI_OnLineFunctionCode codeList="standards.iso.org/19115/-3/lan/1.0/codelists.xml#CI_OnLineFunctionCode" codeListValue="information">information</cit:CI_OnLineFunctionCode>
+              </cit:function>
+            </cit:CI_OnlineResource>
+          </cit:onlineResource>
+        </cit:CI_Citation>
+      </mrc:featureCatalogueCitation>
+    </mrc:MD_FeatureCatalogueDescription>
+  </mdb:contentInfo>
+  <mdb:contentInfo>
+    <mrc:MD_ImageDescription>
+      <mrc:attributeDescription>
+        <gco:RecordType>Pantulan permukaan</gco:RecordType>
+      </mrc:attributeDescription>
+      <mrc:processingLevelCode>
+        <mcc:MD_Identifier>
+          <mcc:code>
+            <gco:CharacterString>L2A</gco:CharacterString>
+          </mcc:code>
+          <mcc:codeSpace>
+            <gco:CharacterString>contoh</gco:CharacterString>
+          </mcc:codeSpace>
+          <mcc:description>
+            <gco:CharacterString>Reflektansi permukaan</gco:CharacterString>
+          </mcc:description>
+        </mcc:MD_Identifier>
+      </mrc:processingLevelCode>
+      <mrc:attributeGroup>
+        <mrc:MD_AttributeGroup>
+          <mrc:contentType>
+            <mrc:MD_CoverageContentTypeCode codeList="standards.iso.org/19115/-3/lan/1.0/codelists.xml#MD_CoverageContentTypeCode" codeListValue="physicalMeasurement">physicalMeasurement</mrc:MD_CoverageContentTypeCode>
+          </mrc:contentType>
+          <mrc:attribute>
+            <mrc:MD_Band>
+              <mrc:sequenceIdentifier>
+                <gco:MemberName>
+                  <gco:aName>
+                    <gco:CharacterString>B1</gco:CharacterString>
+                  </gco:aName>
+                  <gco:attributeType>
+                    <gco:TypeName>
+                      <gco:aName>
+                        <gco:CharacterString>integer</gco:CharacterString>
+                      </gco:aName>
+                    </gco:TypeName>
+                  </gco:attributeType>
+                </gco:MemberName>
+              </mrc:sequenceIdentifier>
+              <mrc:description>
+                <gco:CharacterString>Pita 1 (contoh)</gco:CharacterString>
+              </mrc:description>
+              <mrc:name>
+                <mcc:MD_Identifier>
+                  <mcc:authority>
+                    <cit:CI_Citation>
+                      <cit:title>
+                        <gco:CharacterString>Sensor Contoh</gco:CharacterString>
+                      </cit:title>
+                    </cit:CI_Citation>
+                  </mcc:authority>
+                  <mcc:code>
+                    <gco:CharacterString>BAND1</gco:CharacterString>
+                  </mcc:code>
+                  <mcc:codeSpace>
+                    <gco:CharacterString>contoh</gco:CharacterString>
+                  </mcc:codeSpace>
+                </mcc:MD_Identifier>
+              </mrc:name>
+              <mrc:maxValue>
+                <gco:Real>255</gco:Real>
+              </mrc:maxValue>
+              <mrc:minValue>
+                <gco:Real>0</gco:Real>
+              </mrc:minValue>
+              <mrc:scaleFactor>
+                <gco:Real>1</gco:Real>
+              </mrc:scaleFactor>
+              <mrc:bitsPerValue>
+                <gco:Integer>8</gco:Integer>
+              </mrc:bitsPerValue>
+              <mrc:rangeElementDescription>
+                <mrc:MI_RangeElementDescription>
+                  <mrc:name>
+                    <gco:CharacterString>Air</gco:CharacterString>
+                  </mrc:name>
+                  <mrc:definition>
+                    <gco:CharacterString>Piksel perairan</gco:CharacterString>
+                  </mrc:definition>
+                  <mrc:rangeElement>
+                    <gco:Record>0-20</gco:Record>
+                  </mrc:rangeElement>
+                </mrc:MI_RangeElementDescription>
+              </mrc:rangeElementDescription>
+              <mrc:boundMax>
+                <gco:Real>690</gco:Real>
+              </mrc:boundMax>
+              <mrc:boundMin>
+                <gco:Real>630</gco:Real>
+              </mrc:boundMin>
+              <mrc:peakResponse>
+                <gco:Real>660</gco:Real>
+              </mrc:peakResponse>
+              <mrc:toneGradation>
+                <gco:Integer>256</gco:Integer>
+              </mrc:toneGradation>
+            </mrc:MD_Band>
+          </mrc:attribute>
+        </mrc:MD_AttributeGroup>
+      </mrc:attributeGroup>
+      <mrc:illuminationElevationAngle>
+        <gco:Real>55.2</gco:Real>
+      </mrc:illuminationElevationAngle>
+      <mrc:illuminationAzimuthAngle>
+        <gco:Real>130.4</gco:Real>
+      </mrc:illuminationAzimuthAngle>
+      <mrc:imagingCondition>
+        <mrc:MD_ImagingConditionCode codeList="standards.iso.org/19115/-3/lan/1.0/codelists.xml#MD_ImagingConditionCode" codeListValue="cloud">cloud</mrc:MD_ImagingConditionCode>
+      </mrc:imagingCondition>
+      <mrc:imageQualityCode>
+        <mcc:MD_Identifier>
+          <mcc:authority>
+            <cit:CI_Citation>
+              <cit:title>
+                <gco:CharacterString>Kontrol Kualitas Contoh</gco:CharacterString>
+              </cit:title>
+            </cit:CI_Citation>
+          </mcc:authority>
+          <mcc:code>
+            <gco:CharacterString>Q1</gco:CharacterString>
+          </mcc:code>
+          <mcc:codeSpace>
+            <gco:CharacterString>contoh</gco:CharacterString>
+          </mcc:codeSpace>
+        </mcc:MD_Identifier>
+      </mrc:imageQualityCode>
+      <mrc:cloudCoverPercentage>
+        <gco:Real>12.5</gco:Real>
+      </mrc:cloudCoverPercentage>
+      <mrc:compressionGenerationQuantity>
+        <gco:Integer>1</gco:Integer>
+      </mrc:compressionGenerationQuantity>
+      <mrc:triangulationIndicator>
+        <gco:Boolean>true</gco:Boolean>
+      </mrc:triangulationIndicator>
+      <mrc:radiometricCalibrationDataAvailability>
+        <gco:Boolean>true</gco:Boolean>
+      </mrc:radiometricCalibrationDataAvailability>
+      <mrc:cameraCalibrationInformationAvailability>
+        <gco:Boolean>false</gco:Boolean>
+      </mrc:cameraCalibrationInformationAvailability>
+      <mrc:filmDistortionInformationAvailability>
+        <gco:Boolean>false</gco:Boolean>
+      </mrc:filmDistortionInformationAvailability>
+      <mrc:lensDistortionInformationAvailability>
+        <gco:Boolean>false</gco:Boolean>
+      </mrc:lensDistortionInformationAvailability>
+    </mrc:MD_ImageDescription>
+  </mdb:contentInfo>
+  <mdb:distributionInfo>
+    <mrd:MD_Distribution>
+      <mrd:description>
+        <gco:CharacterString>Distribusi lewat portal data</gco:CharacterString>
+      </mrd:description>
+      <mrd:distributionFormat>
+        <mrd:MD_Format>
+          <mrd:formatSpecificationCitation>
+            <cit:CI_Citation>
+              <cit:title>
+                <gco:CharacterString>GeoPackage</gco:CharacterString>
+              </cit:title>
+              <cit:alternateTitle>
+                <gco:CharacterString>OGC GeoPackage</gco:CharacterString>
+              </cit:alternateTitle>
+              <cit:edition>
+                <gco:CharacterString>1.3</gco:CharacterString>
+              </cit:edition>
+            </cit:CI_Citation>
+          </mrd:formatSpecificationCitation>
+        </mrd:MD_Format>
+      </mrd:distributionFormat>
+      <mrd:distributor>
+        <mrd:MD_Distributor>
+          <mrd:distributorContact>
+            <cit:CI_Responsibility>
+              <cit:role>
+                <cit:CI_RoleCode codeList="standards.iso.org/19115/-3/lan/1.0/codelists.xml#CI_RoleCode" codeListValue="distributor">distributor</cit:CI_RoleCode>
+              </cit:role>
+              <cit:party>
+                <cit:CI_Organisation>
+                  <cit:name>
+                    <gco:CharacterString>Unit Layanan Data Contoh</gco:CharacterString>
+                  </cit:name>
+                  <cit:contactInfo>
+                    <cit:CI_Contact>
+                      <cit:phone>
+                        <cit:CI_Telephone>
+                          <cit:number>
+                            <gco:CharacterString>+62 21 555 0100</gco:CharacterString>
+                          </cit:number>
+                          <cit:numberType>
+                            <cit:CI_TelephoneTypeCode codeList="standards.iso.org/19115/-3/lan/1.0/codelists.xml#CI_TelephoneTypeCode" codeListValue="voice">voice</cit:CI_TelephoneTypeCode>
+                          </cit:numberType>
+                        </cit:CI_Telephone>
+                      </cit:phone>
+                      <cit:phone>
+                        <cit:CI_Telephone>
+                          <cit:number>
+                            <gco:CharacterString>+62 21 555 0101</gco:CharacterString>
+                          </cit:number>
+                          <cit:numberType>
+                            <cit:CI_TelephoneTypeCode codeList="standards.iso.org/19115/-3/lan/1.0/codelists.xml#CI_TelephoneTypeCode" codeListValue="facsimile">facsimile</cit:CI_TelephoneTypeCode>
+                          </cit:numberType>
+                        </cit:CI_Telephone>
+                      </cit:phone>
+                      <cit:address>
+                        <cit:CI_Address>
+                          <cit:deliveryPoint>
+                            <gco:CharacterString>Jl. Contoh No. 1</gco:CharacterString>
+                          </cit:deliveryPoint>
+                          <cit:city>
+                            <gco:CharacterString>Jakarta Pusat</gco:CharacterString>
+                          </cit:city>
+                          <cit:administrativeArea>
+                            <gco:CharacterString>DKI Jakarta</gco:CharacterString>
+                          </cit:administrativeArea>
+                          <cit:postalCode>
+                            <gco:CharacterString>10110</gco:CharacterString>
+                          </cit:postalCode>
+                          <cit:country>
+                            <gco:CharacterString>Indonesia</gco:CharacterString>
+                          </cit:country>
+                          <cit:electronicMailAddress>
+                            <gco:CharacterString>layanan@example.org</gco:CharacterString>
+                          </cit:electronicMailAddress>
+                        </cit:CI_Address>
+                      </cit:address>
+                      <cit:onlineResource>
+                        <cit:CI_OnlineResource>
+                          <cit:linkage>
+                            <gco:CharacterString>https://www.example.org</gco:CharacterString>
+                          </cit:linkage>
+                          <cit:protocol>
+                            <gco:CharacterString>https</gco:CharacterString>
+                          </cit:protocol>
+                          <cit:applicationProfile>
+                            <gco:CharacterString>Profil Contoh</gco:CharacterString>
+                          </cit:applicationProfile>
+                          <cit:name>
+                            <gco:CharacterString>Situs web</gco:CharacterString>
+                          </cit:name>
+                          <cit:description>
+                            <gco:CharacterString>Situs resmi instansi</gco:CharacterString>
+                          </cit:description>
+                          <cit:function>
+                            <cit:CI_OnLineFunctionCode codeList="standards.iso.org/19115/-3/lan/1.0/codelists.xml#CI_OnLineFunctionCode" codeListValue="information">information</cit:CI_OnLineFunctionCode>
+                          </cit:function>
+                        </cit:CI_OnlineResource>
+                      </cit:onlineResource>
+                      <cit:hoursOfService>
+                        <gco:CharacterString>Senin-Jumat 08:00-16:00 WIB</gco:CharacterString>
+                      </cit:hoursOfService>
+                      <cit:contactInstructions>
+                        <gco:CharacterString>Hubungi lewat surel</gco:CharacterString>
+                      </cit:contactInstructions>
+                    </cit:CI_Contact>
+                  </cit:contactInfo>
+                  <cit:individual>
+                    <cit:CI_Individual>
+                      <cit:name>
+                        <gco:CharacterString>Andi Wijaya</gco:CharacterString>
+                      </cit:name>
+                      <cit:positionName>
+                        <gco:CharacterString>Petugas Layanan</gco:CharacterString>
+                      </cit:positionName>
+                    </cit:CI_Individual>
+                  </cit:individual>
+                </cit:CI_Organisation>
+              </cit:party>
+            </cit:CI_Responsibility>
+          </mrd:distributorContact>
+        </mrd:MD_Distributor>
+      </mrd:distributor>
+      <mrd:transferOptions>
+        <mrd:MD_DigitalTransferOptions>
+          <mrd:unitsOfDistribution>
+            <gco:CharacterString>Per dataset</gco:CharacterString>
+          </mrd:unitsOfDistribution>
+          <mrd:transferSize>
+            <gco:Real>48.5</gco:Real>
+          </mrd:transferSize>
+          <mrd:onLine>
+            <cit:CI_OnlineResource>
+              <cit:linkage>
+                <gco:CharacterString>https://data.example.org/unduh/batas-admin.zip</gco:CharacterString>
+              </cit:linkage>
+              <cit:protocol>
+                <gco:CharacterString>https</gco:CharacterString>
+              </cit:protocol>
+              <cit:applicationProfile>
+                <gco:CharacterString>Profil Contoh</gco:CharacterString>
+              </cit:applicationProfile>
+              <cit:name>
+                <gco:CharacterString>Unduh Shapefile</gco:CharacterString>
+              </cit:name>
+              <cit:description>
+                <gco:CharacterString>Berkas ZIP</gco:CharacterString>
+              </cit:description>
+              <cit:function>
+                <cit:CI_OnLineFunctionCode codeList="standards.iso.org/19115/-3/lan/1.0/codelists.xml#CI_OnLineFunctionCode" codeListValue="download">download</cit:CI_OnLineFunctionCode>
+              </cit:function>
+            </cit:CI_OnlineResource>
+          </mrd:onLine>
+          <mrd:onLine>
+            <cit:CI_OnlineResource>
+              <cit:linkage>
+                <gco:CharacterString>https://data.example.org/wms</gco:CharacterString>
+              </cit:linkage>
+              <cit:protocol>
+                <gco:CharacterString>OGC:WMS</gco:CharacterString>
+              </cit:protocol>
+              <cit:applicationProfile>
+                <gco:CharacterString>Profil Contoh</gco:CharacterString>
+              </cit:applicationProfile>
+              <cit:name>
+                <gco:CharacterString>batas_admin</gco:CharacterString>
+              </cit:name>
+              <cit:description>
+                <gco:CharacterString>Layanan peta WMS</gco:CharacterString>
+              </cit:description>
+              <cit:function>
+                <cit:CI_OnLineFunctionCode codeList="standards.iso.org/19115/-3/lan/1.0/codelists.xml#CI_OnLineFunctionCode" codeListValue="browsing">browsing</cit:CI_OnLineFunctionCode>
+              </cit:function>
+            </cit:CI_OnlineResource>
+          </mrd:onLine>
+        </mrd:MD_DigitalTransferOptions>
+      </mrd:transferOptions>
+    </mrd:MD_Distribution>
+  </mdb:distributionInfo>
+  <mdb:dataQualityInfo>
+    <mdq:DQ_DataQuality>
+      <mdq:scope>
+        <mcc:MD_Scope>
+          <mcc:level>
+            <mcc:MD_ScopeCode codeList="standards.iso.org/19115/-3/lan/1.0/codelists.xml#MD_ScopeCode" codeListValue="dataset">dataset</mcc:MD_ScopeCode>
+          </mcc:level>
+        </mcc:MD_Scope>
+      </mdq:scope>
+      <mdq:report>
+        <mdq:DQ_DomainConsistency>
+          <mdq:measure>
+            <mdq:DQ_MeasureReference>
+              <mdq:nameOfMeasure>
+                <gco:CharacterString>Kesesuaian skema atribut</gco:CharacterString>
+              </mdq:nameOfMeasure>
+              <mdq:measureDescription>
+                <gco:CharacterString>Persentase atribut sesuai kamus data</gco:CharacterString>
+              </mdq:measureDescription>
+            </mdq:DQ_MeasureReference>
+          </mdq:measure>
+          <mdq:evaluationMethod>
+            <mdq:DQ_EvaluationMethod>
+              <mdq:evaluationMethodDescription>
+                <gco:CharacterString>Pemeriksaan otomatis terhadap skema</gco:CharacterString>
+              </mdq:evaluationMethodDescription>
+              <mdq:evaluationMethodType>
+                <mdq:DQ_EvaluationMethodTypeCode codeList="standards.iso.org/19115/-3/lan/1.0/codelists.xml#DQ_EvaluationMethodTypeCode" codeListValue="directInternal">directInternal</mdq:DQ_EvaluationMethodTypeCode>
+              </mdq:evaluationMethodType>
+            </mdq:DQ_EvaluationMethod>
+          </mdq:evaluationMethod>
+          <mdq:result>
+            <mdq:DQ_ConformanceResult>
+              <mdq:dateTime>
+                <gco:DateTime>2026-10-10T10:00:00</gco:DateTime>
+              </mdq:dateTime>
+              <mdq:resultScope>
+                <mcc:MD_Scope>
+                  <mcc:level>
+                    <mcc:MD_ScopeCode codeList="standards.iso.org/19115/-3/lan/1.0/codelists.xml#MD_ScopeCode" codeListValue="dataset">dataset</mcc:MD_ScopeCode>
+                  </mcc:level>
+                </mcc:MD_Scope>
+              </mdq:resultScope>
+              <mdq:specification>
+                <cit:CI_Citation>
+                  <cit:title>
+                    <gco:CharacterString>Spesifikasi Teknis Batas Administrasi</gco:CharacterString>
+                  </cit:title>
+                  <cit:alternateTitle>
+                    <gco:CharacterString>Spek Batas Admin</gco:CharacterString>
+                  </cit:alternateTitle>
+                  <cit:date>
+                    <cit:CI_Date>
+                      <cit:date>
+                        <gco:DateTime>2025-02-01T00:00:00</gco:DateTime>
+                      </cit:date>
+                      <cit:dateType>
+                        <cit:CI_DateTypeCode codeList="standards.iso.org/19115/-3/lan/1.0/codelists.xml#CI_DateTypeCode" codeListValue="publication">publication</cit:CI_DateTypeCode>
+                      </cit:dateType>
+                    </cit:CI_Date>
+                  </cit:date>
+                </cit:CI_Citation>
+              </mdq:specification>
+              <mdq:explanation>
+                <gco:CharacterString>Seluruh atribut sesuai spesifikasi</gco:CharacterString>
+              </mdq:explanation>
+              <mdq:pass>
+                <gco:Boolean>true</gco:Boolean>
+              </mdq:pass>
+            </mdq:DQ_ConformanceResult>
+          </mdq:result>
+        </mdq:DQ_DomainConsistency>
+      </mdq:report>
+    </mdq:DQ_DataQuality>
+  </mdb:dataQualityInfo>
+  <mdb:resourceLineage>
+    <mrl:LI_Lineage>
+      <mrl:statement>
+        <gco:CharacterString>Digitasi batas dari citra satelit lalu diverifikasi dengan survei lapangan.</gco:CharacterString>
+      </mrl:statement>
+      <mrl:scope>
+        <mcc:MD_Scope>
+          <mcc:level>
+            <mcc:MD_ScopeCode codeList="standards.iso.org/19115/-3/lan/1.0/codelists.xml#MD_ScopeCode" codeListValue="dataset">dataset</mcc:MD_ScopeCode>
+          </mcc:level>
+        </mcc:MD_Scope>
+      </mrl:scope>
+      <mrl:source>
+        <mrl:LI_Source>
+          <mrl:description>
+            <gco:CharacterString>Citra satelit resolusi tinggi tahun 2024</gco:CharacterString>
+          </mrl:description>
+          <mrl:sourceSpatialResolution>
+            <mri:MD_Resolution>
+              <mri:distance>
+                <gco:Distance uom="m">10</gco:Distance>
+              </mri:distance>
+            </mri:MD_Resolution>
+          </mrl:sourceSpatialResolution>
+          <mrl:sourceReferenceSystem>
+            <mrs:MD_ReferenceSystem>
+              <mrs:referenceSystemIdentifier>
+                <mcc:MD_Identifier>
+                  <mcc:code>
+                    <gco:CharacterString>4326</gco:CharacterString>
+                  </mcc:code>
+                  <mcc:codeSpace>
+                    <gco:CharacterString>EPSG</gco:CharacterString>
+                  </mcc:codeSpace>
+                </mcc:MD_Identifier>
+              </mrs:referenceSystemIdentifier>
+            </mrs:MD_ReferenceSystem>
+          </mrl:sourceReferenceSystem>
+          <mrl:sourceCitation>
+            <cit:CI_Citation>
+              <cit:title>
+                <gco:CharacterString>Citra Satelit Contoh</gco:CharacterString>
+              </cit:title>
+              <cit:date>
+                <cit:CI_Date>
+                  <cit:date>
+                    <gco:DateTime>2024-06-01T00:00:00</gco:DateTime>
+                  </cit:date>
+                  <cit:dateType>
+                    <cit:CI_DateTypeCode codeList="standards.iso.org/19115/-3/lan/1.0/codelists.xml#CI_DateTypeCode" codeListValue="creation">creation</cit:CI_DateTypeCode>
+                  </cit:dateType>
+                </cit:CI_Date>
+              </cit:date>
+            </cit:CI_Citation>
+          </mrl:sourceCitation>
+          <mrl:sourceMetadata>
+            <cit:CI_Citation>
+              <cit:title>
+                <gco:CharacterString>Metadata Citra Satelit Contoh</gco:CharacterString>
+              </cit:title>
+            </cit:CI_Citation>
+          </mrl:sourceMetadata>
+          <mrl:scope>
+            <mcc:MD_Scope>
+              <mcc:level>
+                <mcc:MD_ScopeCode codeList="standards.iso.org/19115/-3/lan/1.0/codelists.xml#MD_ScopeCode" codeListValue="dataset">dataset</mcc:MD_ScopeCode>
+              </mcc:level>
+            </mcc:MD_Scope>
+          </mrl:scope>
+        </mrl:LI_Source>
+      </mrl:source>
+      <mrl:processStep>
+        <mrl:LE_ProcessStep>
+          <mrl:description>
+            <gco:CharacterString>Digitasi batas administrasi</gco:CharacterString>
+          </mrl:description>
+          <mrl:rationale>
+            <gco:CharacterString>Pembaruan batas sesuai peraturan terbaru</gco:CharacterString>
+          </mrl:rationale>
+          <mrl:stepDateTime>
+            <gml:TimeInstant gml:id="STEP1">
+              <gml:timePosition>2025-02-20T08:00:00</gml:timePosition>
+            </gml:TimeInstant>
+          </mrl:stepDateTime>
+          <mrl:processor>
+            <cit:CI_Responsibility>
+              <cit:role>
+                <cit:CI_RoleCode codeList="standards.iso.org/19115/-3/lan/1.0/codelists.xml#CI_RoleCode" codeListValue="processor">processor</cit:CI_RoleCode>
+              </cit:role>
+              <cit:party>
+                <cit:CI_Organisation>
+                  <cit:name>
+                    <gco:CharacterString>Pusat Data Geospasial Contoh</gco:CharacterString>
+                  </cit:name>
+                  <cit:contactInfo>
+                    <cit:CI_Contact>
+                      <cit:phone>
+                        <cit:CI_Telephone>
+                          <cit:number>
+                            <gco:CharacterString>+62 21 555 0100</gco:CharacterString>
+                          </cit:number>
+                          <cit:numberType>
+                            <cit:CI_TelephoneTypeCode codeList="standards.iso.org/19115/-3/lan/1.0/codelists.xml#CI_TelephoneTypeCode" codeListValue="voice">voice</cit:CI_TelephoneTypeCode>
+                          </cit:numberType>
+                        </cit:CI_Telephone>
+                      </cit:phone>
+                      <cit:phone>
+                        <cit:CI_Telephone>
+                          <cit:number>
+                            <gco:CharacterString>+62 21 555 0101</gco:CharacterString>
+                          </cit:number>
+                          <cit:numberType>
+                            <cit:CI_TelephoneTypeCode codeList="standards.iso.org/19115/-3/lan/1.0/codelists.xml#CI_TelephoneTypeCode" codeListValue="facsimile">facsimile</cit:CI_TelephoneTypeCode>
+                          </cit:numberType>
+                        </cit:CI_Telephone>
+                      </cit:phone>
+                      <cit:address>
+                        <cit:CI_Address>
+                          <cit:deliveryPoint>
+                            <gco:CharacterString>Jl. Contoh No. 1</gco:CharacterString>
+                          </cit:deliveryPoint>
+                          <cit:city>
+                            <gco:CharacterString>Jakarta Pusat</gco:CharacterString>
+                          </cit:city>
+                          <cit:administrativeArea>
+                            <gco:CharacterString>DKI Jakarta</gco:CharacterString>
+                          </cit:administrativeArea>
+                          <cit:postalCode>
+                            <gco:CharacterString>10110</gco:CharacterString>
+                          </cit:postalCode>
+                          <cit:country>
+                            <gco:CharacterString>Indonesia</gco:CharacterString>
+                          </cit:country>
+                          <cit:electronicMailAddress>
+                            <gco:CharacterString>siti@example.org</gco:CharacterString>
+                          </cit:electronicMailAddress>
+                        </cit:CI_Address>
+                      </cit:address>
+                      <cit:onlineResource>
+                        <cit:CI_OnlineResource>
+                          <cit:linkage>
+                            <gco:CharacterString>https://www.example.org</gco:CharacterString>
+                          </cit:linkage>
+                          <cit:protocol>
+                            <gco:CharacterString>https</gco:CharacterString>
+                          </cit:protocol>
+                          <cit:applicationProfile>
+                            <gco:CharacterString>Profil Contoh</gco:CharacterString>
+                          </cit:applicationProfile>
+                          <cit:name>
+                            <gco:CharacterString>Situs web</gco:CharacterString>
+                          </cit:name>
+                          <cit:description>
+                            <gco:CharacterString>Situs resmi instansi</gco:CharacterString>
+                          </cit:description>
+                          <cit:function>
+                            <cit:CI_OnLineFunctionCode codeList="standards.iso.org/19115/-3/lan/1.0/codelists.xml#CI_OnLineFunctionCode" codeListValue="information">information</cit:CI_OnLineFunctionCode>
+                          </cit:function>
+                        </cit:CI_OnlineResource>
+                      </cit:onlineResource>
+                      <cit:hoursOfService>
+                        <gco:CharacterString>Senin-Jumat 08:00-16:00 WIB</gco:CharacterString>
+                      </cit:hoursOfService>
+                      <cit:contactInstructions>
+                        <gco:CharacterString>Hubungi lewat surel</gco:CharacterString>
+                      </cit:contactInstructions>
+                    </cit:CI_Contact>
+                  </cit:contactInfo>
+                  <cit:individual>
+                    <cit:CI_Individual>
+                      <cit:name>
+                        <gco:CharacterString>Siti Rahma</gco:CharacterString>
+                      </cit:name>
+                      <cit:positionName>
+                        <gco:CharacterString>Analis Data Spasial</gco:CharacterString>
+                      </cit:positionName>
+                    </cit:CI_Individual>
+                  </cit:individual>
+                </cit:CI_Organisation>
+              </cit:party>
+            </cit:CI_Responsibility>
+          </mrl:processor>
+          <mrl:reference>
+            <cit:CI_Citation>
+              <cit:title>
+                <gco:CharacterString>SOP Digitasi Contoh</gco:CharacterString>
+              </cit:title>
+            </cit:CI_Citation>
+          </mrl:reference>
+          <mrl:scope>
+            <mcc:MD_Scope>
+              <mcc:level>
+                <mcc:MD_ScopeCode codeList="standards.iso.org/19115/-3/lan/1.0/codelists.xml#MD_ScopeCode" codeListValue="dataset">dataset</mcc:MD_ScopeCode>
+              </mcc:level>
+            </mcc:MD_Scope>
+          </mrl:scope>
+          <mrl:source>
+            <mrl:LI_Source>
+              <mrl:description>
+                <gco:CharacterString>Citra satelit resolusi tinggi tahun 2024</gco:CharacterString>
+              </mrl:description>
+              <mrl:sourceSpatialResolution>
+                <mri:MD_Resolution>
+                  <mri:distance>
+                    <gco:Distance uom="m">10</gco:Distance>
+                  </mri:distance>
+                </mri:MD_Resolution>
+              </mrl:sourceSpatialResolution>
+              <mrl:sourceReferenceSystem>
+                <mrs:MD_ReferenceSystem>
+                  <mrs:referenceSystemIdentifier>
+                    <mcc:MD_Identifier>
+                      <mcc:code>
+                        <gco:CharacterString>4326</gco:CharacterString>
+                      </mcc:code>
+                      <mcc:codeSpace>
+                        <gco:CharacterString>EPSG</gco:CharacterString>
+                      </mcc:codeSpace>
+                    </mcc:MD_Identifier>
+                  </mrs:referenceSystemIdentifier>
+                </mrs:MD_ReferenceSystem>
+              </mrl:sourceReferenceSystem>
+              <mrl:sourceCitation>
+                <cit:CI_Citation>
+                  <cit:title>
+                    <gco:CharacterString>Citra Satelit Contoh</gco:CharacterString>
+                  </cit:title>
+                  <cit:date>
+                    <cit:CI_Date>
+                      <cit:date>
+                        <gco:DateTime>2024-06-01T00:00:00</gco:DateTime>
+                      </cit:date>
+                      <cit:dateType>
+                        <cit:CI_DateTypeCode codeList="standards.iso.org/19115/-3/lan/1.0/codelists.xml#CI_DateTypeCode" codeListValue="creation">creation</cit:CI_DateTypeCode>
+                      </cit:dateType>
+                    </cit:CI_Date>
+                  </cit:date>
+                </cit:CI_Citation>
+              </mrl:sourceCitation>
+              <mrl:sourceMetadata>
+                <cit:CI_Citation>
+                  <cit:title>
+                    <gco:CharacterString>Metadata Citra Satelit Contoh</gco:CharacterString>
+                  </cit:title>
+                </cit:CI_Citation>
+              </mrl:sourceMetadata>
+              <mrl:scope>
+                <mcc:MD_Scope>
+                  <mcc:level>
+                    <mcc:MD_ScopeCode codeList="standards.iso.org/19115/-3/lan/1.0/codelists.xml#MD_ScopeCode" codeListValue="dataset">dataset</mcc:MD_ScopeCode>
+                  </mcc:level>
+                </mcc:MD_Scope>
+              </mrl:scope>
+            </mrl:LI_Source>
+          </mrl:source>
+          <mrl:processingInformation>
+            <mrl:LE_Processing>
+              <mrl:algorithm>
+                <mrl:LE_Algorithm>
+                  <mrl:citation>
+                    <cit:CI_Citation>
+                      <cit:title>
+                        <gco:CharacterString>Algoritma Digitasi Contoh</gco:CharacterString>
+                      </cit:title>
+                    </cit:CI_Citation>
+                  </mrl:citation>
+                  <mrl:description>
+                    <gco:CharacterString>Digitasi manual dengan koreksi topologi</gco:CharacterString>
+                  </mrl:description>
+                </mrl:LE_Algorithm>
+              </mrl:algorithm>
+              <mrl:identifier>
+                <mcc:MD_Identifier>
+                  <mcc:code>
+                    <gco:CharacterString>PROC-01</gco:CharacterString>
+                  </mcc:code>
+                  <mcc:codeSpace>
+                    <gco:CharacterString>contoh</gco:CharacterString>
+                  </mcc:codeSpace>
+                </mcc:MD_Identifier>
+              </mrl:identifier>
+              <mrl:softwareReference>
+                <cit:CI_Citation>
+                  <cit:title>
+                    <gco:CharacterString>QGIS 3.34</gco:CharacterString>
+                  </cit:title>
+                </cit:CI_Citation>
+              </mrl:softwareReference>
+              <mrl:procedureDescription>
+                <gco:CharacterString>Digitasi, koreksi topologi, validasi atribut</gco:CharacterString>
+              </mrl:procedureDescription>
+              <mrl:documentation>
+                <cit:CI_Citation>
+                  <cit:title>
+                    <gco:CharacterString>SOP Digitasi Contoh</gco:CharacterString>
+                  </cit:title>
+                </cit:CI_Citation>
+              </mrl:documentation>
+              <mrl:runTimeParameters>
+                <gco:CharacterString>skala=1:25000</gco:CharacterString>
+              </mrl:runTimeParameters>
+              <mrl:parameter>
+                <mrl:LE_ProcessParameter>
+                  <mrl:name>
+                    <gco:MemberName>
+                      <gco:aName>
+                        <gco:CharacterString>toleransi</gco:CharacterString>
+                      </gco:aName>
+                      <gco:attributeType>
+                        <gco:TypeName>
+                          <gco:aName>
+                            <gco:CharacterString>real</gco:CharacterString>
+                          </gco:aName>
+                        </gco:TypeName>
+                      </gco:attributeType>
+                    </gco:MemberName>
+                  </mrl:name>
+                  <mrl:direction>
+                    <mrl:LE_ParameterDirection>in</mrl:LE_ParameterDirection>
+                  </mrl:direction>
+                  <mrl:description>
+                    <gco:CharacterString>Toleransi snapping</gco:CharacterString>
+                  </mrl:description>
+                  <mrl:optionality>
+                    <gco:Boolean>true</gco:Boolean>
+                  </mrl:optionality>
+                  <mrl:repeatability>
+                    <gco:Boolean>false</gco:Boolean>
+                  </mrl:repeatability>
+                  <mrl:value>
+                    <gco:Record>0.5</gco:Record>
+                  </mrl:value>
+                </mrl:LE_ProcessParameter>
+              </mrl:parameter>
+            </mrl:LE_Processing>
+          </mrl:processingInformation>
+          <mrl:report>
+            <mrl:LE_ProcessStepReport>
+              <mrl:name>
+                <gco:CharacterString>Laporan digitasi</gco:CharacterString>
+              </mrl:name>
+              <mrl:description>
+                <gco:CharacterString>Ringkasan hasil digitasi</gco:CharacterString>
+              </mrl:description>
+              <mrl:fileType>
+                <gco:CharacterString>application/pdf</gco:CharacterString>
+              </mrl:fileType>
+            </mrl:LE_ProcessStepReport>
+          </mrl:report>
+          <mrl:output>
+            <mrl:LE_Source>
+              <mrl:description>
+                <gco:CharacterString>Citra satelit resolusi tinggi tahun 2024</gco:CharacterString>
+              </mrl:description>
+              <mrl:sourceSpatialResolution>
+                <mri:MD_Resolution>
+                  <mri:distance>
+                    <gco:Distance uom="m">10</gco:Distance>
+                  </mri:distance>
+                </mri:MD_Resolution>
+              </mrl:sourceSpatialResolution>
+              <mrl:sourceReferenceSystem>
+                <mrs:MD_ReferenceSystem>
+                  <mrs:referenceSystemIdentifier>
+                    <mcc:MD_Identifier>
+                      <mcc:code>
+                        <gco:CharacterString>4326</gco:CharacterString>
+                      </mcc:code>
+                      <mcc:codeSpace>
+                        <gco:CharacterString>EPSG</gco:CharacterString>
+                      </mcc:codeSpace>
+                    </mcc:MD_Identifier>
+                  </mrs:referenceSystemIdentifier>
+                </mrs:MD_ReferenceSystem>
+              </mrl:sourceReferenceSystem>
+              <mrl:sourceCitation>
+                <cit:CI_Citation>
+                  <cit:title>
+                    <gco:CharacterString>Citra Satelit Contoh</gco:CharacterString>
+                  </cit:title>
+                  <cit:date>
+                    <cit:CI_Date>
+                      <cit:date>
+                        <gco:DateTime>2024-06-01T00:00:00</gco:DateTime>
+                      </cit:date>
+                      <cit:dateType>
+                        <cit:CI_DateTypeCode codeList="standards.iso.org/19115/-3/lan/1.0/codelists.xml#CI_DateTypeCode" codeListValue="creation">creation</cit:CI_DateTypeCode>
+                      </cit:dateType>
+                    </cit:CI_Date>
+                  </cit:date>
+                </cit:CI_Citation>
+              </mrl:sourceCitation>
+              <mrl:sourceMetadata>
+                <cit:CI_Citation>
+                  <cit:title>
+                    <gco:CharacterString>Metadata Citra Satelit Contoh</gco:CharacterString>
+                  </cit:title>
+                </cit:CI_Citation>
+              </mrl:sourceMetadata>
+              <mrl:scope>
+                <mcc:MD_Scope>
+                  <mcc:level>
+                    <mcc:MD_ScopeCode codeList="standards.iso.org/19115/-3/lan/1.0/codelists.xml#MD_ScopeCode" codeListValue="dataset">dataset</mcc:MD_ScopeCode>
+                  </mcc:level>
+                </mcc:MD_Scope>
+              </mrl:scope>
+              <mrl:processedLevel>
+                <mcc:MD_Identifier>
+                  <mcc:code>
+                    <gco:CharacterString>L3</gco:CharacterString>
+                  </mcc:code>
+                  <mcc:codeSpace>
+                    <gco:CharacterString>contoh</gco:CharacterString>
+                  </mcc:codeSpace>
+                </mcc:MD_Identifier>
+              </mrl:processedLevel>
+              <mrl:resolution>
+                <mrl:LE_NominalResolution>
+                  <mrl:groundResolution>
+                    <gco:Distance uom="m">10</gco:Distance>
+                  </mrl:groundResolution>
+                </mrl:LE_NominalResolution>
+              </mrl:resolution>
+            </mrl:LE_Source>
+          </mrl:output>
+        </mrl:LE_ProcessStep>
+      </mrl:processStep>
+    </mrl:LI_Lineage>
+  </mdb:resourceLineage>
+  <mdb:portrayalCatalogueInfo>
+    <mpc:MD_PortrayalCatalogueReference>
+      <mpc:portrayalCatalogueCitation>
+        <cit:CI_Citation>
+          <cit:title>
+            <gco:CharacterString>Katalog Simbologi Peta Dasar</gco:CharacterString>
+          </cit:title>
+          <cit:alternateTitle>
+            <gco:CharacterString>Simbologi Peta Dasar</gco:CharacterString>
+          </cit:alternateTitle>
+          <cit:citedResponsibleParty>
+            <cit:CI_Responsibility>
+              <cit:role>
+                <cit:CI_RoleCode codeList="standards.iso.org/19115/-3/lan/1.0/codelists.xml#CI_RoleCode" codeListValue="publisher">publisher</cit:CI_RoleCode>
+              </cit:role>
+              <cit:party>
+                <cit:CI_Organisation>
+                  <cit:name>
+                    <gco:CharacterString>Pusat Data Geospasial Contoh</gco:CharacterString>
+                  </cit:name>
+                  <cit:contactInfo>
+                    <cit:CI_Contact>
+                      <cit:phone>
+                        <cit:CI_Telephone>
+                          <cit:number>
+                            <gco:CharacterString>+62 21 555 0100</gco:CharacterString>
+                          </cit:number>
+                          <cit:numberType>
+                            <cit:CI_TelephoneTypeCode codeList="standards.iso.org/19115/-3/lan/1.0/codelists.xml#CI_TelephoneTypeCode" codeListValue="voice">voice</cit:CI_TelephoneTypeCode>
+                          </cit:numberType>
+                        </cit:CI_Telephone>
+                      </cit:phone>
+                      <cit:phone>
+                        <cit:CI_Telephone>
+                          <cit:number>
+                            <gco:CharacterString>+62 21 555 0101</gco:CharacterString>
+                          </cit:number>
+                          <cit:numberType>
+                            <cit:CI_TelephoneTypeCode codeList="standards.iso.org/19115/-3/lan/1.0/codelists.xml#CI_TelephoneTypeCode" codeListValue="facsimile">facsimile</cit:CI_TelephoneTypeCode>
+                          </cit:numberType>
+                        </cit:CI_Telephone>
+                      </cit:phone>
+                      <cit:address>
+                        <cit:CI_Address>
+                          <cit:deliveryPoint>
+                            <gco:CharacterString>Jl. Contoh No. 1</gco:CharacterString>
+                          </cit:deliveryPoint>
+                          <cit:city>
+                            <gco:CharacterString>Jakarta Pusat</gco:CharacterString>
+                          </cit:city>
+                          <cit:administrativeArea>
+                            <gco:CharacterString>DKI Jakarta</gco:CharacterString>
+                          </cit:administrativeArea>
+                          <cit:postalCode>
+                            <gco:CharacterString>10110</gco:CharacterString>
+                          </cit:postalCode>
+                          <cit:country>
+                            <gco:CharacterString>Indonesia</gco:CharacterString>
+                          </cit:country>
+                          <cit:electronicMailAddress>
+                            <gco:CharacterString>siti@example.org</gco:CharacterString>
+                          </cit:electronicMailAddress>
+                        </cit:CI_Address>
+                      </cit:address>
+                      <cit:onlineResource>
+                        <cit:CI_OnlineResource>
+                          <cit:linkage>
+                            <gco:CharacterString>https://www.example.org</gco:CharacterString>
+                          </cit:linkage>
+                          <cit:protocol>
+                            <gco:CharacterString>https</gco:CharacterString>
+                          </cit:protocol>
+                          <cit:applicationProfile>
+                            <gco:CharacterString>Profil Contoh</gco:CharacterString>
+                          </cit:applicationProfile>
+                          <cit:name>
+                            <gco:CharacterString>Situs web</gco:CharacterString>
+                          </cit:name>
+                          <cit:description>
+                            <gco:CharacterString>Situs resmi instansi</gco:CharacterString>
+                          </cit:description>
+                          <cit:function>
+                            <cit:CI_OnLineFunctionCode codeList="standards.iso.org/19115/-3/lan/1.0/codelists.xml#CI_OnLineFunctionCode" codeListValue="information">information</cit:CI_OnLineFunctionCode>
+                          </cit:function>
+                        </cit:CI_OnlineResource>
+                      </cit:onlineResource>
+                      <cit:hoursOfService>
+                        <gco:CharacterString>Senin-Jumat 08:00-16:00 WIB</gco:CharacterString>
+                      </cit:hoursOfService>
+                      <cit:contactInstructions>
+                        <gco:CharacterString>Hubungi lewat surel</gco:CharacterString>
+                      </cit:contactInstructions>
+                    </cit:CI_Contact>
+                  </cit:contactInfo>
+                  <cit:individual>
+                    <cit:CI_Individual>
+                      <cit:name>
+                        <gco:CharacterString>Siti Rahma</gco:CharacterString>
+                      </cit:name>
+                      <cit:positionName>
+                        <gco:CharacterString>Analis Data Spasial</gco:CharacterString>
+                      </cit:positionName>
+                    </cit:CI_Individual>
+                  </cit:individual>
+                </cit:CI_Organisation>
+              </cit:party>
+            </cit:CI_Responsibility>
+          </cit:citedResponsibleParty>
+          <cit:onlineResource>
+            <cit:CI_OnlineResource>
+              <cit:linkage>
+                <gco:CharacterString>https://data.example.org/simbologi</gco:CharacterString>
+              </cit:linkage>
+              <cit:protocol>
+                <gco:CharacterString>https</gco:CharacterString>
+              </cit:protocol>
+              <cit:applicationProfile>
+                <gco:CharacterString>Profil Contoh</gco:CharacterString>
+              </cit:applicationProfile>
+              <cit:name>
+                <gco:CharacterString>Simbologi</gco:CharacterString>
+              </cit:name>
+              <cit:description>
+                <gco:CharacterString>Katalog simbologi</gco:CharacterString>
+              </cit:description>
+              <cit:function>
+                <cit:CI_OnLineFunctionCode codeList="standards.iso.org/19115/-3/lan/1.0/codelists.xml#CI_OnLineFunctionCode" codeListValue="information">information</cit:CI_OnLineFunctionCode>
+              </cit:function>
+            </cit:CI_OnlineResource>
+          </cit:onlineResource>
+        </cit:CI_Citation>
+      </mpc:portrayalCatalogueCitation>
+    </mpc:MD_PortrayalCatalogueReference>
+  </mdb:portrayalCatalogueInfo>
+  <mdb:metadataConstraints>
+    <mco:MD_Constraints>
+      <mco:useLimitation>
+        <gco:CharacterString>Metadata dapat disalin dengan atribusi</gco:CharacterString>
+      </mco:useLimitation>
+    </mco:MD_Constraints>
+  </mdb:metadataConstraints>
+  <mdb:metadataConstraints>
+    <mco:MD_LegalConstraints>
+      <mco:otherConstraints>
+        <gco:CharacterString>Metadata berlisensi CC BY 4.0</gco:CharacterString>
+      </mco:otherConstraints>
+    </mco:MD_LegalConstraints>
+  </mdb:metadataConstraints>
+  <mdb:metadataConstraints>
+    <mco:MD_SecurityConstraints>
+      <mco:classification>
+        <mco:MD_ClassificationCode codeList="standards.iso.org/19115/-3/lan/1.0/codelists.xml#MD_ClassificationCode" codeListValue="unclassified">unclassified</mco:MD_ClassificationCode>
+      </mco:classification>
+      <mco:userNote>
+        <gco:CharacterString>Metadata terbuka</gco:CharacterString>
+      </mco:userNote>
+      <mco:classificationSystem>
+        <gco:CharacterString>Klasifikasi Contoh</gco:CharacterString>
+      </mco:classificationSystem>
+    </mco:MD_SecurityConstraints>
+  </mdb:metadataConstraints>
+  <mdb:applicationSchemaInfo>
+    <mas:MD_ApplicationSchemaInformation>
+      <mas:name>
+        <cit:CI_Citation>
+          <cit:title>
+            <gco:CharacterString>Skema Aplikasi Batas Administrasi</gco:CharacterString>
+          </cit:title>
+          <cit:alternateTitle>
+            <gco:CharacterString>Skema Batas</gco:CharacterString>
+          </cit:alternateTitle>
+          <cit:onlineResource>
+            <cit:CI_OnlineResource>
+              <cit:linkage>
+                <gco:CharacterString>https://data.example.org/skema.xsd</gco:CharacterString>
+              </cit:linkage>
+              <cit:protocol>
+                <gco:CharacterString>https</gco:CharacterString>
+              </cit:protocol>
+              <cit:applicationProfile>
+                <gco:CharacterString>Profil Contoh</gco:CharacterString>
+              </cit:applicationProfile>
+              <cit:name>
+                <gco:CharacterString>Skema</gco:CharacterString>
+              </cit:name>
+              <cit:description>
+                <gco:CharacterString>Berkas skema</gco:CharacterString>
+              </cit:description>
+              <cit:function>
+                <cit:CI_OnLineFunctionCode codeList="standards.iso.org/19115/-3/lan/1.0/codelists.xml#CI_OnLineFunctionCode" codeListValue="download">download</cit:CI_OnLineFunctionCode>
+              </cit:function>
+            </cit:CI_OnlineResource>
+          </cit:onlineResource>
+        </cit:CI_Citation>
+      </mas:name>
+      <mas:schemaLanguage>
+        <gco:CharacterString>XML Schema</gco:CharacterString>
+      </mas:schemaLanguage>
+      <mas:constraintLanguage>
+        <gco:CharacterString>Schematron</gco:CharacterString>
+      </mas:constraintLanguage>
+      <mas:schemaAscii>
+        <gco:CharacterString>https://data.example.org/skema.xsd</gco:CharacterString>
+      </mas:schemaAscii>
+      <mas:graphicsFile>
+        <cit:CI_OnlineResource>
+          <cit:linkage>
+            <gco:CharacterString>https://data.example.org/skema.png</gco:CharacterString>
+          </cit:linkage>
+          <cit:protocol>
+            <gco:CharacterString>https</gco:CharacterString>
+          </cit:protocol>
+          <cit:applicationProfile>
+            <gco:CharacterString>Profil Contoh</gco:CharacterString>
+          </cit:applicationProfile>
+          <cit:name>
+            <gco:CharacterString>Diagram skema</gco:CharacterString>
+          </cit:name>
+          <cit:description>
+            <gco:CharacterString>Diagram UML</gco:CharacterString>
+          </cit:description>
+          <cit:function>
+            <cit:CI_OnLineFunctionCode codeList="standards.iso.org/19115/-3/lan/1.0/codelists.xml#CI_OnLineFunctionCode" codeListValue="information">information</cit:CI_OnLineFunctionCode>
+          </cit:function>
+        </cit:CI_OnlineResource>
+      </mas:graphicsFile>
+    </mas:MD_ApplicationSchemaInformation>
+  </mdb:applicationSchemaInfo>
+  <mdb:metadataMaintenance>
+    <mmi:MD_MaintenanceInformation>
+      <mmi:maintenanceAndUpdateFrequency>
+        <mmi:MD_MaintenanceFrequencyCode codeList="standards.iso.org/19115/-3/lan/1.0/codelists.xml#MD_MaintenanceFrequencyCode" codeListValue="asNeeded">asNeeded</mmi:MD_MaintenanceFrequencyCode>
+      </mmi:maintenanceAndUpdateFrequency>
+      <mmi:maintenanceScope>
+        <mcc:MD_Scope>
+          <mcc:level>
+            <mcc:MD_ScopeCode codeList="standards.iso.org/19115/-3/lan/1.0/codelists.xml#MD_ScopeCode" codeListValue="dataset">dataset</mcc:MD_ScopeCode>
+          </mcc:level>
+        </mcc:MD_Scope>
+      </mmi:maintenanceScope>
+      <mmi:maintenanceNote>
+        <gco:CharacterString>Diperbarui setiap tahun</gco:CharacterString>
+      </mmi:maintenanceNote>
+      <mmi:contact>
+        <cit:CI_Responsibility>
+          <cit:role>
+            <cit:CI_RoleCode codeList="standards.iso.org/19115/-3/lan/1.0/codelists.xml#CI_RoleCode" codeListValue="custodian">custodian</cit:CI_RoleCode>
+          </cit:role>
+          <cit:party>
+            <cit:CI_Organisation>
+              <cit:name>
+                <gco:CharacterString>Pusat Data Geospasial Contoh</gco:CharacterString>
+              </cit:name>
+              <cit:contactInfo>
+                <cit:CI_Contact>
+                  <cit:phone>
+                    <cit:CI_Telephone>
+                      <cit:number>
+                        <gco:CharacterString>+62 21 555 0100</gco:CharacterString>
+                      </cit:number>
+                      <cit:numberType>
+                        <cit:CI_TelephoneTypeCode codeList="standards.iso.org/19115/-3/lan/1.0/codelists.xml#CI_TelephoneTypeCode" codeListValue="voice">voice</cit:CI_TelephoneTypeCode>
+                      </cit:numberType>
+                    </cit:CI_Telephone>
+                  </cit:phone>
+                  <cit:phone>
+                    <cit:CI_Telephone>
+                      <cit:number>
+                        <gco:CharacterString>+62 21 555 0101</gco:CharacterString>
+                      </cit:number>
+                      <cit:numberType>
+                        <cit:CI_TelephoneTypeCode codeList="standards.iso.org/19115/-3/lan/1.0/codelists.xml#CI_TelephoneTypeCode" codeListValue="facsimile">facsimile</cit:CI_TelephoneTypeCode>
+                      </cit:numberType>
+                    </cit:CI_Telephone>
+                  </cit:phone>
+                  <cit:address>
+                    <cit:CI_Address>
+                      <cit:deliveryPoint>
+                        <gco:CharacterString>Jl. Contoh No. 1</gco:CharacterString>
+                      </cit:deliveryPoint>
+                      <cit:city>
+                        <gco:CharacterString>Jakarta Pusat</gco:CharacterString>
+                      </cit:city>
+                      <cit:administrativeArea>
+                        <gco:CharacterString>DKI Jakarta</gco:CharacterString>
+                      </cit:administrativeArea>
+                      <cit:postalCode>
+                        <gco:CharacterString>10110</gco:CharacterString>
+                      </cit:postalCode>
+                      <cit:country>
+                        <gco:CharacterString>Indonesia</gco:CharacterString>
+                      </cit:country>
+                      <cit:electronicMailAddress>
+                        <gco:CharacterString>data@example.org</gco:CharacterString>
+                      </cit:electronicMailAddress>
+                    </cit:CI_Address>
+                  </cit:address>
+                  <cit:onlineResource>
+                    <cit:CI_OnlineResource>
+                      <cit:linkage>
+                        <gco:CharacterString>https://www.example.org</gco:CharacterString>
+                      </cit:linkage>
+                      <cit:protocol>
+                        <gco:CharacterString>https</gco:CharacterString>
+                      </cit:protocol>
+                      <cit:applicationProfile>
+                        <gco:CharacterString>Profil Contoh</gco:CharacterString>
+                      </cit:applicationProfile>
+                      <cit:name>
+                        <gco:CharacterString>Situs web</gco:CharacterString>
+                      </cit:name>
+                      <cit:description>
+                        <gco:CharacterString>Situs resmi instansi</gco:CharacterString>
+                      </cit:description>
+                      <cit:function>
+                        <cit:CI_OnLineFunctionCode codeList="standards.iso.org/19115/-3/lan/1.0/codelists.xml#CI_OnLineFunctionCode" codeListValue="information">information</cit:CI_OnLineFunctionCode>
+                      </cit:function>
+                    </cit:CI_OnlineResource>
+                  </cit:onlineResource>
+                  <cit:hoursOfService>
+                    <gco:CharacterString>Senin-Jumat 08:00-16:00 WIB</gco:CharacterString>
+                  </cit:hoursOfService>
+                  <cit:contactInstructions>
+                    <gco:CharacterString>Hubungi lewat surel</gco:CharacterString>
+                  </cit:contactInstructions>
+                </cit:CI_Contact>
+              </cit:contactInfo>
+              <cit:individual>
+                <cit:CI_Individual>
+                  <cit:name>
+                    <gco:CharacterString>Budi Santoso</gco:CharacterString>
+                  </cit:name>
+                  <cit:positionName>
+                    <gco:CharacterString>Kepala Seksi Data</gco:CharacterString>
+                  </cit:positionName>
+                </cit:CI_Individual>
+              </cit:individual>
+            </cit:CI_Organisation>
+          </cit:party>
+        </cit:CI_Responsibility>
+      </mmi:contact>
+    </mmi:MD_MaintenanceInformation>
+  </mdb:metadataMaintenance>
+</mdb:MD_Metadata>

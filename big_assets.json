@@ -1,0 +1,1599 @@
+{
+  "options": {
+    "languageOptions": [
+      {
+        "label": "Bahasa Indonesia",
+        "value": "ind",
+        "description": "Bahasa resmi negara Republik Indonesia"
+      },
+      {
+        "label": "English",
+        "value": "eng",
+        "description": "Bahasa Inggris — internasional"
+      },
+      {
+        "label": "Melayu",
+        "value": "msa",
+        "description": "Bahasa Melayu / Malaysia"
+      }
+    ],
+    "encodingOptions": [
+      {
+        "label": "UTF-8",
+        "value": "utf8",
+        "description": "Unicode Transformation Format 8-bit — encoding standar paling umum"
+      },
+      {
+        "label": "UTF-16",
+        "value": "utf16",
+        "description": "Unicode Transformation Format 16-bit — mendukung seluruh karakter Unicode"
+      },
+      {
+        "label": "UTF-32",
+        "value": "utf32",
+        "description": "Unicode Transformation Format 32-bit — 4 byte per karakter"
+      },
+      {
+        "label": "ISO-8859-1",
+        "value": "iso8859-1",
+        "description": "Latin-1 — encoding untuk bahasa Eropa Barat"
+      }
+    ],
+    "scopeOptions": [
+      {
+        "label": "Attribute",
+        "value": "attribute",
+        "description": "informasi berlaku untuk nilai atribut"
+      },
+      {
+        "label": "Attribute Type",
+        "value": "attributeType",
+        "description": "informasi berlaku untuk karakteristik sebuah feature"
+      },
+      {
+        "label": "Collection Hardware",
+        "value": "collectionHardware",
+        "description": "informasi berlaku untuk kelas koleksi perangkat keras"
+      },
+      {
+        "label": "Collection Session",
+        "value": "collectionSession",
+        "description": "informasi berlaku untuk kumpulan sesi (session)"
+      },
+      {
+        "label": "Dataset",
+        "value": "dataset",
+        "description": "informasi berlaku untuk dataset"
+      },
+      {
+        "label": "Series",
+        "value": "series",
+        "description": "informasi berlaku untuk seri (series)"
+      },
+      {
+        "label": "Non Geographic Dataset",
+        "value": "nonGeographicDataset",
+        "description": "informasi berlaku untuk data nongeografis"
+      },
+      {
+        "label": "Dimension Group",
+        "value": "dimensionGroup",
+        "description": "informasi berlaku untuk kelompok dimensi (dimension group)"
+      },
+      {
+        "label": "Feature",
+        "value": "feature",
+        "description": "informasi berlaku untuk suatu feature"
+      },
+      {
+        "label": "Feature Type",
+        "value": "featureType",
+        "description": "informasi berlaku untuk tipe feature"
+      },
+      {
+        "label": "Property Type",
+        "value": "propertyType",
+        "description": "informasi berlaku untuk jenis properti"
+      },
+      {
+        "label": "Software",
+        "value": "software",
+        "description": "informasi berlaku untuk program komputer atau rutin (routine)"
+      },
+      {
+        "label": "Field Session",
+        "value": "fieldSession",
+        "description": "informasi berlaku untuk sesi lapangan (field session)"
+      },
+      {
+        "label": "Service",
+        "value": "service",
+        "description": "informasi berlaku untuk kemampuan yang disediakan oleh entitas penyedia layanan kepada entitas pengguna layanan melalui sekumpulan antarmuka yang mendefinisikan perilaku, seperti contoh penggunaan (use case)"
+      },
+      {
+        "label": "Model",
+        "value": "model",
+        "description": "informasi berlaku untuk tiruan atau imitasi dari objek yang ada atau objek hipotetis"
+      },
+      {
+        "label": "Tile",
+        "value": "tile",
+        "description": "informasi berlaku untuk ubin (tile), bagian spasial data geografis"
+      },
+      {
+        "label": "Metadata",
+        "value": "metadata",
+        "description": "informasi berlaku untuk metadata"
+      },
+      {
+        "label": "Sample",
+        "value": "sample",
+        "description": "informasi berlaku untuk sampel"
+      },
+      {
+        "label": "Initiative",
+        "value": "initiative",
+        "description": "informasi berlaku untuk suatu inisiatif"
+      },
+      {
+        "label": "Document",
+        "value": "document",
+        "description": "informasi berlaku untuk dokumen"
+      },
+      {
+        "label": "Repository",
+        "value": "repository",
+        "description": "informasi berlaku untuk repositori"
+      },
+      {
+        "label": "Aggregate",
+        "value": "aggregate",
+        "description": "informasi berlaku untuk sekumpulan sumberdaya"
+      },
+      {
+        "label": "Product",
+        "value": "product",
+        "description": "metadata yang menjelaskan spesifikasi produk data SNI ISO 19131"
+      },
+      {
+        "label": "Collection",
+        "value": "collection",
+        "description": "informasi berlaku untuk suatu set yang tidak terstruktur"
+      },
+      {
+        "label": "Coverage",
+        "value": "coverage",
+        "description": "informasi berlaku untuk suatu coverage (model data yang memiliki relasi geografis dan menyimpan data verktor)"
+      },
+      {
+        "label": "Application",
+        "value": "application",
+        "description": "sumber daya informasi yang dihosting pada perangkat keras tertentu dan dapat diakses melalui jaringan"
+      }
+    ],
+    "dateTypeOptions": [
+      {
+        "label": "Creation",
+        "value": "creation",
+        "description": "tanggal yang mengidentifikasi waktu sumber daya di buat"
+      },
+      {
+        "label": "Publication",
+        "value": "publication",
+        "description": "tanggal yang mengidentifikasi waktu sumber daya diterbitkan"
+      },
+      {
+        "label": "Revision",
+        "value": "revision",
+        "description": "tanggal yang mengidentifikasi waktu sumber daya diperiksa atau diperiksa ulang dan dimutakhirkan atau diperbaiki"
+      },
+      {
+        "label": "Expiry",
+        "value": "expiry",
+        "description": "tanggal yang mengidentifikasi waktu sumber daya kadaluwarsa"
+      },
+      {
+        "label": "Last Update",
+        "value": "lastUpdate",
+        "description": "tanggal yang mengidentifikasi waktu sumber daya terakhir diperbarui"
+      },
+      {
+        "label": "Last Revision",
+        "value": "lastRevision",
+        "description": "tanggal yang mengidentifikasi waktu sumber daya terakhir ditinjau"
+      },
+      {
+        "label": "Next Update",
+        "value": "nextUpdate",
+        "description": "tanggal yang mengidentifikasi waktu berikutnya sumber daya diperbarui"
+      },
+      {
+        "label": "Unavailable",
+        "value": "unavailable",
+        "description": "tanggal yang mengidentifikasi waktu sumber daya menjadi tidak tersedia atau tidak dapat diperoleh"
+      },
+      {
+        "label": "In Force",
+        "value": "inForce",
+        "description": "tanggal yang mengidentifikasi waktu sumber daya mulai berlaku"
+      },
+      {
+        "label": "Adopted",
+        "value": "adopted",
+        "description": "tanggal yang mengidentifikasi waktu sumber daya diadopsi"
+      },
+      {
+        "label": "Deprecated",
+        "value": "deprecated",
+        "description": "tanggal yang mengidentifikasi waktu sumber daya sudah tidak digunakan"
+      },
+      {
+        "label": "Superseded",
+        "value": "superseded",
+        "description": "tanggal yang mengidentifikasi ketika sumber daya disubstitusi atau digantikan oleh sumber daya lain"
+      },
+      {
+        "label": "Validity Begins",
+        "value": "validityBegins",
+        "description": "waktu ketika data dianggap menjadi valid. CATATAN: Mungkin ada perbedaan waktu antara pembuatan dan validitas dimulai"
+      },
+      {
+        "label": "Validity Expires",
+        "value": "validityExpires",
+        "description": "waktu ketika data tidak lagi dianggap valid"
+      },
+      {
+        "label": "Released",
+        "value": "released",
+        "description": "tanggal ketika sumber daya akan dirilis untuk akses publik"
+      },
+      {
+        "label": "Distribution",
+        "value": "distribution",
+        "description": "tanggal yang mengidentifikasi ketika sebuah instance dari sumber daya didistribusikan"
+      }
+    ],
+    "statusOptions": [
+      {
+        "label": "Selesai (Completed)",
+        "value": "completed",
+        "description": "produksi data telah selesai"
+      },
+      {
+        "label": "Arsip Historis (Historical Archive)",
+        "value": "historicalArchive",
+        "description": "data disimpan dalam arsip offline"
+      },
+      {
+        "label": "Kedaluwarsa (Obsolete)",
+        "value": "obsolete",
+        "description": "informasi tidak lagi relevan"
+      },
+      {
+        "label": "Sedang Berjalan (On Going)",
+        "value": "onGoing",
+        "description": "data terus diperbarui"
+      },
+      {
+        "label": "Direncanakan (Planned)",
+        "value": "planned",
+        "description": "keputusan untuk membuat sumber daya telah ditetapkan"
+      },
+      {
+        "label": "Diperlukan (Required)",
+        "value": "required",
+        "description": "sumber daya diperlukan untuk dihasilkan"
+      },
+      {
+        "label": "Dalam Proses (Under Development)",
+        "value": "underDevelopment",
+        "description": "data masih dalam tahap pembuatan"
+      },
+      {
+        "label": "Final",
+        "value": "final",
+        "description": "telah melalui prosedur atau pengkajian dan dianggap selesai"
+      },
+      {
+        "label": "Tertunda (Pending)",
+        "value": "pending",
+        "description": "dikembangkan dengan tujuan yang spesifik, saat ini tidak tersedia, akan tersedia di masa depan"
+      },
+      {
+        "label": "Dihapus (Retired)",
+        "value": "retired",
+        "description": "item tidak lagi sesuai untuk peran itu dimaksudkan"
+      },
+      {
+        "label": "Tidak Berlaku (Superseded)",
+        "value": "superseded",
+        "description": "diganti oleh sumber daya yang lebih baru"
+      },
+      {
+        "label": "Tentatif (Tentative)",
+        "value": "tentative",
+        "description": "nilai item dikembangkan berdasarkan metode yang tidak konsisten atau perlu verifikasi"
+      },
+      {
+        "label": "Valid",
+        "value": "valid",
+        "description": "pengetahuan saat ini tentang item valid"
+      },
+      {
+        "label": "Diterima (Accepted)",
+        "value": "accepted",
+        "description": "item yang diterima sebagai sah (rekomendasi resmi)"
+      },
+      {
+        "label": "Tidak Diterima (Not Accepted)",
+        "value": "notAccepted",
+        "description": "item yang tidak diterima sebagai sah"
+      },
+      {
+        "label": "Ditarik (Withdrawn)",
+        "value": "withdrawn",
+        "description": "item yang sebelumnya diterima tetapi kini ditarik"
+      },
+      {
+        "label": "Diusulkan (Proposed)",
+        "value": "proposed",
+        "description": "item diusulkan untuk diterima"
+      },
+      {
+        "label": "Usang (Deprecated)",
+        "value": "deprecated",
+        "description": "item tidak dianjurkan digunakan, dapat dihapus di masa mendatang"
+      }
+    ],
+    "onlineFunctionOptions": [
+      {
+        "label": "Download",
+        "value": "download",
+        "description": "petunjuk online untuk mentransfer data dari satu perangkat atau sistem ke perangkat lain"
+      },
+      {
+        "label": "Information",
+        "value": "information",
+        "description": "informasi online tentang sumber daya"
+      },
+      {
+        "label": "Offline Access",
+        "value": "offlineAccess",
+        "description": "petunjuk online untuk meminta sumber daya dari penyedia"
+      },
+      {
+        "label": "Order",
+        "value": "order",
+        "description": "proses pemesanan online untuk mendapatkan sumber daya"
+      },
+      {
+        "label": "Search",
+        "value": "search",
+        "description": "antarmuka pencarian online untuk mencari informasi tentang sumber daya"
+      },
+      {
+        "label": "Complete Metadata",
+        "value": "completeMetadata",
+        "description": "metadata lengkap disediakan"
+      },
+      {
+        "label": "Browse Graphic",
+        "value": "browseGraphic",
+        "description": "grafik penelusuran (browse graphic) disediakan"
+      },
+      {
+        "label": "Upload",
+        "value": "upload",
+        "description": "kemampuan unggah sumber daya online disediakan"
+      },
+      {
+        "label": "Email Service",
+        "value": "emailService",
+        "description": "layanan email online disediakan"
+      },
+      {
+        "label": "Browsing",
+        "value": "browsing",
+        "description": "penelusuran online disediakan"
+      },
+      {
+        "label": "File Access",
+        "value": "fileAccess",
+        "description": "akses file online disediakan"
+      }
+    ],
+    "spatialRepTypeOptions": [
+      {
+        "label": "Vector",
+        "value": "vector",
+        "description": "data vektor digunakan untuk merepresentasikan data geografis"
+      },
+      {
+        "label": "Grid",
+        "value": "grid",
+        "description": "data grid digunakan untuk merepresentasikan data geografis"
+      },
+      {
+        "label": "Text Table",
+        "value": "textTable",
+        "description": "data tekstual atau tabular yang digunakan untuk merepresentasikan data geografis"
+      },
+      {
+        "label": "TIN",
+        "value": "tin",
+        "description": "triangulated irregular network"
+      },
+      {
+        "label": "Stereo Model",
+        "value": "stereoModel",
+        "description": "tampilan tiga dimensi yang dibentuk oleh sinar sepancaran yang saling berpotongan dari sepasang gambar yang tumpang susun"
+      },
+      {
+        "label": "Video",
+        "value": "video",
+        "description": "data video yang digunakan untuk merepresentasikan data geografis"
+      }
+    ],
+    "topologyOptions": [
+      {
+        "label": "Geometry Only",
+        "value": "geometryOnly",
+        "description": "objek geometri tanpa struktur tambahan yang menggambarkan topologi"
+      },
+      {
+        "label": "Topology 1D",
+        "value": "topology1D",
+        "description": "Kompleks topologi satu-dimensi - biasa disebut \"simpul-rantai\" topologi"
+      },
+      {
+        "label": "Planar Graph",
+        "value": "planarGraph",
+        "description": "Kompleks topologi 1-dimensi yang planar. CATATAN: Grafik planar adalah grafik yang dapat digambar dalam bidang sedemikian rupa pada verteks."
+      },
+      {
+        "label": "Full Planar Graph",
+        "value": "fullPlanarGraph",
+        "description": "Kompleks topologi 2 dimensi yang planar. CATATAN: Kompleks topologi 2 dimensi umumnya disebut \"topologi lengkap\" dalam lingkungan 2D kartografi."
+      },
+      {
+        "label": "Surface Graph",
+        "value": "surfaceGraph",
+        "description": "Kompleks topologi 1-dimensi yang isomorfik terhadap sebuah subset permukaan. CATATAN: Komplek geometrik bersifat isomorfik terhadap kompleks topologi jika unsur-unsurnya berada dalam korespondensi satu-satu, saling mempertahankan dimensi dan batas satu sama lain."
+      },
+      {
+        "label": "Full Surface Graph",
+        "value": "fullSurfaceGraph",
+        "description": "Kompleks topologi dua-dimensi yang isomorfik pada bagian sebuah permukaan"
+      },
+      {
+        "label": "Topology 3D",
+        "value": "topology3D",
+        "description": "Kompleks topologi 3 dimensi. CATATAN: Kompleks topologi adalah kumpulan topologi primitif yang tertutup dalam operasi batas."
+      },
+      {
+        "label": "Full Topology 3D",
+        "value": "fullTopology3D",
+        "description": "cakupan lengkap dari ruang koordinat Euclidean 3D"
+      },
+      {
+        "label": "Abstract",
+        "value": "abstract",
+        "description": "topologi kompleks tanpa realisasi geometrik tertentu"
+      }
+    ],
+    "geometricObjectOptions": [
+      {
+        "label": "Complex",
+        "value": "complex",
+        "description": "Kumpulan geometris primitif sedemikian rupa sehingga batas-batasnya dapat direpresentasikan sebagai gabungan dari primitif lainnya"
+      },
+      {
+        "label": "Composite",
+        "value": "composite",
+        "description": "set kurva, padatan atau permukaan yang terhubung"
+      },
+      {
+        "label": "Curve",
+        "value": "curve",
+        "description": "dibatasi, geometris primitif 1-dimensi, mewakili gambar garis yang terus menerus"
+      },
+      {
+        "label": "Point",
+        "value": "point",
+        "description": "geometrik primitif nol-dimensi, mewakili posisi tetapi tidak memiliki luasan"
+      },
+      {
+        "label": "Solid",
+        "value": "solid",
+        "description": "mengelilingi, geometrik primitif 3-dimensi terhubung, mewakili citra kontinu dari suatu wilayah ruang"
+      },
+      {
+        "label": "Surface",
+        "value": "surface",
+        "description": "mengelilingi, geometrik primitif 2-dimensi terhubung, mewakili citra kontinyu dari suatu bidang daerah"
+      }
+    ],
+    "topicCategoryOptions": [
+      {
+        "label": "Farming",
+        "value": "farming",
+        "description": "pemeliharaan hewan dan/atau budidaya tanaman. CONTOH: Irigasi, akuakultur, perkebunan, pengelolaan hama, pertanian"
+      },
+      {
+        "label": "Biota",
+        "value": "biota",
+        "description": "flora dan/atau fauna di lingkungan alam. CONTOH: Kehidupan liar, tumbuhan, ilmu biologi, ekologi, hutan basah, habitat"
+      },
+      {
+        "label": "Boundaries",
+        "value": "boundaries",
+        "description": "deskripsi lahan yang sah, batas maritim. CONTOH: Batas wilayah/propinsi, batas nasional"
+      },
+      {
+        "label": "Climatology Meteorology Atmosphere",
+        "value": "climatologyMeteorologyAtmosphere",
+        "description": "proses dan fenomena atmosfer. CONTOH: Tutupan awan, cuaca, iklim, kondisi atmosfer, perubahan iklim, presipitasi"
+      },
+      {
+        "label": "Economy",
+        "value": "economy",
+        "description": "kegiatan ekonomi, kondisi dan pekerjaan. CONTOH: Produksi, tenaga kerja, pendapatan, perdagangan, industri, pariwisata, kehutanan, perikanan"
+      },
+      {
+        "label": "Elevation",
+        "value": "elevation",
+        "description": "ketinggian di atas atau di bawah datum vertikal. CONTOH: Ketinggian, batimetri, model ketinggian digital, kemiringan, produk turunan"
+      },
+      {
+        "label": "Environment",
+        "value": "environment",
+        "description": "sumber daya alam lingkungan, perlindungan dan konservasi. CONTOH: Polusi, sampah, degradasi lingkungan, dampak lingkungan"
+      },
+      {
+        "label": "Geoscientific Information",
+        "value": "geoscientificInformation",
+        "description": "informasi yang berkaitan dengan ilmu bumi. CONTOH: Geofisika, geologi, mineral, ilmu tentang gempa bumi, aktivitas gunung berapi, tanah longsor"
+      },
+      {
+        "label": "Health",
+        "value": "health",
+        "description": "kesehatan, layanan kesehatan, ekologi manusia, dan keselamatan. CONTOH: Penyakit, kebersihan, penyalahgunaan zat, kesehatan mental"
+      },
+      {
+        "label": "Imagery Base Maps Earth Cover",
+        "value": "imageryBaseMapsEarthCover",
+        "description": "peta dasar. CONTOH: Peta topografi, citra, citra tanpa klasifikasi, anotasi"
+      },
+      {
+        "label": "Intelligence Military",
+        "value": "intelligenceMilitary",
+        "description": "pangkalan, struktur, kegiatan militer. CONTOH: Barak, latihan militer, transportasi militer, pengadaan"
+      },
+      {
+        "label": "Inland Waters",
+        "value": "inlandWaters",
+        "description": "feature air di daratan, sistem drainase dan karakteristiknya. CONTOH: Sungai, gletser, danau, air tanah, banjir, kualitas air"
+      },
+      {
+        "label": "Location",
+        "value": "location",
+        "description": "informasi dan layanan posisional. CONTOH: Alamat, geodesi, titik kontrol, kode pos"
+      },
+      {
+        "label": "Oceans",
+        "value": "oceans",
+        "description": "feature dan karakteristik tubuh air laut (kecuali perairan pedalaman). CONTOH: Pasang surut, tsunami, informasi pantai, terumbu karang"
+      },
+      {
+        "label": "Planning Cadastre",
+        "value": "planningCadastre",
+        "description": "informasi yang digunakan untuk pengambilan tindakan yang tepat mengenai penggunaan lahan di masa mendatang. CONTOH: Peta penggunaan lahan, peta zonasi, survei kadaster, kepemilikan lahan"
+      },
+      {
+        "label": "Society",
+        "value": "society",
+        "description": "karakteristik masyarakat dan budaya. CONTOH: Pemukiman, antropologi, arkeologi, pendidikan, kepercayaan tradisional, tata krama dan adat istiadat, data demografi, area rekreasi, penilaian dampak sosial, kejahatan dan keadilan, informasi sensus"
+      },
+      {
+        "label": "Structure",
+        "value": "structure",
+        "description": "konstruksi buatan manusia. CONTOH: Bangunan, museum, gereja, pabrik, perumahan, monumen, toko, menara"
+      },
+      {
+        "label": "Transportation",
+        "value": "transportation",
+        "description": "sarana dan bantuan untuk membawa orang dan/atau barang. CONTOH: Jalan, bandara, rute pelayaran, terowongan, bagan bahari, lokasi kendaraan atau kapal, skema penerbangan, kereta api"
+      },
+      {
+        "label": "Utilities Communication",
+        "value": "utilitiesCommunication",
+        "description": "sistem energi, air dan limbah serta infrastruktur dan layanan komunikasi. CONTOH: Pembangkit listrik, pemurnian dan distribusi air, pengumpulan dan pembuangan limbah, distribusi listrik dan gas, telekomunikasi, radio, jaringan komunikasi"
+      },
+      {
+        "label": "Extra Terrestrial",
+        "value": "extraTerrestrial",
+        "description": "wilayah lebih dari 100 km di atas permukaan Bumi"
+      },
+      {
+        "label": "Disaster",
+        "value": "disaster",
+        "description": "informasi terkait bencana. CONTOH: Situs bencana, zona evakuasi, fasilitas pencegahan bencana, kegiatan bantuan bencana"
+      }
+    ],
+    "keywordTypeOptions": [
+      {
+        "label": "— Tanpa Tipe —",
+        "value": "",
+        "description": ""
+      },
+      {
+        "label": "Discipline",
+        "value": "discipline",
+        "description": "kata kunci yang mengidentifikasikan cabang pelajaran atau pembelajaran khusus"
+      },
+      {
+        "label": "Place",
+        "value": "place",
+        "description": "kata kunci yang mengidentifikasikan lokasi"
+      },
+      {
+        "label": "Stratum",
+        "value": "stratum",
+        "description": "kata kunci yang mengidentifikasikan lapisan dari substansi atau level dalam sistem yang teratur"
+      },
+      {
+        "label": "Temporal",
+        "value": "temporal",
+        "description": "kata kunci yang mengidentifikasikan periode waktu yang terkait dengan sumber daya"
+      },
+      {
+        "label": "Theme",
+        "value": "theme",
+        "description": "kata kunci yang mengidentifikasikan subjek atau topik tertentu"
+      },
+      {
+        "label": "Data Centre",
+        "value": "dataCentre",
+        "description": "kata kunci yang mengidentifikasikan repositori atau arsip yang mengelola dan mendistribusikan data"
+      },
+      {
+        "label": "Feature Type",
+        "value": "featureType",
+        "description": "kata kunci yang mengidentifikasikan sumber daya yang berisi atau tentang kumpulan contoh feature dengan karakteristik umum"
+      },
+      {
+        "label": "Instrument",
+        "value": "instrument",
+        "description": "kata kunci yang mengidentifikasikan perangkat yang digunakan untuk mengukur atau membandingkan properti fisik"
+      },
+      {
+        "label": "Platform",
+        "value": "platform",
+        "description": "kata kunci yang mengidentifikasikan struktur tempat instrumen dipasang"
+      },
+      {
+        "label": "Process",
+        "value": "process",
+        "description": "kata kunci yang mengidentifikasikan serangkaian tindakan atau kejadian alami"
+      },
+      {
+        "label": "Project",
+        "value": "project",
+        "description": "kata kunci yang mengidentifikasikan upaya yang dilakukan untuk membuat atau memodifikasi produk atau layanan"
+      },
+      {
+        "label": "Service",
+        "value": "service",
+        "description": "kata kunci yang mengidentifikasikan aktivitas yang dilakukan oleh satu pihak untuk kepentingan pihak lain"
+      },
+      {
+        "label": "Product",
+        "value": "product",
+        "description": "kata kunci yang mengidentifikasikan jenis produk"
+      },
+      {
+        "label": "Sub Topic Category",
+        "value": "subTopicCategory",
+        "description": "penyempurnaan kategori topik untuk tujuan klasifikasi data geografis"
+      },
+      {
+        "label": "Taxon",
+        "value": "taxon",
+        "description": "kata kunci yang mengidentifikasikan taksonomi dari sumber daya"
+      }
+    ],
+    "constraintOptions": [
+      {
+        "label": "Copyright",
+        "value": "copyright",
+        "description": "hak eksklusif untuk publikasi, produksi, atau penjualan hak atas karya sastra, drama, musik, atau artistik, atau penggunaan cetak atau label komersial, yang diberikan oleh hukum selama jangka waktu tertentu kepada seorang penulis, komposer, artis, distributor"
+      },
+      {
+        "label": "Patent",
+        "value": "patent",
+        "description": "pemerintah telah memberikan hak eksklusif untuk membuat, menjual, menggunakan, atau melisensikan suatu penciptaan atau penemuan"
+      },
+      {
+        "label": "Patent Pending",
+        "value": "patentPending",
+        "description": "informasi dihasilkan atau terjual yang menunggu paten"
+      },
+      {
+        "label": "Trademark",
+        "value": "trademark",
+        "description": "nama, simbol, atau perangkat lain yang mengidentifikasi suatu produk, terdaftar secara resmi dan dibatasi secara hukum untuk penggunaan pemilik atau pabrikan"
+      },
+      {
+        "label": "Licence",
+        "value": "licence",
+        "description": "izin resmi untuk melakukan sesuatu"
+      },
+      {
+        "label": "License (Lisensi)",
+        "value": "license",
+        "description": "izin resmi untuk melakukan sesuatu"
+      },
+      {
+        "label": "Intellectual Property Rights",
+        "value": "intellectualPropertyRights",
+        "description": "hak atas keuntungan finansial dari dan kontrol distribusi properti tidak berwujud yang merupakan hasil kreativitas"
+      },
+      {
+        "label": "Restricted",
+        "value": "restricted",
+        "description": "ditahan dari peredaran atau pengungkapan umum"
+      },
+      {
+        "label": "Other Restrictions",
+        "value": "otherRestrictions",
+        "description": "limitasi tidak terdaftar"
+      },
+      {
+        "label": "Class",
+        "value": "class",
+        "description": "tidak ada batasan"
+      },
+      {
+        "label": "Licence Unrestricted",
+        "value": "licenceUnrestricted",
+        "description": "izin resmi tidak diperlukan untuk menggunakan sumber daya"
+      },
+      {
+        "label": "Licence End User",
+        "value": "licenceEndUser",
+        "description": "izin formal yang diperlukan untuk seseorang atau suatu entitas untuk menggunakan sumberdaya dan yang mungkin berbeda dari orang yang memesan atau membelinya"
+      },
+      {
+        "label": "Licence Distributor",
+        "value": "licenceDistributor",
+        "description": "izin formal yang diperlukan untuk seseorang atau suatu entitas untuk mengkomersialiskan atau mendistribusikan sumber daya"
+      },
+      {
+        "label": "Private",
+        "value": "private",
+        "description": "melindungi hak individu atau organisasi dari pengawasan, intrusi, atau maksud orang lain"
+      },
+      {
+        "label": "Statutory",
+        "value": "statutory",
+        "description": "ditentukan oleh hukum"
+      },
+      {
+        "label": "Confidential",
+        "value": "confidential",
+        "description": "tidak tersedia untuk umum. CATATAN: Berisi informasi yang dapat merugikan kepentingan perniagaan, industri, atau nasional"
+      },
+      {
+        "label": "Caution",
+        "value": "caution",
+        "description": "meskipun umum, membutuhkan kontrol ketat atas distribusinya"
+      },
+      {
+        "label": "In Confidence",
+        "value": "in-confidence",
+        "description": "dengan kepercayaan"
+      }
+    ],
+    "classificationOptions": [
+      {
+        "label": "Unclassified",
+        "value": "unclassified",
+        "description": "tersedia untuk umum"
+      },
+      {
+        "label": "Restricted",
+        "value": "restricted",
+        "description": "tidak untuk umum"
+      },
+      {
+        "label": "Confidential",
+        "value": "confidential",
+        "description": "hanya tersedia untuk orang yang dapat dipercaya terhadap informasi"
+      },
+      {
+        "label": "Secret",
+        "value": "secret",
+        "description": "disimpan atau dimaksudkan untuk dirahasiakan, tidak diketahui, atau disembunyikan dari semua kecuali sekelompok orang terpilih"
+      },
+      {
+        "label": "Top Secret",
+        "value": "topSecret",
+        "description": "kerahasiaan tertinggi"
+      },
+      {
+        "label": "Sensitive But Unclassified",
+        "value": "sensitiveButUnclassified",
+        "description": "meskipun umum, membutuhkan kontrol ketat atas distribusinya"
+      },
+      {
+        "label": "For Official Use Only",
+        "value": "forOfficialUseOnly",
+        "description": "informasi umum yang akan digunakan hanya untuk tujuan resmi yang ditentukan oleh badan yang ditunjuk"
+      },
+      {
+        "label": "Protected",
+        "value": "protected",
+        "description": "Akses tidak berhak terhadap informasi dapat menyebabkan kerusakan"
+      },
+      {
+        "label": "Limited Distribution",
+        "value": "limitedDistribution",
+        "description": "desiminasi dibatasi oleh badan yang ditunjuk"
+      }
+    ],
+    "maintenanceOptions": [
+      {
+        "label": "Continual",
+        "value": "continual",
+        "description": "sumber daya berulang kali dan sering diperbarui"
+      },
+      {
+        "label": "Daily",
+        "value": "daily",
+        "description": "sumber daya diperbarui setiap hari"
+      },
+      {
+        "label": "Weekly",
+        "value": "weekly",
+        "description": "sumber daya diperbarui setiap minggu"
+      },
+      {
+        "label": "Fortnightly",
+        "value": "fortnightly",
+        "description": "sumber daya diperbarui setiap dua minggu"
+      },
+      {
+        "label": "Monthly",
+        "value": "monthly",
+        "description": "sumber daya diperbarui setiap bulan"
+      },
+      {
+        "label": "Quarterly",
+        "value": "quarterly",
+        "description": "sumber daya diperbarui setiap tiga bulan"
+      },
+      {
+        "label": "Biannually",
+        "value": "biannually",
+        "description": "sumber daya diperbarui dua kali setiap tahun"
+      },
+      {
+        "label": "Annually",
+        "value": "annually",
+        "description": "sumber daya diperbarui setiap tahun"
+      },
+      {
+        "label": "As Needed",
+        "value": "asNeeded",
+        "description": "sumber daya diperbarui jika dianggap perlu"
+      },
+      {
+        "label": "Irregular",
+        "value": "irregular",
+        "description": "sumber daya diperbarui dalam interval tidak tetap dalam durasi"
+      },
+      {
+        "label": "Not Planned",
+        "value": "notPlanned",
+        "description": "tidak ada rencana untuk memperbarui data"
+      },
+      {
+        "label": "Unknown",
+        "value": "unknown",
+        "description": "frekuensi pemeliharaan untuk data tidak diketahui"
+      },
+      {
+        "label": "Periodic",
+        "value": "periodic",
+        "description": "sumber daya diperbarui secara berkala"
+      },
+      {
+        "label": "Semimonthly",
+        "value": "semimonthly",
+        "description": "sumber daya diperbarui dua kali setiap bulan"
+      },
+      {
+        "label": "Biennially",
+        "value": "biennially",
+        "description": "sumber daya diperbarui setiap 2 tahun"
+      }
+    ],
+    "roleOptions": [
+      {
+        "label": "Resource Provider",
+        "value": "resourceProvider",
+        "description": "pihak yang menyediakan sumber daya"
+      },
+      {
+        "label": "Custodian",
+        "value": "custodian",
+        "description": "pihak yang memiliki akuntabilitas dan bertanggung jawab atas sumber daya serta memastikan perawatan dan pemeliharaan yang sesuai terhadap sumber daya"
+      },
+      {
+        "label": "Owner",
+        "value": "owner",
+        "description": "pihak yang memiliki sumber daya"
+      },
+      {
+        "label": "User",
+        "value": "user",
+        "description": "pihak yang menggunakan sumber daya"
+      },
+      {
+        "label": "Distributor",
+        "value": "distributor",
+        "description": "pihak yang mendistribusikan sumber daya"
+      },
+      {
+        "label": "Originator",
+        "value": "originator",
+        "description": "pihak yang menemukan sumber daya"
+      },
+      {
+        "label": "Point of Contact",
+        "value": "pointOfContact",
+        "description": "pihak yang dapat dihubungi untuk memperoleh informasi tentang atau perolehan sumber"
+      },
+      {
+        "label": "Principal Investigator",
+        "value": "principalInvestigator",
+        "description": "pihak kunci yang bertanggung jawab untuk mengumpulkan informasi dan melakukan penelitian"
+      },
+      {
+        "label": "Processor",
+        "value": "processor",
+        "description": "pihak yang telah memproses data sedemikian rupa sehingga sumber daya telah dimodifikasi"
+      },
+      {
+        "label": "Publisher",
+        "value": "publisher",
+        "description": "pihak yang mempublikasikan sumber daya"
+      },
+      {
+        "label": "Author",
+        "value": "author",
+        "description": "pihak yang membuat sumber daya"
+      },
+      {
+        "label": "Sponsor",
+        "value": "sponsor",
+        "description": "pihak yang merepresentasikan sumber daya"
+      },
+      {
+        "label": "Co Author",
+        "value": "coAuthor",
+        "description": "pihak yang bersama-sama membuat sumber daya"
+      },
+      {
+        "label": "Collaborator",
+        "value": "collaborator",
+        "description": "pihak yang membantu pembentukan sumber daya selain peneliti utama"
+      },
+      {
+        "label": "Editor",
+        "value": "editor",
+        "description": "pihak yang meninjau atau memodifikasi sumber untuk meningkatkan konten"
+      },
+      {
+        "label": "Mediator",
+        "value": "mediator",
+        "description": "kelas entitas yang memediasi akses terhadap sumber daya dan untuk siapa sumber daya diperuntukan atau bermanfaat"
+      },
+      {
+        "label": "Rights Holder",
+        "value": "rightsHolder",
+        "description": "pihak yang memiliki atau mengelola hak atas sumber daya"
+      },
+      {
+        "label": "Contributor",
+        "value": "contributor",
+        "description": "pihak yang berkontribusi pada sumber daya"
+      },
+      {
+        "label": "Funder",
+        "value": "funder",
+        "description": "pihak yang memberikan dukungan moneter untuk sumber daya"
+      },
+      {
+        "label": "Stakeholder",
+        "value": "stakeholder",
+        "description": "pihak yang memiliki kepentingan terhadap sumber daya atau pemanfaatan sumber daya"
+      }
+    ],
+    "phoneTypeOptions": [
+      {
+        "label": "Voice",
+        "value": "voice",
+        "description": "Telepon yang menyediakan layanan suara"
+      },
+      {
+        "label": "Facsimile",
+        "value": "facsimile",
+        "description": "Telepon yang menyediakan layanan faksimili"
+      },
+      {
+        "label": "SMS",
+        "value": "sms",
+        "description": "Telepon yang menyediakan layanan pesan singkat"
+      }
+    ],
+    "countryOptions": [
+      {
+        "label": "ID — Indonesia",
+        "value": "ID"
+      },
+      {
+        "label": "MY — Malaysia",
+        "value": "MY"
+      },
+      {
+        "label": "SG — Singapura",
+        "value": "SG"
+      },
+      {
+        "label": "PH — Filipina",
+        "value": "PH"
+      },
+      {
+        "label": "TH — Thailand",
+        "value": "TH"
+      },
+      {
+        "label": "VN — Vietnam",
+        "value": "VN"
+      },
+      {
+        "label": "AU — Australia",
+        "value": "AU"
+      },
+      {
+        "label": "US — Amerika Serikat",
+        "value": "US"
+      },
+      {
+        "label": "GB — Inggris",
+        "value": "GB"
+      }
+    ],
+    "qualityTypeOptions": [
+      {
+        "label": "Format Consistency",
+        "value": "DQ_FormatConsistency",
+        "description": "kepatuhan data terhadap format fisik dan encoding yang ditetapkan dalam spesifikasi produk"
+      },
+      {
+        "label": "Completeness Commission",
+        "value": "DQ_CompletenessCommission",
+        "description": "kelebihan data di kumpulan data dibandingkan yang seharusnya ada"
+      },
+      {
+        "label": "Completeness Omission",
+        "value": "DQ_CompletenessOmission",
+        "description": "data yang kurang dari kumpulan data dibandingkan yang seharusnya ada"
+      },
+      {
+        "label": "Conceptual Consistency",
+        "value": "DQ_ConceptualConsistency",
+        "description": "kepatuhan terhadap aturan skema konseptual"
+      },
+      {
+        "label": "Domain Consistency",
+        "value": "DQ_DomainConsistency",
+        "description": "kepatuhan nilai atribut dengan rentang nilai yang ditentukan"
+      },
+      {
+        "label": "Absolute External Positional Accuracy",
+        "value": "DQ_AbsoluteExternalPositionalAccuracy",
+        "description": "kedekatan nilai koordinat yang dilaporkan ke nilai yang diterima sebagai benar"
+      },
+      {
+        "label": "Relative Internal Positional Accuracy",
+        "value": "DQ_RelativeInternalPositionalAccuracy",
+        "description": "kedekatan posisi relatif objek di kumpulan data terhadap posisi relatif yang diterima sebagai benar"
+      },
+      {
+        "label": "Thematic Classification Correctness",
+        "value": "DQ_ThematicClassificationCorrectness",
+        "description": "perbandingan kelas yang ditetapkan dengan kelas yang terdokumentasi di alam semesta fitur"
+      },
+      {
+        "label": "Temporal Consistency",
+        "value": "DQ_TemporalConsistency",
+        "description": "kebenaran urutan kronologis atau keteraturan data temporal"
+      },
+      {
+        "label": "Temporal Validity",
+        "value": "DQ_TemporalValidity",
+        "description": "validitas data dengan mengacu pada waktu"
+      },
+      {
+        "label": "Topological Consistency",
+        "value": "DQ_TopologicalConsistency",
+        "description": "kebenaran pengkodean secara eksplisit karakteristik topologi suatu kumpulan data"
+      },
+      {
+        "label": "Gridded Data Positional Accuracy",
+        "value": "DQ_GriddedDataPositionalAccuracy",
+        "description": "kedekatan nilai posisi spasial data berbentuk grid pada nilai yang benar atau dianggap benar"
+      },
+      {
+        "label": "Non Quantitative Attribute Accuracy",
+        "value": "DQ_NonQuantitativeAttributeCorrectness",
+        "description": "ukuran apakah atribut non-kuantitatif benar atau salah"
+      },
+      {
+        "label": "Quantitative Attribute Accuracy",
+        "value": "DQ_QuantitativeAttributeAccuracy",
+        "description": "kedekatan nilai suatu atribut kuantitatif pada nilai yang benar atau dianggap benar"
+      },
+      {
+        "label": "Accuracy of a Time Measurement",
+        "value": "DQ_AccuracyOfATimeMeasurement",
+        "description": "kedekatan waktu pengukuran yang dilaporkan dengan nilai yang diterima atau diketahui sebagai nilai yang benar"
+      }
+    ],
+    "evaluationMethodTypeOptions": [
+      {
+        "label": "Direct Internal",
+        "value": "directInternal",
+        "description": "metode evaluasi langsung menggunakan instrumen yang diukur dari dalam dataset itu sendiri"
+      },
+      {
+        "label": "Direct External",
+        "value": "directExternal",
+        "description": "metode evaluasi langsung menggunakan data referensi eksternal sebagai pembanding"
+      },
+      {
+        "label": "Indirect",
+        "value": "indirect",
+        "description": "metode evaluasi tidak langsung yang didasarkan pada pengetahuan tentang proses produksi data"
+      }
+    ],
+    "referenceSystemTypeOptions": [
+      {
+        "label": "Compound Engineering + Parametric",
+        "value": "compoundEngineeringParametric",
+        "description": "Sistem koordinat gabungan teknik dan parametrik"
+      },
+      {
+        "label": "Compound Engineering + Parametric + Temporal",
+        "value": "compoundEngineeringParametricTemporal",
+        "description": "Sistem koordinat gabungan teknik, parametrik, dan temporal"
+      },
+      {
+        "label": "Compound Engineering + Temporal",
+        "value": "compoundEngineeringTemporal",
+        "description": "Sistem koordinat gabungan teknik dan temporal"
+      },
+      {
+        "label": "Compound Engineering + Vertical",
+        "value": "compoundEngineeringVertical",
+        "description": "Sistem koordinat gabungan teknik dan vertikal"
+      },
+      {
+        "label": "Compound Engineering + Vertical + Temporal",
+        "value": "compoundEngineeringVerticalTemporal",
+        "description": "Sistem koordinat gabungan teknik, vertikal, dan temporal"
+      },
+      {
+        "label": "Compound Geographic 2D + Parametric",
+        "value": "compoundGeographic2DParametric",
+        "description": "Sistem koordinat gabungan geografis 2D dan parametrik"
+      },
+      {
+        "label": "Compound Geographic 2D + Parametric + Temporal",
+        "value": "compoundGeographic2DParametricTemporal",
+        "description": "Sistem koordinat gabungan geografis 2D, parametrik, dan temporal"
+      },
+      {
+        "label": "Compound Geographic 2D + Temporal",
+        "value": "compoundGeographic2DTemporal",
+        "description": "Sistem koordinat gabungan geografis 2D dan temporal"
+      },
+      {
+        "label": "Compound Geographic 2D + Vertical",
+        "value": "compoundGeographic2DVertical",
+        "description": "Sistem koordinat gabungan geografis 2D dan vertikal"
+      },
+      {
+        "label": "Compound Geographic 2D + Vertical + Temporal",
+        "value": "compoundGeographic2DVerticalTemporal",
+        "description": "Sistem koordinat gabungan geografis 2D, vertikal, dan temporal"
+      },
+      {
+        "label": "Compound Geographic 3D + Temporal",
+        "value": "compoundGeographic3DTemporal",
+        "description": "Sistem koordinat gabungan geografis 3D dan temporal"
+      },
+      {
+        "label": "Compound Projected 2D + Parametric",
+        "value": "compoundProjected2DParametric",
+        "description": "Sistem koordinat gabungan proyeksi 2D dan parametrik"
+      },
+      {
+        "label": "Compound Projected 2D + Parametric + Temporal",
+        "value": "compoundProjected2DParametricTemporal",
+        "description": "Sistem koordinat gabungan proyeksi 2D, parametrik, dan temporal"
+      },
+      {
+        "label": "Compound Projected + Temporal",
+        "value": "compoundProjectedTemporal",
+        "description": "Sistem koordinat gabungan proyeksi dan temporal"
+      },
+      {
+        "label": "Compound Projected + Vertical",
+        "value": "compoundProjectedVertical",
+        "description": "Sistem koordinat gabungan proyeksi dan vertikal"
+      },
+      {
+        "label": "Compound Projected + Vertical + Temporal",
+        "value": "compoundProjectedVerticalTemporal",
+        "description": "Sistem koordinat gabungan proyeksi, vertikal, dan temporal"
+      },
+      {
+        "label": "Engineering",
+        "value": "engineering",
+        "description": "Sistem koordinat teknik lokal — tidak terkait dengan Bumi"
+      },
+      {
+        "label": "Engineering Design",
+        "value": "engineeringDesign",
+        "description": "Sistem koordinat teknik untuk keperluan desain"
+      },
+      {
+        "label": "Engineering Image",
+        "value": "engineeringImage",
+        "description": "Sistem koordinat teknik untuk gambar atau citra"
+      },
+      {
+        "label": "Geodetic Geocentric",
+        "value": "geodeticGeocentric",
+        "description": "Sistem referensi geodetik geosentrik — koordinat Kartesian 3D berpusat di pusat massa Bumi"
+      },
+      {
+        "label": "Geodetic Geographic 2D",
+        "value": "geodeticGeographic2D",
+        "description": "Sistem referensi geodetik geografis 2D — lintang dan bujur di permukaan elipsoid"
+      },
+      {
+        "label": "Geodetic Geographic 3D",
+        "value": "geodeticGeographic3D",
+        "description": "Sistem referensi geodetik geografis 3D — lintang, bujur, dan ketinggian elipsoid"
+      },
+      {
+        "label": "Geographic Identifier",
+        "value": "geographicIdentifier",
+        "description": "Identifikasi lokasi berdasarkan nama atau kode geografis, bukan koordinat numerik"
+      },
+      {
+        "label": "Linear",
+        "value": "linear",
+        "description": "Sistem koordinat linear — mengukur jarak sepanjang suatu kurva atau garis"
+      },
+      {
+        "label": "Parametric",
+        "value": "parametric",
+        "description": "Sistem koordinat parametrik — berbasis parameter fisik seperti tekanan atau suhu"
+      },
+      {
+        "label": "Projected",
+        "value": "projected",
+        "description": "Sistem koordinat proyeksi peta — misalnya UTM, Transverse Mercator; koordinat datar (X, Y) di bidang datar"
+      },
+      {
+        "label": "Temporal",
+        "value": "temporal",
+        "description": "Sistem koordinat temporal — berbasis waktu"
+      },
+      {
+        "label": "Vertical",
+        "value": "vertical",
+        "description": "Sistem koordinat vertikal — ketinggian atau kedalaman di atas/bawah datum vertikal tertentu"
+      }
+    ]
+  },
+  "desc": {
+    "metadataIdentifier": "ID Unik Metadata yang berisi Unsur, Skala, Wilayah, Tahun",
+    "language": "Kode bahasa (contoh: ind = Bahasa Indonesia)",
+    "country": "Kode negara (contoh: ID = Indonesia)",
+    "characterEncoding": "Jenis huruf/karakter yang digunakan dalam metadata",
+    "parentMetadata": "ID unik metadata Induk",
+    "metadataScope": "Cakupan data yang dijelaskan dalam metadata",
+    "scopeName": "Nama cakupan data yang dijelaskan dalam metadata",
+    "contactRole": "Peran (role) merujuk pada pemilik dataset",
+    "contactOrganization": "Nama Unit Kerja/Unit Teknis Pemilik Dataset",
+    "contactIndividual": "Nama pemegang jabatan/posisi dari role aktor yang memiliki data",
+    "contactPosition": "Jabatan/Posisi serta organisasi dari pihak yang memiliki data",
+    "contactPhone": "Nomor telepon organisasi yang mengelola, memelihara dan menyebarluaskan data",
+    "contactPhoneType": "Jenis nomor telepon/tata cara menghubungi organisasi pengelola.\nvoice : melalui panggilan suara\nfacsimile : melalui faks/fax",
+    "contactEmail": "Alamat email/pos elektronik dari organisasi pengelola, pemelihara, dan penyebarluasan data",
+    "contactAddress": "Alamat detail meliputi jalan dan nomor bangunan dari organisasi yang mengelola, memelihara, dan menyebarluaskan data",
+    "contactCity": "Kabupaten/Kota lokasi organisasi pengelola, pemelihara, dan penyebarluasan data berada",
+    "contactProvince": "Provinsi tempat organisasi pengelola, pemelihara, dan penyebarluasan data berada",
+    "contactPostalCode": "Kode Pos dari organisasi pengelola, pemelihara, dan penyebarluasan data berada",
+    "contactCountry": "Kode negara organisasi pengelola, pemelihara, dan penyebarluasan data berada",
+    "contactHours": "Jam operasional pelayanan pengguna",
+    "contactInstructions": "Contoh : hari operasional pelayanan pengguna, terkait publikasi data bisa kontak walidata, terkait ketidaksesuian data bisa kontak produsen",
+    "metadataDate": "Tanggal pembuatan/pembaruan metadata",
+    "metadataDateType": "Jenis tanggal/tipe tanggal",
+    "referenceSystemTitle": "Nama resmi sistem referensi spasial yang digunakan",
+    "referenceSystemAlternateTitle": "Nama alias sistem referensi spasial yang digunakan",
+    "referenceSystemCode": "Kode EPSG dari sebuah sistem referensi koordinat",
+    "referenceSystemCodeSpace": "Organisasi yang mendefinisikan kode sistem referensi koordinat",
+    "referenceSystemType": "Tipe sistem referensi koordinat sesuai MD_ReferenceSystemTypeCode (contoh: geodeticGeographic2D, projected, vertical)",
+    "dataTitle": "Judul/nama data, biasanya berupa kode singkat yang menjelaskan nama, lokasi, skala dan tahun data",
+    "dataAlternateTitle": "Judul/nama alternatif dari data berupa nama deskriptif dari data tidak berupa kode",
+    "dataAbstract": "Abstrak atau penjelasan singkat dari data",
+    "dataPurpose": "Tujuan pembuatan data",
+    "dataCredit": "Instansi yang memiliki data",
+    "dataStatus": "Status pengerjaan data",
+    "dataCreationDate": "Tanggal pembuatan/pembaruan metadata",
+    "dataPublicationDate": "Tanggal publikasi data",
+    "dataRevisionDate": "Tanggal revisi data",
+    "dataEdition": "Edisi data",
+    "dataEditionDate": "Tanggal edisi data diterbitkan",
+    "dataIdentifier": "URL unik yang mengidentifikasi dataset secara global (DOI atau URI).\nContoh: https://tanahair.indonesia.go.id/portal-web",
+    "dataOnlineResourceURL": "URL akses langsung ke layanan atau halaman unduh dataset.\nContoh: https://geoservices.big.go.id/rbi/rest/services",
+    "dataOnlineResourceName": "Nama atau label deskriptif untuk tautan online resource.\nContoh: Geoportal BIG",
+    "dataOnlineResourceProtocol": "Protokol koneksi yang digunakan untuk mengakses sumber daya online.\nContoh: https, OGC:WMS, OGC:WFS, OGC:WMTS",
+    "dataOnlineResourceFunction": "Fungsi yang dilakukan oleh sumber daya online",
+    "spatialRepresentationType": "Metode yang digunakan untuk merepresentasikan informasi geografis",
+    "topologyLevel": "Tingkat kompleksitas hubungan spasial vektor dalam satu dataset",
+    "geometricObjectType": "Bentuk geometri objek dalam dataset\npoint (titik), curve (garis), surface (area), complex (gabungan)",
+    "spatialResolution": "Resolusi spasial (denominator skala untuk vektor, atau piksel sel dalam meter untuk raster)",
+    "rasterNumDimensions": "Jumlah dimensi spasial grid (biasanya 2 untuk baris dan kolom)",
+    "rasterDimension1Size": "Jumlah baris (rows) pada grid spasial raster",
+    "rasterDimension1Resolution": "Resolusi sel / piksel baris (rows) raster (meter)",
+    "rasterDimension2Size": "Jumlah kolom (columns) pada grid spasial raster",
+    "rasterDimension2Resolution": "Resolusi sel / piksel kolom (columns) raster (meter)",
+    "rasterCellGeometry": "Tipe geometri sel raster (area atau point)",
+    "rasterTransformationParams": "Menunjukkan apakah parameter transformasi koordinat raster tersedia",
+    "rasterCheckPointDescription": "Deskripsi titik kontrol yang digunakan untuk verifikasi akurasi geometrik citra",
+    "rasterGCPCollectionId": "ID unik koleksi GCP yang digunakan dalam proses orthorektifikasi",
+    "rasterGCPCollectionName": "Nama koleksi Titik Kontrol Tanah (GCP)",
+    "rasterGCPCollectionCRS": "Kode EPSG sistem referensi koordinat untuk GCP (contoh: 4326)",
+    "rasterGCPCollectionCRSSpace": "Organisasi yang mendefinisikan kode CRS (contoh: EPSG)",
+    "rasterGCPs": "Koordinat dan laporan akurasi setiap Titik Kontrol Tanah (msr:MI_GCP)",
+    "rasterCornerPoint1Lat": "Latitude titik sudut pertama citra (msr:cornerPoints)",
+    "rasterCornerPoint1Lon": "Longitude titik sudut pertama citra (msr:cornerPoints)",
+    "rasterCornerPoint2Lat": "Latitude titik sudut kedua citra (msr:cornerPoints)",
+    "rasterCornerPoint2Lon": "Longitude titik sudut kedua citra (msr:cornerPoints)",
+    "rasterCentrePointLat": "Latitude titik tengah citra (msr:centrePoint)",
+    "rasterCentrePointLon": "Longitude titik tengah citra (msr:centrePoint)",
+    "rasterPointPixel": "Orientasi piksel terhadap koordinat (MD_PixelOrientationCode). center = koordinat di tengah piksel",
+    "rasterTransformationDimensionDescription": "Deskripsi transformasi yang digunakan untuk meregistrasi citra ke proyeksi tertentu melalui titik kontrol tanah",
+    "rasterTransformationDimensionMappings": "Pemetaan dimensi transformasi (contoh: column maps to X Northing)",
+    "coverageAttributeDescription": "Deskripsi atribut data cakupan raster (mrc:attributeDescription)",
+    "coverageContentType": "Tipe konten cakupan (MD_CoverageContentTypeCode). image = citra biasa",
+    "coverageProcessingLevelCode": "Kode tingkat pemrosesan Grid/Raster (contoh: L2 untuk citra tegak, L3 untuk mosaik final, klasifikasi untuk pemodelan grid)",
+    "coverageProcessingLevelDescription": "Deskripsi tingkat pemrosesan citra (contoh: Orthorectified image)",
+    "bandAuthority": "Otoritas pengenal attribute/band citra (mcc:authority)",
+    "bandCode": "Kode pengenal attribute/band citra (mcc:code)",
+    "bandCodeSpace": "Ruang nama / sistem pengenal attribute/band citra (mcc:codeSpace)",
+    "imageIlluminationElevation": "Sudut elevasi matahari saat akuisisi citra (dalam derajat)",
+    "imageIlluminationAzimuth": "Sudut azimuth matahari saat akuisisi citra (dalam derajat)",
+    "imageImagingCondition": "Kondisi pengambilan citra (MD_ImagingConditionCode). cloud = ada tutupan awan",
+    "imageQualityAuthority": "Vendor/instansi yang mengklasifikasikan kualitas citra",
+    "imageQualityCode": "Kode kualitas citra yang ditetapkan oleh vendor/instansi (contoh: GOOD)",
+    "imageCloudCoverPercentage": "Persentase tutupan awan pada citra (%)",
+    "imageCompressionGenerationQuantity": "Jumlah generasi kompresi yang telah diterapkan pada citra",
+    "imageTriangulationIndicator": "Menunjukkan apakah informasi triangulasi tersedia untuk citra",
+    "imageRadiometricCalibration": "Menunjukkan apakah data kalibrasi radiometrik tersedia",
+    "imageCameraCalibration": "Menunjukkan apakah informasi kalibrasi kamera tersedia",
+    "imageFilmDistortion": "Menunjukkan apakah informasi distorsi film tersedia",
+    "imageLensDistortion": "Menunjukkan apakah informasi distorsi lensa tersedia",
+    "coverageSpatialRepType": "Tipe representasi spasial hasil kualitas (QE_CoverageResult)",
+    "coverageResultFileName": "Nama file hasil pengujian kualitas raster (contoh: error_matrix_grid.tif)",
+    "coverageResultFileSrc": "Path atau URL file hasil pengujian kualitas (contoh: file:///kualitas/error_matrix.tif)",
+    "coverageResultFileType": "Tipe MIME file hasil pengujian (contoh: image/tiff)",
+    "coverageResultFileDescription": "Deskripsi isi file hasil pengujian kualitas raster",
+    "coverageResultFileFormatTitle": "Nama format file hasil (contoh: Tag Image File Format with Geographic Metadata (GeoTIFF))",
+    "coverageResultAmendmentNumber": "Nomor amendemen format file hasil (contoh: 1.1)",
+    "coverageResultFileDecompression": "Teknik dekompresi file hasil (contoh: None, LZW)",
+    "coverageResultContentDesc": "Deskripsi konten hasil kualitas (contoh: Nilai simpangan posisi horizontal absolut dalam meter (RMSE))",
+    "coverageResultContentType": "Tipe konten hasil pengujian kualitas (contoh: thematicClassification)",
+    "lineageScopeLevel": "Tingkatan cakupan (scope level) untuk keseluruhan lineage dataset",
+    "lineageSourceDescription": "Deskripsi singkat sumber data yang digunakan (contoh: Foto Udara skala 1:5.000, Citra Satelit Pleiades, atau Peta Dasar RBI)",
+    "lineageSourceSpatialResolution": "Resolusi spasial sumber data (dalam meter)",
+    "lineageSourceReferenceSystemCode": "Kode sistem referensi koordinat sumber data (contoh: EPSG:32748)",
+    "lineageSourceReferenceSystemCodeSpace": "Organisasi/otoritas pengelola kode CRS sumber data (contoh: EPSG)",
+    "lineageSourceCitationTitle": "Judul sitasi/dokumen dari sumber data masukan",
+    "lineageSourceCitationDate": "Tanggal penerbitan sitasi sumber data",
+    "lineageSourceCitationDateType": "Tipe tanggal sitasi sumber data (creation, publication, revision)",
+    "lineageSourceMetadataTitle": "Judul metadata terkait sumber data masukan",
+    "lineageSourceScopeLevel": "Scope level cakupan sumber data masukan (contoh: tile, dataset)",
+    "leProcessStepDescription": "Deskripsi rinci langkah pemrosesan/pengolahan data (mrl:description)",
+    "leProcessStepRationale": "Alasan atau justifikasi pelaksanaan proses pengolahan (mrl:rationale)",
+    "leProcessStepDateTime": "Waktu pelaksanaan proses pengolahan data (mrl:stepDateTime)",
+    "leProcessStepProcessorName": "Nama organisasi/pelaksana yang melakukan pemrosesan (mrl:processor)",
+    "leProcessStepProcessorRole": "Peran pelaksana pemrosesan (contoh: processor)",
+    "leProcessStepReferenceTitle": "Judul dokumen referensi pemrosesan (mrl:reference)",
+    "leProcessStepScopeLevel": "Scope level tahapan pemrosesan (mrl:Scope)",
+    "processingId": "Kode unik pengolahan data (mrl:identifier)",
+    "softwareReference": "Nama dan referensi software/alat pengolah (mrl:softwareReference)",
+    "documentation": "Judul dokumen dokumentasi/SOP pengolahan (mrl:documentation)",
+    "procedureDescription": "Deskripsi prosedur teknis pengolahan data (mrl:procedureDescription)",
+    "runTimeParameters": "Parameter runtime saat proses dijalankan (mrl:runTimeParameters)",
+    "algorithmTitle": "Judul algoritma pengolahan yang digunakan (mrl:LE_Algorithm)",
+    "algorithmDescription": "Deskripsi matematis/teknis algoritma pengolahan",
+    "processParamName": "Nama parameter pengolahan (mrl:name)",
+    "processParamDirection": "Arah parameter pengolahan (in/out/in/out)",
+    "processParamDescription": "Deskripsi parameter pengolahan",
+    "processParamValue": "Nilai parameter pengolahan (mrl:value)",
+    "reportName": "Nama laporan hasil pengolahan (mrl:LE_ProcessStepReport)",
+    "reportDescription": "Deskripsi isi laporan hasil pengolahan",
+    "reportFileType": "Format/tipe file laporan pengolahan (contoh: PDF)",
+    "stepSourceLEDescription": "Deskripsi data masukan untuk tahapan proses ini (mrl:source)",
+    "stepSourceLESpatialResolution": "Resolusi spasial data masukan proses (meter)",
+    "stepSourceLEReferenceSystemCode": "Sistem referensi koordinat (CRS) data masukan proses",
+    "stepSourceLEReferenceSystemCodeSpace": "Code space CRS data masukan proses (contoh: EPSG)",
+    "stepSourceLECitationTitle": "Judul sitasi data masukan proses",
+    "stepSourceLECitationDate": "Tanggal sitasi data masukan proses",
+    "stepSourceLECitationDateType": "Tipe tanggal sitasi data masukan proses",
+    "stepSourceLEMetadataTitle": "Judul metadata data masukan proses",
+    "stepSourceLEScopeLevel": "Scope level data masukan proses (contoh: tile, dataset)",
+    "stepOutputLEDescription": "Deskripsi produk hasil keluaran dari tahapan proses ini (mrl:output)",
+    "stepOutputLESpatialResolution": "Resolusi spasial produk keluaran (meter)",
+    "stepOutputLEReferenceSystemCode": "Sistem referensi koordinat (CRS) produk keluaran",
+    "stepOutputLEReferenceSystemCodeSpace": "Code space CRS produk keluaran (contoh: EPSG)",
+    "stepOutputLECitationTitle": "Judul sitasi produk keluaran proses",
+    "stepOutputLECitationDate": "Tanggal sitasi produk keluaran proses",
+    "stepOutputLECitationDateType": "Tipe tanggal sitasi produk keluaran proses",
+    "stepOutputLEMetadataTitle": "Judul metadata produk keluaran proses",
+    "stepOutputLEScopeLevel": "Scope level produk keluaran proses (contoh: tile, dataset)",
+    "stepOutputLEProcessedLevel": "Level pemrosesan produk keluaran (mrl:processedLevel, contoh: Level-2A)",
+    "stepOutputLEScanningResolution": "Resolusi scanning pada produk keluaran (meter)",
+    "stepOutputLEGroundResolution": "Resolusi spasial di permukaan bumi (GSD) produk keluaran (meter)",
+    "acquisitionScope": "Tingkatan cakupan akuisisi (MD_ScopeCode, contoh: tile, dataset)",
+    "acquisitionRequirementTitle": "Judul dokumen persyaratan akuisisi atau kontrak pengadaan",
+    "acquisitionRequirementDate": "Tanggal ditetapkannya persyaratan akuisisi",
+    "acquisitionRequirementId": "Kode/nomor unik persyaratan akuisisi (contoh: REQ-001)",
+    "acquisitionRequestorRole": "Peran pihak pemohon akuisisi (contoh: originator)",
+    "acquisitionRequestorOrg": "Nama organisasi pemohon akuisisi data",
+    "acquisitionRecipientRole": "Peran pihak penerima/pelaksana akuisisi (contoh: processor)",
+    "acquisitionRecipientOrg": "Nama organisasi pelaksana akuisisi data",
+    "acquisitionPriority": "Tingkat prioritas akuisisi (critical, high, medium, low)",
+    "acquisitionRequestedDateCollection": "Tanggal yang diminta untuk pengumpulan/akuisisi data",
+    "acquisitionLatestAcceptableDate": "Tanggal terakhir yang dapat diterima untuk akuisisi data",
+    "acquisitionExpiryDate": "Tanggal kadaluarsa persyaratan akuisisi",
+    "acquisitionAvgAirTemp": "Suhu udara rata-rata saat akuisisi citra (°C)",
+    "acquisitionMaxHumidity": "Kelembaban udara maksimum saat akuisisi (%)",
+    "acquisitionMaxAltitude": "Ketinggian maksimum wahana/platform akuisisi (meter)",
+    "acquisitionMeteoConditions": "Kondisi meteorologi umum saat akuisisi (contoh: Clear sky with low cloud coverage)",
+    "acquisitionSolarAzimuth": "Sudut azimuth matahari saat akuisisi (derajat)",
+    "acquisitionSolarElevation": "Sudut elevasi matahari saat akuisisi (derajat)",
+    "instrumentCitationTitle": "Judul dokumen spesifikasi instrumen sensor yang digunakan",
+    "instrumentCitationDate": "Tanggal dokumen spesifikasi instrumen",
+    "instrumentId": "Kode/nomor identifikasi unik instrumen (contoh: SENSOR-RGB-01)",
+    "instrumentType": "Tipe instrumen/sensor (contoh: RGB Pushbroom Sensor, Multispectral)",
+    "instrumentDescription": "Deskripsi instrumen sensor yang digunakan untuk akuisisi",
+    "instrumentOtherPropertyType": "Tipe properti tambahan instrumen (contoh: SensorBandNumber)",
+    "instrumentOtherProperty": "Nilai properti tambahan instrumen (contoh: 4 bands)",
+    "objectiveId": "Kode/nomor identifikasi unik tujuan akuisisi (contoh: OBJ-ORTHO-01)",
+    "objectivePriority": "Tingkat prioritas tujuan akuisisi (contoh: high, critical)",
+    "objectiveType": "Tipe tujuan akuisisi (MI_ObjectiveTypeCode: survey, mapping, detection, discovery, monitoring)",
+    "objectiveFunction": "Fungsi/kegunaan akuisisi (contoh: Orthophoto production)",
+    "objectiveExtentDescription": "Deskripsi cakupan area tujuan akuisisi",
+    "operationDescription": "Deskripsi operasional misi akuisisi (contoh: UAV orthophoto mission)",
+    "operationCitationTitle": "Judul dokumen operasional misi akuisisi",
+    "operationId": "Kode/nomor identifikasi unik operasi (contoh: OP-001)",
+    "operationOtherPropertyType": "Tipe properti tambahan operasi (contoh: FlightDuration)",
+    "operationOtherProperty": "Nilai properti tambahan operasi (contoh: 55 minutes)",
+    "platformCitationTitle": "Judul dokumen spesifikasi platform wahana yang digunakan",
+    "platformId": "Kode/nomor identifikasi platform wahana (contoh: PLATFORM-UAV-01)",
+    "platformDescription": "Deskripsi platform wahana akuisisi (contoh: Fixed-wing UAV mapping platform)",
+    "platformSponsorOrg": "Nama organisasi yang mendanai/mensponsori platform",
+    "platformOtherPropertyType": "Tipe properti tambahan platform (contoh: FlightDuration)",
+    "platformOtherProperty": "Nilai properti tambahan platform (contoh: 55 minutes)",
+    "acquisitionPlanTitle": "Judul dokumen rencana penerbangan/akuisisi",
+    "extendedElementName": "Nama elemen metadata yang diperluas (contoh: cloudCoverage)",
+    "extendedElementDefinition": "Definisi elemen metadata yang diperluas",
+    "extendedElementObligation": "Tingkat kewajiban elemen (mandatory/optional/conditional)",
+    "extendedElementCondition": "Kondisi yang mewajibkan pengisian elemen ini (contoh: Required for satellite imagery)",
+    "extendedElementDataType": "Tipe data elemen yang diperluas (real, integer, CharacterString, dll.)",
+    "extendedElementMaxOccurrence": "Kemunculan maksimum elemen (contoh: 1 untuk satu kali)",
+    "extendedElementDomainValue": "Rentang nilai yang valid untuk elemen (contoh: 0-100)",
+    "extendedElementParentEntity": "Entitas induk yang memuat elemen ini (contoh: MD_DataIdentification)",
+    "extendedElementRule": "Aturan validasi nilai elemen (contoh: Value must be between 0 and 100)",
+    "extendedElementRationale": "Alasan/justifikasi penambahan elemen ini (contoh: Helps evaluate image usability)",
+    "extentDescription": "Cakupan spasial",
+    "westBoundLongitude": "Koordinat paling barat",
+    "eastBoundLongitude": "Koordinat paling timur",
+    "southBoundLatitude": "Koordinat paling selatan",
+    "northBoundLatitude": "Koordinat paling utara",
+    "topicCategory": "Tema utama",
+    "keyword": "Kata kunci yang mendeskripsikan data",
+    "keywordType": "Jenis kata kunci",
+    "formatTitle": "Judul spesifikasi format atau layanan yang digunakan untuk mendistribusikan dataset \n(contoh singkatan layanannya: Shapefile (.shp), GeoJSON, GeoPackage (.gpkg), TIFF / GeoTIFF, KML, CSV).",
+    "formatAlternateTitle": "Judul alternatif atau nama resmi lengkap dari standar spesifikasi format/layanan distribusi tersebut",
+    "formatEdition": "Versi atau edisi dari standar format/layanan distribusi yang digunakan",
+    "extensionOnlineURL": "URL tautan resource online pada metadataExtensionInfo.\nContoh: https://example.com/data",
+    "extensionOnlineProtocol": "Protokol komunikasi resource online.\nContoh: HTTPS, OGC:WMS",
+    "extensionOnlineApplicationProfile": "Profil aplikasi yang menggunakan resource ini.\nContoh: Web API, ISO 19115",
+    "extensionOnlineName": "Nama resource online dalam metadataExtensionInfo.",
+    "extensionOnlineDescription": "Deskripsi resource online dalam metadataExtensionInfo.",
+    "extensionOnlineFunction": "Fungsi resource online (CI_OnLineFunctionCode).\nContoh: download, information, offlineAccess",
+    "useLimitation": "Batasan penggunaan yang menjelaskan pembatasan atau pengecualian dalam pemanfaatan metadata (contoh: aturan perundang-undangan terkait akses)",
+    "accessConstraints": "Batasan hukum terkait pembatasan akses data",
+    "useConstraints": "Batasan hukum terkait penggunaan data",
+    "otherConstraints": "Keterangan batasan hukum lainnya (hanya boleh diisi jika Batasan Akses atau Batasan Penggunaan bernilai \"Other Restrictions\")",
+    "securityClassification": "Tingkat klasifikasi keamanan (kerahasiaan) yang diterapkan pada metadata yang membatasi penanganan metadata tersebut",
+    "securityUserNote": "Batasan keamanan terkait penjelasan penerapan pembatasan hukum atau pembatasan lain dan prasyarat hukum untuk memperoleh dan menggunakan produk data \n(contoh: Data dibuat untuk kepentingan proyek internal. Penggunaan di luar ruang lingkup proyek harus mendapat persetujuan pemilik data)",
+    "securitySystem": "Nama sistem klasifikasi",
+    "handlingDescription": "Informasi tambahan tentang pembatasan penanganan data \n(misal: siapa yang boleh menyimpan data, apakah perlu enkripsi, ketentuan distribusi internal/eksternal, dll)",
+    "maintenanceFrequency": "Frekuensi perubahan terhadap data setelah diproduksi pertama kali",
+    "maintenanceDate": "Tanggal pemeliharaan atau pembaruan (update) data dilakukan (mmi:maintenanceDate)",
+    "maintenanceScopeLevel": "Cakupan objek yang menjadi target pemeliharaan data (mmi:maintenanceScope)",
+    "maintenanceNote": "Catatan informasi khusus terkait pemeliharaan data (mmi:maintenanceNote)",
+    "metadataMaintenanceFrequency": "Frekuensi pembaruan metadata setelah diproduksi pertama kali",
+    "metadataMaintenanceDate": "Tanggal pemeliharaan atau pembaruan (update) metadata dilakukan (mmi:maintenanceDate)",
+    "metadataMaintenanceScopeLevel": "Cakupan objek yang menjadi target pemeliharaan metadata (mmi:maintenanceScope)",
+    "metadataMaintenanceNote": "Catatan informasi khusus terkait pemeliharaan metadata (mmi:maintenanceNote)",
+    "featureName": "Nama kelas/tipe unsur geografi dalam katalog unsur yang terkandung dalam dataset.\nContoh: JalanArteri, SungaiBesar, BatasDesa, GedungPemerintah",
+    "featureCode": "Kode unik yang merepresentasikan tipe unsur geografi sesuai katalog unsur (KUGI).\nContoh: 34110 (Jalan Arteri), 54100 (Sungai Besar), 12210 (Batas Desa)",
+    "catalogueTitle": "Referensi katalog unsur/fitur data",
+    "catalogueAlternateTitle": "Nama lain referensi katalog data",
+    "catalogueEdition": "Versi katalog data",
+    "catalogueURL": "URL halaman resmi katalog unsur geografi.\nContoh: https://kugi.ina-sdi.or.id/",
+    "qualityType": "Nama pengujian kualitas data yang dilakukan. Pada bagian ini, fokusnya adalah Completeness Commission (Kelebihan/Komisi Data)",
+    "qualityMeasure": "Nama parameter pengujian kualitas data yang diukur. Pada bagian ini fokusnya adalah pada pengujian Akurasi Posisi",
+    "qualityMeasureDescription": "Deskripsi detail parameter yang menjelaskan definisi dan maksud dari pengujian kelebihan data (komisi) tersebut secara spesifik",
+    "qualityExplanation": "Penjelasan naratif (kualitatif) mengenai hasil dari pengujian kelebihan data (komisi), misalnya kesimpulan bahwa tidak ditemukan duplikasi.",
+    "evaluationMethodDescription": "Deskripsi metode yang digunakan untuk mengevaluasi kualitas data, termasuk prosedur dan alat yang digunakan.",
+    "evaluationMethodType": "Tipe metode evaluasi kualitas data yang digunakan (langsung internal, langsung eksternal, atau tidak langsung).",
+    "lineageStatement": "Pernyataan umum (narasi) yang merangkum keseluruhan riwayat asal-usul dataset, termasuk gambaran besar alur proses pengolahannya",
+    "lineageSource": "Deskripsi data sumber (referensi asal) yang digunakan dalam proses pembuatan dataset \n(contoh: Foto Udara, Citra Satelit, atau Peta Dasar)",
+    "lineageScopeCode": "Tingkatan cakupan sumber data (scope level) – biasanya \"dataset\" untuk seluruh kumpulan data, atau \"featureType\" untuk tipe objek tertentu",
+    "lineageDenominator": "Nilai penyebut (denominator) skala peta ekuivalen dari sumber data. Contoh: 5000 berarti skala 1:5.000",
+    "processStepDescription": "Deskripsi satu tahap proses pengolahan data. Contoh: Tahap 1: Akuisisi data foto udara, Tahap 2: Stereoplotting dan digitasi",
+    "portrayalCatalogueTitle": "Merefer nama dokumen hukum yang memuat informasi portrayal yang sudah dibakukan",
+    "portrayalCatalogueAlternateTitle": "Merefer nama dokumen hukum yang memuat informasi portrayal yang sudah dibakukan",
+    "portrayalCatalogueURL": "Tautan/URL yang mengarah ke dokumen, repository, atau lokasi daring dokumen portrayal dapat dilihat atau diunduh",
+    "schemaName": "Nama skema aplikasi/model data yang digunakan.\nContoh: Skema UML RBI",
+    "schemaAlternateTitle": "Nama singkat atau akronim dari skema aplikasi yang digunakan.\nContoh: UML RBI, Skema KUGI 5",
+    "schemaLanguage": "Bahasa pemodelan yang digunakan untuk mendefinisikan skema.\nContoh: UML (Unified Modeling Language)",
+    "schemaConstraintLanguage": "Bahasa yang digunakan untuk mendefinisikan constraint pada skema.\nContoh: OCL (Object Constraint Language)",
+    "schemaAscii": "Nama file atau path dokumen skema dalam format teks ASCII.\nContoh: schema_rbi5k.txt, uml_rbi.asc",
+    "schemaGraphicsURL": "URL file diagram/grafis skema UML (biasanya format PNG atau SVG).\nContoh: https://kugi.ina-sdi.or.id/schema/rbi_uml.png",
+    "distributionUnits": "Satuan ukuran pendistribusian dari dataset atau layanan tersebut (contoh: layer, tile, scene, atau ukuran megabytes).",
+    "transferSize": "Perkiraan ukuran transfer data dalam megabyte (MB).\nContoh: 25 (untuk 25 MB)",
+    "distributionFormatTitle": "Nama singkat atau kode format distribusi data.\nContoh: WMS, WFS, GeoTIFF, Shapefile, GeoJSON",
+    "distributionFormatAlternateTitle": "Nama lengkap dari format distribusi data.\nContoh: OGC Web Map Service, OGC Web Feature Service, GeoTIFF Raster Format",
+    "distributionFormatEdition": "Versi/edisi format distribusi yang digunakan.\nContoh: 1.3.0 (untuk WMS 1.3.0)",
+    "distributionOnlineURL": "Tautan referensi (URL endpoint) untuk mengakses, mengunduh, atau menggunakan layanan dari dataset yang didistribusikan secara langsung.",
+    "distributionProtocol": "Protokol koneksi jaringan yang spesifik digunakan untuk mengakses tautan layanan data tersebut",
+    "distributionOnlineName": "Nama teknis atau nama layer dari sumber daya daring/layanan yang didistribusikan (biasanya berupa nama identifikasi layer pada server spasial, misal: palapa:faskes).",
+    "distributionOnlineDescription": "Deskripsi singkat mengenai isi, konten, atau kegunaan dari tautan distribusi data tersebut",
+    "specificUsage": "Uraian singkat tentang penggunaan data",
+    "userRole": "Peran/fungsi pihak yang terlibat dalam penggunaan data (CI_RoleCode)",
+    "userOrganization": "Pihak/organisasi yang terlibat dalam penggunaan data",
+    "userIndividual": "Nama individu dari pihak yang terlibat dalam penggunaan data",
+    "metadataUseLimitation": "Batasan penggunaan yang menjelaskan pembatasan atau pengecualian dalam pemanfaatan data \n(contoh: cara penggunaan, penafsiran(disclaimer), kualitas).",
+    "metadataOtherConstraints": "Keterangan batasan hukum lainnya untuk metadata (hanya boleh diisi jika Batasan Akses atau Batasan Penggunaan di Batasan Hukum bernilai \"Other Restrictions\")",
+    "metadataSecurityClassification": "Batasan keamanan terkait level keamanan data",
+    "metadataSecurityUserNote": "Batasan keamanan terkait penjelasan penerapan pembatasan hukum atau pembatasan lain dan prasyarat hukum untuk memperoleh dan menggunakan produk data \n(contoh: Data dibuat untuk kepentingan proyek internal. Penggunaan di luar ruang lingkup proyek harus mendapat persetujuan pemilik data)",
+    "metadataSecuritySystem": "Nama sistem klasifikasi",
+    "metadataStandardTitle": "Standar metadata yang digunakan",
+    "metadataStandardEdition": "edisi standar metadata yang digunakan"
+  }
+}

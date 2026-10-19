@@ -1,0 +1,34 @@
+{
+  "Pusat Data Geospasial Contoh": {
+    "role": "pointOfContact",
+    "organization": "Pusat Data Geospasial Contoh",
+    "individual": "Siti Rahma",
+    "position": "Analis Data Spasial",
+    "phone": "+62 21 555 0100",
+    "fax": "+62 21 555 0101",
+    "email": "siti@example.org",
+    "address": "Jl. Contoh No. 1",
+    "city": "Jakarta Pusat",
+    "province": "DKI Jakarta",
+    "postalCode": "10110",
+    "country": "Indonesia",
+    "hours": "Senin-Jumat 08:00-16:00 WIB",
+    "instructions": "Hubungi lewat surel"
+  },
+  "Badan Informasi Geospasial (BIG)": {
+    "role": "pointOfContact",
+    "organization": "Badan Informasi Geospasial",
+    "individual": "Pusat Pengelolaan dan Penyebarluasan Informasi Geospasial",
+    "position": "Pengelola Metadata",
+    "phone": "+62 21 875 2062",
+    "fax": "+62 21 875 2064",
+    "email": "info@big.go.id",
+    "address": "Jl. Raya Jakarta - Bogor KM. 46",
+    "city": "Cibinong, Bogor",
+    "province": "Jawa Barat",
+    "postalCode": "16911",
+    "country": "Indonesia",
+    "hours": "Senin-Jumat 08:00-16:00 WIB",
+    "instructions": "Hubungi melalui email atau portal resmi"
+  }
+}
