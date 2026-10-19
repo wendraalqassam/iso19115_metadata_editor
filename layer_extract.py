@@ -140,7 +140,7 @@ def extract_vector(layer):
             v = _qdt(md.dateTime(dtype))
             if v:
                 F((2, key, v.date() if isinstance(v, datetime.datetime) else v))
-    except Exception:
+    except (AttributeError, TypeError, ValueError, KeyError):
         pass
 
     ext = layer.extent()
@@ -157,7 +157,7 @@ def extract_vector(layer):
         rngs = md.extent().temporalExtents()
         if rngs:
             begin, end = _qdt(rngs[0].begin()), _qdt(rngs[0].end())
-    except Exception:
+    except (AttributeError, TypeError, ValueError, IndexError):
         pass
     if not (begin or end):
         try:
@@ -165,7 +165,7 @@ def extract_vector(layer):
             if tp.isActive() and hasattr(tp, "fixedTemporalRange"):
                 r = tp.fixedTemporalRange()
                 begin, end = _qdt(r.begin()), _qdt(r.end())
-        except Exception:
+        except (AttributeError, TypeError, ValueError):
             pass
     if begin:
         F((2, "timeBegin", begin.date() if isinstance(begin, datetime.datetime) else begin))
