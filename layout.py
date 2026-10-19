@@ -29,7 +29,7 @@ class L:
         self.title, self.path, self.items, self.show_class, self.snips = title, path, items, show_class, snips
 
 
-class O:
+class O:  # noqa: E742
     """Blok opsional: kotak centang yang menyisipkan/menghapus snippet pada XML."""
     def __init__(self, label, path, snippet, items):
         self.label, self.path, self.snippet, self.items = label, path, snippet, items
