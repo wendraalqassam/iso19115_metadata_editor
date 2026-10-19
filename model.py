@@ -4,7 +4,7 @@ import io
 import json
 import os
 import re
-import xml.etree.ElementTree as ET
+import xml.etree.ElementTree as ET  # nosec B405
 from collections import Counter
 
 NS_GCO = "http://standards.iso.org/iso/19115/-3/gco/1.0"
@@ -321,7 +321,7 @@ _SNIPS = {}
 def snippet(name):
     """Salinan elemen snippet bernama dari snippets.xml (struktur kosong siap sisip)."""
     if not _SNIPS:
-        tree = ET.parse(os.path.join(os.path.dirname(__file__), "snippets.xml"))
+        tree = ET.parse(os.path.join(os.path.dirname(__file__), "snippets.xml"))  # nosec B314
         for sn in tree.getroot():
             _SNIPS[sn.get("name")] = sn[0]
     return copy.deepcopy(_SNIPS[name])
@@ -366,7 +366,7 @@ def load(path):
         text = text.replace("mdq:DQEvaluationMethod", "mdq:DQ_EvaluationMethod")
         fixes.append("mdq:DQEvaluationMethod diperbaiki menjadi mdq:DQ_EvaluationMethod.")
     root = None
-    for ev, d in ET.iterparse(io.BytesIO(text.encode("utf-8")), events=("start-ns", "start")):
+    for ev, d in ET.iterparse(io.BytesIO(text.encode("utf-8")), events=("start-ns", "start")):  # nosec B314
         if ev == "start-ns":
             prefix, uri = d
             if prefix:

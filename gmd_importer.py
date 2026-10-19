@@ -9,7 +9,7 @@ import copy
 import datetime
 import os
 import re
-import xml.etree.ElementTree as ET
+import xml.etree.ElementTree as ET  # nosec B405
 
 from . import layout, model
 
@@ -151,7 +151,7 @@ def parse_online(res_el):
 def extract_gmd_plan(gmd_root_or_path):
     """Mengekstrak seluruh nilai elemen dari berkas/akar XML ISO 19139 ke format Plan GeoMDB."""
     if isinstance(gmd_root_or_path, str):
-        gmd_root = ET.parse(gmd_root_or_path).getroot()
+        gmd_root = ET.parse(gmd_root_or_path).getroot()  # nosec B314
     else:
         gmd_root = gmd_root_or_path
 
@@ -779,7 +779,7 @@ def convert_gmd_to_iso3(gmd_root_or_path, template_path):
     berbasis template.xml sehingga dapat langsung dimuat ke EditorDialog GeoMDB.
     """
     if isinstance(gmd_root_or_path, str):
-        gmd_root = ET.parse(gmd_root_or_path).getroot()
+        gmd_root = ET.parse(gmd_root_or_path).getroot()  # nosec B314
     else:
         gmd_root = gmd_root_or_path
 

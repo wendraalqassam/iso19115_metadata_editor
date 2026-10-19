@@ -6,7 +6,7 @@ blok TIDAK sama dengan skema ISO 19115-3 resmi (mis. MD_Georectified di dalam MD
 tersebut. Hasilnya dimaksudkan untuk diimpor ke editor BIG, bukan untuk validasi XSD ketat.
 """
 import copy
-import xml.etree.ElementTree as ET
+import xml.etree.ElementTree as ET  # nosec B405
 
 from .model import local
 

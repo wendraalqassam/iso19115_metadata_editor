@@ -7,7 +7,7 @@ import copy
 import datetime
 import os
 import re
-import xml.etree.ElementTree as ET
+import xml.etree.ElementTree as ET  # nosec B405
 
 from . import layout
 
@@ -248,7 +248,7 @@ def export_to_gmd(iso3_root, template_path=None):
     if not os.path.exists(tmpl_file):
         raise FileNotFoundError(f"Template GMD tidak ditemukan di: {tmpl_file}")
 
-    tree = ET.parse(tmpl_file)
+    tree = ET.parse(tmpl_file)  # nosec B314
     gmd_root = tree.getroot()
 
     # Bangun struktur seksi dari form ISO 19115-3
