@@ -86,23 +86,35 @@ pengguna. Beri group/pengguna izin *ubah metadata* hanya pada dataset miliknya.
 4. Sunting isian, lalu **☁ Kirim ke GeoNode...** di bawah formulir → dataset tertaut terpilih otomatis →
    **Perbarui di GeoNode**.
 
-Plugin ini dimaksudkan **melengkapi** metadata GeoNode, jadi pengiriman selalu memakai mode *preserve*
-(`metadata_uploaded_preserve`): CSW GeoNode menyajikan XML GeoMDB apa adanya — kontak, riwayat/langkah proses,
-laporan kualitas, batasan, dsb. tetap utuh — sedangkan halaman dan pencarian GeoNode menampilkan kolom yang
-dikenalnya (judul, abstrak, kata kunci, …). Tautan WMS/WFS/unduhan dan thumbnail GeoNode disisipkan otomatis dan
-`fileIdentifier` diganti uuid dataset. Karena CSW menyajikan XML unggahan terakhir, sunting metadata dataset ini
-lewat GeoMDB (ambil → sunting → perbarui), bukan lewat form GeoNode. Setelah unggah, plugin memeriksa record CSW
-dan isian GeoNode, lalu memperingatkan bila XML belum diterapkan.
+**Dua mode pengiriman:**
+- **Mode biasa (bawaan)**: GeoNode memperbarui kolom yang dikenalnya (judul, abstrak, kata kunci, …) dan membuat
+  ulang record CSW dari templatenya. Aman di semua GeoNode. Metadata lengkap tetap di berkas GeoMDB.
+- **Mode preserve** (`metadata_uploaded_preserve`): CSW GeoNode menyajikan XML GeoMDB apa adanya, termasuk kontak,
+  riwayat/langkah proses, laporan kualitas, batasan, dsb. Tautan WMS/WFS/unduhan & thumbnail GeoNode disisipkan
+  otomatis. Hanya dipakai bila **"Server GeoNode ini sudah ditambal"** dicentang, karena GeoNode 4.2.5 s.d. versi
+  terbaru punya bug yang merusak record ber-preserve. Admin server memasang tambalannya dengan
+  **[alat tambal GeoNode](https://github.com/hariHK1/geonode-tambal-preserve)**.
+
+Plugin **mendeteksi server yang belum ditambal**:
+- saat daftar dataset dimuat, record CSW rusak pada dataset ber-preserve memunculkan peringatan dan link alat tambal;
+- saat mengirim dengan preserve, gejala bug membuat plugin otomatis mematikan preserve, mengirim ulang tanpa
+  preserve (record CSW sehat kembali), lalu menandai server "belum ditambal".
+
+Dengan mode preserve, CSW menyajikan XML unggahan terakhir, jadi sunting metadata dataset itu lewat GeoMDB
+(ambil → sunting → perbarui), bukan lewat form GeoNode. Setelah unggah, plugin memeriksa record CSW dan isian
+GeoNode, lalu memperingatkan bila XML belum diterapkan.
 
 Metadata yang diambil dari GeoNode dimuat ke formulir yang **dikosongkan dulu dari nilai bawaan template plugin**,
 dan teks pengisi template GeoNode ("None", "No abstract provided") dibuang, sehingga yang tampil hanya data GeoNode.
-Lisensi, DOI, batasan lain, dan informasi tambahan GeoNode ikut terbawa; `dateStamp` diisi waktu pengiriman.
+Lisensi, DOI, batasan lain, dan informasi tambahan GeoNode ikut terbawa. `dateStamp` diisi tanggal dataset GeoNode,
+karena GeoNode mengisi tanggal dataset dari `dateStamp` (tanggalnya jadi tidak berubah).
 
 **Pengaman salah-tujuan** (GeoNode tidak punya *undo*):
 - Formulir hasil *Ambil dari GeoNode* dikunci ke dataset asalnya; tujuan lain hanya lewat **Ganti dataset tujuan…**.
 - Mengirim ke dataset yang bukan asal formulir wajib konfirmasi dengan **mengetik nama layer** tujuan.
 - Sebelum menimpa, metadata lama disimpan di `<profil QGIS>/geomdb_cadangan/<host>/<pk>-<layer>/` dan bisa
-  dikembalikan dengan **Pulihkan dari cadangan…** (hanya ke dataset asalnya, status *preserve* ikut dipulihkan).
+  dikembalikan dengan **Pulihkan dari cadangan…** (hanya ke dataset asalnya, tanpa preserve, tanggal dataset
+  semula). Ini juga cara memperbaiki record CSW yang rusak oleh bug preserve.
 - Bila cakupan/sistem referensi formulir berbeda dengan GeoNode saat ini, plugin menanyakan nilai mana yang dikirim.
 - *Ambil Metadata dari Layer Aktif* pada formulir tertaut memperingatkan bahwa isiannya ikut terkirim ke dataset itu.
 
@@ -110,8 +122,8 @@ Lisensi, DOI, batasan lain, dan informasi tambahan GeoNode ikut terbawa; `dateSt
 
 | Versi | Ambil | Perbarui | Preserve |
 |---|---|---|---|
-| GeoNode 5.x, 4.4 | ✓ | ✓ | dinyalakan otomatis oleh plugin |
-| GeoNode 4.2.3 – 4.3 | ✓ | ✓ | harus dicentang admin: Django admin → Datasets → *Metadata uploaded preserve* |
+| GeoNode 5.x, 4.4 | ✓ | ✓ | diatur plugin (server harus sudah ditambal) |
+| GeoNode 4.2.3 – 4.3 | ✓ | ✓ | hanya lewat Django admin → Datasets → *Metadata uploaded preserve* (server harus sudah ditambal) |
 | GeoNode 4.0 – 4.2.2 | ✓ | ✗ (belum ada API unggah XML) | – |
 
 ## 📄 Lisensi

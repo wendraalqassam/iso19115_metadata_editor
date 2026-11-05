@@ -148,14 +148,41 @@ def _sisipkan_thumbnail(gmd_root, dataset):
     return True
 
 
-def _set_datestamp(gmd_root, waktu):
-    """dateStamp = waktu pengiriman (UTC): pemanen CSW (geomdb-hub, Ina-Geoportal) memakai tanggal ini untuk
-    mengenali record yang berubah; tanggal lama hasil ambil membuat pembaruan bisa dilewati."""
+def baca_waktu(teks):
+    """Tanggal ISO 8601 ("2026-05-06T05:18:37.261161Z", "2026-05-06") → datetime UTC; None bila tak terbaca."""
+    t = (teks or "").strip()
+    if not t:
+        return None
+    try:
+        w = datetime.datetime.fromisoformat(t.replace("Z", "+00:00"))
+    except ValueError:
+        return None
+    if w.tzinfo is None:
+        w = w.replace(tzinfo=datetime.timezone.utc)
+    return w.astimezone(datetime.timezone.utc)
+
+
+def tanggal_kutipan(md):
+    """Tanggal pertama sitasi data (identificationInfo/*/citation/CI_Citation/date) pada gmd:MD_Metadata —
+    pada record buatan GeoNode = tanggal dataset (layer.date)."""
+    for idf in md.findall(_q(GMD, "identificationInfo")):
+        for cd in idf.iter(_q(GMD, "CI_Date")):
+            tgl = cd.find(_q(GMD, "date"))
+            nilai = [(e.text or "").strip() for e in (tgl if tgl is not None else [])]
+            if any(nilai):
+                return next(v for v in nilai if v)
+    return ""
+
+
+def atur_datestamp(gmd_root, waktu):
+    """dateStamp = `waktu` (UTC). PENTING: parser GeoNode (iso2dict) mengisi tanggal dataset (`date`) dari
+    dateStamp — maka pengiriman memakai tanggal dataset GeoNode saat ini agar tanggalnya tidak berubah."""
     ds = gmd_root.find(_q(GMD, "dateStamp"))
     if ds is None:
         ds = ET.SubElement(gmd_root, _q(GMD, "dateStamp"))
     ds.clear()
-    ET.SubElement(ds, _q(GCO, "DateTime")).text = waktu.strftime("%Y-%m-%dT%H:%M:%SZ")
+    ET.SubElement(ds, _q(GCO, "DateTime")).text = waktu.strftime("%Y-%m-%dT%H:%M:%S") + (
+        ".%06d" % waktu.microsecond if waktu.microsecond else "") + "Z"
 
 
 def siapkan_xml(iso3_root, dataset, sisip_tautan=True, catatan=None, tidak_standar=None, waktu=None):
@@ -165,7 +192,8 @@ def siapkan_xml(iso3_root, dataset, sisip_tautan=True, catatan=None, tidak_stand
       GeoNode tidak mengubah uuid dari XML unggahan; tanpa ini record CSW dan isinya tidak cocok.
     - sisip_tautan (untuk mode preserve): GeoNode tidak lagi menambahkan tautan WMS/WFS/unduhan
       dan thumbnail ke XML yang dipertahankan, jadi plugin menyisipkannya dari API dataset.
-    - dateStamp = `waktu` (bawaan: sekarang, UTC).
+    - dateStamp = `waktu`; bawaan: tanggal dataset GeoNode (`date`) agar tanggal dataset tidak berubah
+      (GeoNode mengisi `date` dari dateStamp), atau sekarang bila dataset tak punya tanggal.
     """
     if catatan is None:
         catatan = []
@@ -186,7 +214,7 @@ def siapkan_xml(iso3_root, dataset, sisip_tautan=True, catatan=None, tidak_stand
     if sisip_tautan:
         _sisipkan_tautan(g, tautan_dataset(dataset))
         _sisipkan_thumbnail(g, dataset)
-    _set_datestamp(g, waktu or datetime.datetime.now(datetime.timezone.utc))
+    atur_datestamp(g, waktu or baca_waktu(dataset.get("date")) or datetime.datetime.now(datetime.timezone.utc))
     _rapikan(g, catatan)
     return g
 
@@ -222,7 +250,12 @@ def form_unggah(pk, xml, alternate="", nama_berkas="metadata.xml"):
 
     Penunjuk dataset dikirim untuk kedua generasi sekaligus — serializer DRF mengabaikan field yang tak
     dikenalnya: GeoNode 5 `resource_pk` + `action`; GeoNode 4.x (MetadataFileSerializer importer)
-    `dataset_title` = alternate (wajib)."""
+    `dataset_title` = alternate (wajib).
+
+    Tanpa deklarasi <?xml ... encoding=...?>: GeoNode membaca berkas unggahan sebagai teks (str) lalu
+    mem-parse-nya dengan lxml, yang menolak str berdeklarasi encoding ("Unicode strings with encoding
+    declaration are not supported") — unggahan gagal & dataset ditandai INVALID. Isi tetap UTF-8 (bawaan XML)."""
+    xml = re.sub(rb"^\s*<\?xml[^>]*\?>\s*", b"", xml.lstrip(b"\xef\xbb\xbf"))
     berkas = (nama_berkas, xml, "application/xml")
     isian = {"action": "resource_metadata_upload", "resource_pk": str(pk)}
     if alternate:
@@ -386,10 +419,13 @@ def cakupan_xml(md):
 
 
 def crs_xml(md):
+    """Kode EPSG dari referenceSystemInfo/*/referenceSystemIdentifier/*/code — hanya elemen `code`: menggabung
+    semua teks ("4326 EPSG 6.11" pada record GeoNode) membuat nomor versi terbaca sebagai ujung kode."""
     for rs in md.findall(_q(GMD, "referenceSystemInfo")):
-        kode = kode_epsg(" ".join(e.text or "" for e in rs.iter() if (e.text or "").strip()))
-        if kode:
-            return kode
+        for kode in rs.iter(_q(GMD, "code")):
+            epsg = kode_epsg("".join(kode.itertext()))
+            if epsg:
+                return epsg
     return None
 
 
@@ -427,7 +463,7 @@ def info_cadangan(base, dataset, versi, waktu):
     """Keterangan pendamping cadangan (JSON) — untuk memulihkan ke dataset yang sama persis."""
     return {"url": url_dasar(base), "pk": dataset.get("pk"), "uuid": dataset.get("uuid"),
             "alternate": dataset.get("alternate"), "title": dataset.get("title"), "versi": versi,
-            "metadata_uploaded_preserve": dataset.get("metadata_uploaded_preserve"),
+            "date": dataset.get("date"), "metadata_uploaded_preserve": dataset.get("metadata_uploaded_preserve"),
             "waktu": waktu.strftime("%Y-%m-%dT%H:%M:%SZ")}
 
 
@@ -439,6 +475,43 @@ def cek_cadangan(info, base, dataset):
     if not info.get("uuid") or info.get("uuid") != dataset.get("uuid"):
         masalah.append("uuid dataset tidak sama dengan cadangan (dataset #%s mungkin sudah berganti)." % info.get("pk"))
     return masalah
+
+
+# Bug GeoNode (4.2.5 s.d. master, catalogue/models.py update_csw_metadata): untuk record ber-preserve,
+# `etree.tostring()` (bytes) disimpan ke kolom teks metadata_xml → menjadi "b'<gmd:...'" → penyimpanan &
+# penyajian CSW berikutnya gagal ("Start tag expected, '<' not found"), CSW ISO record itu HTTP 500.
+BUG_PRESERVE = ("GeoNode menyimpan XML ber-preserve sebagai teks rusak (bug GeoNode), sehingga record CSW-nya "
+                "tidak bisa dibaca. Preserve dimatikan agar GeoNode membuat ulang record CSW dari templatenya.")
+
+# Alat tambal bug preserve untuk admin server GeoNode (tools/tambal-geonode di repo plugin) — repo publik.
+URL_ALAT_TAMBAL = "https://github.com/hariHK1/geonode-tambal-preserve"
+
+SARAN_CSW_RUSAK = ("Biasanya karena metadata dataset ini tersimpan rusak di GeoNode akibat bug preserve GeoNode "
+                   "(server belum ditambal) atau unggahan yang gagal. Perbaiki lewat «Kirim ke GeoNode… → Pulihkan "
+                   "dari cadangan…»; agar tidak terulang, admin GeoNode perlu menjalankan alat tambal: %s"
+                   % URL_ALAT_TAMBAL)
+
+
+def gejala_bug_preserve(pesan):
+    """Pesan galat GeoNode yang khas bug preserve: metadata_xml tersimpan sebagai "b'<...'" lalu gagal di-parse."""
+    p = pesan or ""
+    return "Start tag expected, '<' not found" in p or "b'<gmd:" in p
+
+
+def dataset_preserve(datasets):
+    """Dataset yang preserve-nya aktif (field tersedia di GeoNode 4.4/5.x) — bahan deteksi server belum ditambal."""
+    return [d for d in datasets or [] if d.get("metadata_uploaded_preserve") is True]
+
+
+def pesan_csw(xml_teks):
+    """Teks ows:ExceptionReport pada respons CSW (pycsw membalas begini bila record gagal disajikan); "" bila bukan."""
+    try:
+        root = ET.fromstring(xml_teks.encode("utf-8") if isinstance(xml_teks, str) else xml_teks)  # nosec B314
+    except ET.ParseError:
+        return ""
+    if root.tag.rsplit("}", 1)[-1] != "ExceptionReport":
+        return ""
+    return " ".join(" ".join((e.text or "").split()) for e in root.iter() if e.tag.endswith("ExceptionText")).strip()
 
 
 def ambil_md_metadata(xml_teks):

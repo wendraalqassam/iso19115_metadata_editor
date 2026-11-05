@@ -107,10 +107,25 @@ class BantuAPI(unittest.TestCase):
         self.assertEqual(bagian["resource_pk"].get_payload(), "3")  # GeoNode 5
         self.assertEqual(bagian["dataset_title"].get_payload(), "geonode:umkm")  # GeoNode 4.x (importer)
         self.assertEqual(bagian["base_file"].get_filename(), "metadata.xml")
-        self.assertEqual(bagian["base_file"].get_payload(decode=True), xml)
+        self.assertEqual(bagian["base_file"].get_payload(decode=True), xml.split(b"?>", 1)[1].lstrip())
         # handler vektor/raster GeoNode 5 hanya membaca files["xml_file"] (base_file memilih handler)
         self.assertEqual(bagian["xml_file"].get_filename(), "metadata.xml")
-        self.assertEqual(bagian["xml_file"].get_payload(decode=True), xml)
+        self.assertEqual(bagian["xml_file"].get_payload(decode=True), bagian["base_file"].get_payload(decode=True))
+
+    def test_unggahan_tanpa_deklarasi_xml(self):
+        """GeoNode membaca unggahan sebagai str lalu lxml.fromstring — str berdeklarasi encoding ditolak
+        (galat nyata di staging: "Unicode strings with encoding declaration are not supported")."""
+        import xml.etree.ElementTree as ET
+        xml = gs.xml_bytes(gs.siapkan_xml(contoh(), dataset()))
+        self.assertTrue(xml.startswith(b"<?xml"))
+        body, tipe = gs.form_unggah(3, b"\xef\xbb\xbf" + xml, "geonode:umkm")
+        pesan = email.parser.BytesParser().parsebytes(b"Content-Type: " + tipe.encode() + b"\r\n\r\n" + body)
+        for p in pesan.get_payload():
+            if p.get_filename():
+                isi = p.get_payload(decode=True)
+                self.assertTrue(isi.startswith(b"<gmd:MD_Metadata"), isi[:60])
+                teks = isi.decode("utf-8")  # seperti GeoNode: dibaca sebagai teks lalu di-parse
+                self.assertEqual(gs.judul_xml(ET.fromstring(teks)), gs.judul_xml(ET.fromstring(xml)))
 
     def test_status_dan_csw(self):
         self.assertEqual(gs.ringkas_status({"status": "failed", "log": "XML tidak valid"}), ("failed", "XML tidak valid"))
@@ -295,6 +310,20 @@ class BolakBalikGeoNode(unittest.TestCase):
         self.assertEqual(g.findtext("%s/{%s}DateTime" % (q("dateStamp"), GCO)), "2026-11-05T09:30:00Z")
         self.assertEqual(len(g.findall(q("dateStamp"))), 1)
 
+    def test_datestamp_bawaan_tanggal_dataset(self):
+        """GeoNode mengisi tanggal dataset dari dateStamp — bawaan kirim memakai tanggal dataset agar tidak berubah."""
+        g = gs.siapkan_xml(contoh(), dataset(date="2026-05-06T05:18:37.261161Z"))
+        self.assertEqual(g.findtext("%s/{%s}DateTime" % (q("dateStamp"), GCO)), "2026-05-06T05:18:37.261161Z")
+        self.assertEqual(gs.baca_waktu("2026-05-06").isoformat(), "2026-05-06T00:00:00+00:00")
+        self.assertIsNone(gs.baca_waktu("bukan tanggal"))
+
+    def test_tanggal_asli_dari_cadangan_lama(self):
+        """Cadangan lama tanpa `date`: tanggal sitasi record GeoNode = tanggal dataset (staging: 2026-05-06)."""
+        self.assertEqual(gs.tanggal_kutipan(record_template_staging()), "2026-05-06T05:18:37Z")
+        info = gs.info_cadangan("https://x.go.id", dataset(date="2026-05-06T05:18:37Z"), "5",
+                                gs.baca_waktu("2026-11-05T12:51:40Z"))
+        self.assertEqual(info["date"], "2026-05-06T05:18:37Z")
+
     def test_teks_pengisi_geonode_dibuang(self):
         g = self.kirim(record_template_staging())
         nilai = {(e.text or "").strip() for e in g.iter()}
@@ -359,6 +388,16 @@ class PengamanSalahTujuan(unittest.TestCase):
         self.assertTrue(any("EPSG:32749" in b for b in beda))
         self.assertEqual(gs.bandingkan_cakupan(g, dataset()), [])  # GeoNode tanpa cakupan: tidak dibandingkan
 
+    def test_crs_record_geonode_terbaca(self):
+        """Record GeoNode: code 4326, codeSpace EPSG, version 6.11 — dulu terbaca kosong (uji nyata staging)."""
+        md = record_template_staging()
+        self.assertEqual(gs.crs_xml(md), "4326")
+        bb = gs.cakupan_xml(md)
+        sama = dataset(extent={"coords": list(bb), "srid": "EPSG:4326"}, srid="EPSG:4326")
+        self.assertEqual(gs.bandingkan_cakupan(md, sama), [])
+        self.assertTrue(gs.bandingkan_cakupan(md, dict(sama, srid="EPSG:32749")))
+        self.assertEqual(gs.crs_xml(gs.siapkan_xml(contoh(), dataset())), "4326")
+
     def test_cadangan_hanya_ke_dataset_asal(self):
         import datetime
         ds = dataset(pk=3, metadata_uploaded_preserve=False)
@@ -386,6 +425,26 @@ class AlurAmbilPerbarui(unittest.TestCase):
         root = gmd_importer.convert_gmd_to_iso3(md, os.path.join(HERE, "template.xml"))
         self.assertEqual(gs.judul_formulir(root), gs.judul_formulir(contoh()))
         self.assertIsNone(gs.ambil_md_metadata(b"<bukan-xml"))
+
+    def test_gejala_bug_preserve(self):
+        # pesan nyata dari staging (unggah dengan preserve di GeoNode yang belum ditambal)
+        nyata = ("Start tag expected, '<' not found, line 1, column 1 (<string>, line 1); {'errors': ['Task: "
+                 "geonode.upload.import_resource raised an error during actions for layer: resource_metadata_upload")
+        self.assertTrue(gs.gejala_bug_preserve(nyata))
+        self.assertFalse(gs.gejala_bug_preserve("Unicode strings with encoding declaration are not supported."))
+        self.assertFalse(gs.gejala_bug_preserve(""))
+        self.assertIn(gs.URL_ALAT_TAMBAL, gs.SARAN_CSW_RUSAK)
+        data = [dataset(pk=1, metadata_uploaded_preserve=True), dataset(pk=2, metadata_uploaded_preserve=False),
+                dataset(pk=3)]
+        self.assertEqual([d["pk"] for d in gs.dataset_preserve(data)], [1])
+
+    def test_exceptionreport_csw_terbaca(self):
+        lapor = (b'<ows:ExceptionReport xmlns:ows="http://www.opengis.net/ows" version="1.2.0"><ows:Exception '
+                 b'exceptionCode="NoApplicableCode"><ows:ExceptionText>Unicode strings with encoding declaration '
+                 b'are not supported.</ows:ExceptionText></ows:Exception></ows:ExceptionReport>')
+        self.assertIn("encoding declaration", gs.pesan_csw(lapor))
+        self.assertEqual(gs.pesan_csw(gs.xml_bytes(gs.siapkan_xml(contoh(), dataset()))), "")
+        self.assertEqual(gs.pesan_csw(b"<html>bukan xml"), "")
 
     def test_formulir_kosong_terdeteksi(self):
         self.assertEqual(gs.judul_formulir(model.load(os.path.join(HERE, "template.xml"))[0]), "")

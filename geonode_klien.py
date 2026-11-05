@@ -153,8 +153,13 @@ class KlienGeoNode:
     def csw_record(self, uuid):
         status, isi = self._kirim("GET", gs.url_csw_record(self.base, uuid), terima="application/xml")
         if status != 200:
-            raise GeoNodeError("CSW GeoNode membalas HTTP %s" % status, status)
-        return isi.decode("utf-8", "replace")
+            raise GeoNodeError("CSW GeoNode gagal menyajikan record ini (HTTP %s). %s" % (status, gs.SARAN_CSW_RUSAK),
+                               status)
+        teks = isi.decode("utf-8", "replace")
+        galat = gs.pesan_csw(teks)
+        if galat:
+            raise GeoNodeError("CSW GeoNode gagal menyajikan record ini: %s. %s" % (galat, gs.SARAN_CSW_RUSAK))
+        return teks
 
     def authcfg_untuk(self, url):
         """authcfg hanya untuk URL di host GeoNode ini — token tidak ikut ke host lain."""
