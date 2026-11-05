@@ -20,7 +20,7 @@ except ImportError:  # Qt5 / QGIS 3
     from qgis.PyQt.QtWidgets import QShortcut
 from qgis.core import QgsCoordinateReferenceSystem, QgsCoordinateTransform, QgsProject
 
-from . import model, layout, big_compat, gmd_exporter, gmd_importer
+from . import model, layout, big_compat, gmd_exporter, gmd_importer, kesesuaian
 
 HERE = os.path.dirname(__file__)
 ICON_PATH = os.path.join(HERE, "icon.png")
@@ -635,6 +635,7 @@ class EditorDialog(QDialog):
         self.iface = iface
         self.root = None
         self.src = ""
+        self.geonode_tautan = None  # dataset GeoNode asal isian formulir (lihat muat_dari_geonode)
         self.mode = "big"
         self.sections = []
         self.page_secs = []
@@ -689,6 +690,9 @@ class EditorDialog(QDialog):
             ("Buka XML Metadata...", self.open_file, "Buka berkas XML metadata dari penyimpanan"),
             ("Ambil Metadata dari Layer Aktif", self.fill_from_layer,
              "Ekstrak otomatis judul, batas wilayah (EPSG:4326), CRS, tipe geometri, dan jumlah fitur dari layer aktif"),
+            ("Ambil dari GeoNode...", self.ambil_geonode,
+             "Pilih dataset dari katalog GeoNode (mode kartu/daftar, pratinjau peta dari layanan WMS-nya), lalu muat "
+             "metadatanya ke formulir untuk disunting dan diperbarui"),
         ):
             b = QPushButton(text)
             b.setToolTip(tip)
@@ -860,6 +864,11 @@ class EditorDialog(QDialog):
         """)
         b_export_gmd.clicked.connect(self.export_iso19139)
 
+        b_geonode = QPushButton("☁ Kirim ke GeoNode...")
+        b_geonode.setToolTip("Kirim metadata ini (ISO 19139) ke dataset GeoNode dengan akun GeoNode Anda; CSW GeoNode ikut terbarui")
+        b_geonode.setStyleSheet(b_export_gmd.styleSheet())
+        b_geonode.clicked.connect(self.kirim_geonode)
+
         b_close = QPushButton("Tutup")
         b_close.setStyleSheet("""
             QPushButton {
@@ -891,6 +900,7 @@ class EditorDialog(QDialog):
         bottom.addWidget(self.b_save)
         bottom.addWidget(self.b_save_as)
         bottom.addWidget(b_export_gmd)
+        bottom.addWidget(b_geonode)
         bottom.addWidget(b_close)
         lay.addLayout(bottom)
 
@@ -921,6 +931,7 @@ class EditorDialog(QDialog):
 
         self.root = root
         self.src = path if path not in (TEMPLATE, SAMPLE) else ""
+        self.geonode_tautan = None  # berkas lain → tidak lagi tertaut ke dataset GeoNode
         label_text = {
             TEMPLATE: "Mode Aktif: Template Kosong (Standar BIG)",
             SAMPLE: "Mode Aktif: Contoh Metadata (Terisi & Sesuai Validasi Sistem BIG)",
@@ -931,6 +942,15 @@ class EditorDialog(QDialog):
         self.mode_rebuild()
         if fixes:
             QMessageBox.information(self, TITLE, "\n".join(fixes))
+
+    def muat_dari_geonode(self, root, tautan):
+        """Muat metadata yang diambil dari GeoNode ke formulir dan tautkan editor ke dataset asalnya
+        (tautan = {"url", "pk", "uuid", "title"}), agar pembaruan berikutnya terkirim ke dataset yang sama."""
+        self.root = root
+        self.src = ""
+        self.geonode_tautan = dict(tautan)
+        self.lbl.setText("Tertaut ke GeoNode: %s — dataset #%s di %s" % (tautan["title"], tautan["pk"], tautan["url"]))
+        self.mode_rebuild()
 
     def on_mode(self, checked):
         if not checked or self.root is None:
@@ -1882,6 +1902,16 @@ class EditorDialog(QDialog):
             QMessageBox.information(self, TITLE, "Saat ini pengambilan metadata otomatis baru mendukung layer vektor.\n"
                                                  "Layer '%s' bukan layer vektor." % layer.name())
             return
+        t = self.geonode_tautan
+        if t and QMessageBox.question(
+                self, TITLE,
+                "Formulir ini tertaut ke dataset GeoNode «%s» (#%s).\n\nIsian dari layer «%s» (judul, cakupan, CRS, "
+                "dll.) akan menimpa isian formulir dan IKUT TERKIRIM ke dataset GeoNode itu saat «Perbarui di "
+                "GeoNode». Pastikan layer ini memang data dari dataset tersebut.\n\nLanjutkan?" % (
+                    t["title"], t["pk"], layer.name()),
+                QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No,
+                QMessageBox.StandardButton.No) != QMessageBox.StandardButton.Yes:
+            return
         if self.root is None:
             self.load(TEMPLATE)
         self.apply_values()
@@ -2258,17 +2288,24 @@ class EditorDialog(QDialog):
         self.apply_values()
         if not path.lower().endswith(".xml"):
             path += ".xml"
+        catatan_big = []
         try:
             out = copy.deepcopy(self.root)
-            big_compat.normalize_steps(out)
+            big = self.cb_big.isChecked()
+            if big:
+                big_compat.normalize_steps(out, catatan_big)
+            else:
+                # Tanpa mode BIG: struktur gaya BIG (berkas BIG/simpanan lama) dikembalikan ke ISO 19115-3 standar
+                big_compat.ke_standar(out)
             if self.cb_prune.isChecked():
                 model.prune_empty(out)
-            if self.cb_big.isChecked():
-                out = big_compat.to_big(out)
+            if big:
+                out = big_compat.to_big(out, catatan_big)
             model.save(out, path)
         except Exception as e:
             QMessageBox.warning(self, TITLE, "Gagal menyimpan berkas XML:\n%s" % e)
             return False
+        kosong = 0 if self.cb_prune.isChecked() else kesesuaian.isian_kosong(out)
 
         self.src = path
         now_str = datetime.datetime.now().strftime("%H:%M:%S")
@@ -2282,7 +2319,27 @@ class EditorDialog(QDialog):
                 TITLE,
                 "Metadata (%s) berhasil disimpan ke: %s" % (status_tag, path)
             )
+        self._beri_tahu_kesesuaian("Catatan Kesesuaian Standar — Simpan ISO 19115-3", [
+            ("Struktur tidak standar ISO 19115-3 (opsi \"Kompatibel Sistem BIG\" dicentang)", catatan_big),
+            ("Nilai daftar kode di luar ISO 19115-3", kesesuaian.kode_tidak_standar(out, "19115-3")),
+            ("Berkas draf", ["%d isian kosong ikut disimpan (opsi \"Hanya simpan isian yang terisi\" tidak "
+                             "dicentang) — berkas belum lolos validasi XSD ISO." % kosong] if kosong else []),
+        ])
         return True
+
+    def _beri_tahu_kesesuaian(self, judul, kelompok, selalu=False):
+        """Beri tahu bagian hasil simpan/ekspor yang tidak standar atau tidak kompatibel. Jendela hanya muncul
+        bila isinya berubah dari pemberitahuan terakhir (Simpan bisa sering ditekan) atau `selalu`."""
+        isi = kesesuaian.html(kelompok, html.escape)
+        if not isi:
+            return
+        jumlah = sum(len(p) for _, p in kelompok)
+        if not selalu and isi == getattr(self, "_kesesuaian_terakhir", None):
+            if hasattr(self.iface, "messageBar") and self.iface.messageBar() is not None:
+                self.iface.messageBar().pushWarning(TITLE, "%d catatan kesesuaian standar (sama seperti sebelumnya)." % jumlah)
+            return
+        self._kesesuaian_terakhir = isi
+        QMessageBox.information(self, judul, isi)
 
     def _default_save_path(self):
         """Bentuk path default dengan format <metadataidentifier>_<yyyymmdd>.xml."""
@@ -2375,9 +2432,9 @@ class EditorDialog(QDialog):
         if not path.lower().endswith(".xml"):
             path += ".xml"
 
-        catatan = []
+        catatan, tidak_standar = [], []
         try:
-            gmd_tree = gmd_exporter.export_to_gmd(self.root, catatan=catatan)
+            gmd_tree = gmd_exporter.export_to_gmd(self.root, catatan=catatan, tidak_standar=tidak_standar)
             gmd_exporter.save_gmd_to_file(gmd_tree, path)
         except Exception as e:
             QMessageBox.warning(self, TITLE, "Gagal mengekspor XML ISO 19139:\n%s" % e)
@@ -2391,11 +2448,27 @@ class EditorDialog(QDialog):
         pesan = ("Berkas metadata berhasil diekspor dengan standar <b>ISO 19139</b> "
                  "(namespace <code>http://www.isotc211.org/2005/gmd</code>):<br><br>"
                  f"<b>Lokasi:</b> {html.escape(path)}")
-        if catatan:
-            pesan += ("<br><br><b>Isian berikut tidak punya padanan di ISO 19139</b> dan tetap tersimpan "
-                      "di berkas ISO 19115-3:<ul>"
-                      + "".join(f"<li>{html.escape(c)}</li>" for c in catatan) + "</ul>")
+        isi = kesesuaian.html([
+            ("Tidak kompatibel ISO 19139 — tidak diekspor (tetap tersimpan di berkas ISO 19115-3)", catatan),
+            ("Diekspor, tetapi nilai daftar kodenya di luar ISO 19139 — katalog berbasis ISO 19139 "
+             "(mis. GeoNode) bisa tidak mengenalinya", tidak_standar),
+        ], html.escape)
+        if isi:
+            pesan += "<br><br><b>Catatan kesesuaian standar:</b><br>" + isi
         QMessageBox.information(self, "Ekspor ISO 19139 Berhasil", pesan)
+
+    def kirim_geonode(self):
+        """Buka dialog pengiriman metadata ke GeoNode (login per pengguna, CSW GeoNode ikut terbarui)."""
+        if self.root is None:
+            QMessageBox.information(self, TITLE, "Belum ada metadata yang dimuat untuk dikirim.")
+            return
+        from .geonode_dialog import DialogGeoNode  # qgis.gui hanya dimuat saat dibutuhkan
+        DialogGeoNode(self).exec()
+
+    def ambil_geonode(self):
+        """Buka katalog dataset GeoNode (kartu/daftar + pratinjau WMS) untuk memuat metadatanya ke formulir."""
+        from .geonode_katalog import DialogKatalogGeoNode
+        DialogKatalogGeoNode(self).exec()
 
     def export(self):
         """Alias kompatibilitas untuk Simpan Sebagai."""

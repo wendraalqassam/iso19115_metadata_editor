@@ -10,7 +10,7 @@ import os
 import re
 import xml.etree.ElementTree as ET  # nosec B405
 
-from . import layout
+from . import kesesuaian, layout
 
 HERE = os.path.dirname(__file__)
 GMD_TEMPLATE = os.path.join(HERE, "gmd_template.xml")
@@ -381,6 +381,167 @@ def _dq_pertama(gmd_root):
     return dq
 
 
+def _set_nilai(parent, tag_name, gco_type, value, **attrib):
+    """Properti bernilai tunggal bertipe gco (Integer, Real, Boolean, Measure, Record, ...)."""
+    v = _clean_str(value)
+    if not v:
+        return None
+    if gco_type == "Boolean":
+        v = v.lower()
+    el = ET.SubElement(parent, _q(GMD, tag_name))
+    sub = ET.SubElement(el, _q(GCO, gco_type))
+    for k, a in attrib.items():
+        sub.set(k, a)
+    sub.text = v
+    return el
+
+
+def _daftar(nodes, akhiran):
+    """Instance BList yang path-nya berakhiran `akhiran` (dicari langsung di `nodes`)."""
+    for n in nodes:
+        if isinstance(n, layout.BList) and getattr(n, "path", "").endswith(akhiran):
+            return n.instances
+    return []
+
+
+def _titik(parent, tag_name, gml_id, lat, lon):
+    """gml:Point (GML 3.2: gml:id wajib) dengan posisi "lintang bujur" seperti di formulir."""
+    lat, lon = _clean_str(lat), _clean_str(lon)
+    if not (lat and lon):
+        return None
+    el = ET.SubElement(parent, _q(GMD, tag_name))
+    pt = ET.SubElement(el, _q(GML, "Point"))
+    pt.set(_q(GML, "id"), gml_id)
+    ET.SubElement(pt, _q(GML, "pos")).text = f"{lat} {lon}"
+    return el
+
+
+# Ejaan formulir (ISO 19115-3) → enumerasi ISO 19139
+_PIKSEL = {"centre": "center"}
+
+
+def _grid_dasar(el, d, nodes):
+    """Properti MD_GridSpatialRepresentation yang dipakai Georectified & Georeferenceable."""
+    _set_nilai(el, "numberOfDimensions", "Integer", d.get("rasterNumDimensions"))
+    for inst in _daftar(nodes, "axisDimensionProperties"):
+        dd = _collect_dict_from_nodes(inst.nodes)
+        if not any(dd.values()):
+            continue
+        dim = ET.SubElement(ET.SubElement(el, _q(GMD, "axisDimensionProperties")), _q(GMD, "MD_Dimension"))
+        _set_code(dim, "dimensionName", "MD_DimensionNameTypeCode", dd.get("dimName"))
+        _set_nilai(dim, "dimensionSize", "Integer", dd.get("dimSize"))
+        _set_nilai(dim, "resolution", "Measure", dd.get("dimRes"), uom="m")  # formulir: resolusi dalam meter
+    _set_code(el, "cellGeometry", "MD_CellGeometryCode", d.get("rasterCellGeometry"))
+    _set_nilai(el, "transformationParameterAvailability", "Boolean", d.get("rasterTransformationParams"))
+
+
+def _georectified(opt):
+    d = _bidang_langsung(opt.nodes)
+    wrap = ET.Element(_q(GMD, "spatialRepresentationInfo"))
+    g = ET.SubElement(wrap, _q(GMD, "MD_Georectified"))
+    _grid_dasar(g, d, opt.nodes)
+    _set_nilai(g, "checkPointAvailability", "Boolean", d.get("rasterCheckPointAvailability"))
+    _set_char(g, "checkPointDescription", d.get("rasterCheckPointDescription"))
+    for i in (1, 2):
+        _titik(g, "cornerPoints", f"georectified-corner-{i}",
+               d.get(f"rasterCornerPoint{i}Lat"), d.get(f"rasterCornerPoint{i}Lon"))
+    _titik(g, "centerPoint", "georectified-center", d.get("rasterCentrePointLat"), d.get("rasterCentrePointLon"))
+    if d.get("rasterPointPixel"):
+        px = ET.SubElement(g, _q(GMD, "pointInPixel"))
+        ET.SubElement(px, _q(GMD, "MD_PixelOrientationCode")).text = _PIKSEL.get(d["rasterPointPixel"], d["rasterPointPixel"])
+    _set_char(g, "transformationDimensionDescription", d.get("rasterTransformationDimensionDescription"))
+    for inst in _daftar(opt.nodes, "transformationDimensionMapping")[:2]:  # ISO 19139: maksimal 2
+        v = _collect_dict_from_nodes(inst.nodes).get("value")
+        if v:
+            _set_nilai(g, "transformationDimensionMapping", "CharacterString", v)
+    return wrap
+
+
+def _georeferenceable(opt, catatan):
+    d = _bidang_langsung(opt.nodes)
+    wrap = ET.Element(_q(GMD, "spatialRepresentationInfo"))
+    g = ET.SubElement(wrap, _q(GMD, "MD_Georeferenceable"))
+    _grid_dasar(g, d, opt.nodes)
+    _set_nilai(g, "controlPointAvailability", "Boolean", d.get("controlPointAvailability"))
+    _set_nilai(g, "orientationParameterAvailability", "Boolean", d.get("orientationParameterAvailability"))
+    _set_char(g, "orientationParameterDescription", d.get("orientationParameterDescription"))
+    _set_nilai(g, "georeferencedParameters", "Record", d.get("georeferencedParameters"))
+    gcp = [k for k in d if k.startswith("rasterGCPCollection")] or [
+        i for i in _daftar(opt.nodes, "gcp") if any(_collect_dict_from_nodes(i.nodes).values())]
+    if gcp:
+        catatan.append("Koleksi GCP (geolocationInformation) adalah bagian ISO 19115-2, tidak ada di ISO 19139 — "
+                       "tidak diekspor.")
+    return wrap
+
+
+def _band(bd, catatan):
+    """dimension/MD_Band ISO 19139 dari satu band formulir."""
+    wrap = ET.Element(_q(GMD, "dimension"))
+    b = ET.SubElement(wrap, _q(GMD, "MD_Band"))
+    nama = bd.get("sequenceId") or bd.get("code")
+    if nama:
+        mn = ET.SubElement(ET.SubElement(b, _q(GMD, "sequenceIdentifier")), _q(GCO, "MemberName"))
+        ET.SubElement(ET.SubElement(mn, _q(GCO, "aName")), _q(GCO, "CharacterString")).text = nama
+        ET.SubElement(mn, _q(GCO, "attributeType")).set(_q(GCO, "nilReason"), "missing")
+    if bd.get("sequenceId") and (bd.get("code") or bd.get("authority")):
+        catatan.append("Identitas band (otoritas/kode) tidak punya padanan di MD_Band ISO 19139 — tidak diekspor.")
+    _set_char(b, "descriptor", bd.get("description"))
+    for key, tag, tipe in (("maxValue", "maxValue", "Real"), ("minValue", "minValue", "Real"),
+                           ("peakResponse", "peakResponse", "Real"), ("bitsPerValue", "bitsPerValue", "Integer"),
+                           ("toneGradation", "toneGradation", "Integer"), ("scaleFactor", "scaleFactor", "Real")):
+        _set_nilai(b, tag, tipe, bd.get(key))
+    if bd.get("boundMin") or bd.get("boundMax"):
+        catatan.append("Batas panjang gelombang band (boundMin/boundMax) adalah bagian ISO 19115-2 — tidak diekspor.")
+    return wrap
+
+
+def _deskripsi_cakupan(opt, kelas, catatan):
+    """contentInfo/MD_CoverageDescription atau MD_ImageDescription (ISO 19139)."""
+    d = _bidang_langsung(opt.nodes)
+    wrap = ET.Element(_q(GMD, "contentInfo"))
+    c = ET.SubElement(wrap, _q(GMD, kelas))
+    _set_nilai(c, "attributeDescription", "RecordType", d.get("coverageAttributeDescription"))
+    grup = _daftar(opt.nodes, "attributeGroup")
+    # ISO 19139 hanya punya satu contentType per deskripsi; grup atribut formulir digabung
+    jenis = [_bidang_langsung(g.nodes).get("contentType") for g in grup]
+    jenis = [j for j in jenis if j]
+    _set_code(c, "contentType", "MD_CoverageContentTypeCode", jenis[0] if jenis else "")
+    if len(set(jenis)) > 1:
+        catatan.append("ISO 19139 hanya memuat satu tipe konten per deskripsi cakupan — tipe pertama dipakai.")
+    for g in grup:
+        for att in _daftar(g.nodes, "attribute"):
+            bd = _bidang_langsung(att.nodes)
+            if bd:
+                c.append(_band(bd, catatan))
+            if any(any(_collect_dict_from_nodes(r.nodes).values()) for r in _daftar(att.nodes, "rangeElementDescription")):
+                catatan.append("Deskripsi elemen rentang band adalah bagian ISO 19115-2 — tidak diekspor.")
+    if d.get("coverageProcessingLevelCode") or d.get("coverageProcessingLevelDescription"):
+        if kelas == "MD_ImageDescription":
+            plc = _anak(c, "processingLevelCode", "MD_Identifier")
+            _set_char(plc, "code", d.get("coverageProcessingLevelCode"))
+        if kelas != "MD_ImageDescription" or d.get("coverageProcessingLevelDescription"):
+            catatan.append("Deskripsi/kode tingkat pengolahan tidak sepenuhnya punya padanan di ISO 19139 "
+                           "(hanya kode, dan hanya pada deskripsi citra) — sebagian tidak diekspor.")
+    if kelas == "MD_ImageDescription":
+        _set_nilai(c, "illuminationElevationAngle", "Real", d.get("imageIlluminationElevation"))
+        _set_nilai(c, "illuminationAzimuthAngle", "Real", d.get("imageIlluminationAzimuth"))
+        _set_code(c, "imagingCondition", "MD_ImagingConditionCode", d.get("imageImagingCondition"))
+        if d.get("imageQualityCode") or d.get("imageQualityAuthority"):
+            iq = _anak(c, "imageQualityCode", "MD_Identifier")
+            if d.get("imageQualityAuthority"):
+                _set_char(_anak(iq, "authority", "CI_Citation"), "title", d["imageQualityAuthority"])
+            _set_char(iq, "code", d.get("imageQualityCode"))
+        _set_nilai(c, "cloudCoverPercentage", "Real", d.get("imageCloudCoverPercentage"))
+        _set_nilai(c, "compressionGenerationQuantity", "Integer", d.get("imageCompressionGenerationQuantity"))
+        for key, tag in (("imageTriangulationIndicator", "triangulationIndicator"),
+                         ("imageRadiometricCalibration", "radiometricCalibrationDataAvailability"),
+                         ("imageCameraCalibration", "cameraCalibrationInformationAvailability"),
+                         ("imageFilmDistortion", "filmDistortionInformationAvailability"),
+                         ("imageLensDistortion", "lensDistortionInformationAvailability")):
+            _set_nilai(c, tag, "Boolean", d.get(key))
+    return wrap
+
+
 # Kelas laporan ISO 19157 (formulir) yang namanya berbeda di ISO 19139.
 _DQ_19139 = {"DQ_NonQuantitativeAttributeCorrectness": "DQ_NonQuantitativeAttributeAccuracy"}
 
@@ -445,9 +606,24 @@ _KUNCI_BATASAN = {
 }
 
 
-def _batasan(tag_name, data):
-    """Blok batasan (MD_Constraints / MD_LegalConstraints / MD_SecurityConstraints) yang terisi."""
+def _daftar_nilai(nodes, path, kunci):
+    """Nilai terisi dari daftar formulir `path` (satu kolom `kunci` per instans), urut & tanpa ganda."""
+    out = []
+    for n in nodes:
+        if isinstance(n, layout.BList) and getattr(n, "path", "") == path:
+            for inst in n.instances:
+                v = _clean_str(_collect_dict_from_nodes(inst.nodes).get(kunci))
+                if v and v not in out:
+                    out.append(v)
+    return out
+
+
+def _batasan(tag_name, data, pakai=(), lain=()):
+    """Blok batasan (MD_Constraints / MD_LegalConstraints / MD_SecurityConstraints) yang terisi.
+    `pakai`/`lain`: daftar useConstraints/otherConstraints (batasan sumber daya bisa lebih dari satu nilai)."""
     v = {prop: _clean_str(data.get(kunci)) for prop, kunci in _KUNCI_BATASAN[tag_name].items()}
+    pakai = list(pakai) or ([v["useConstraints"]] if v["useConstraints"] else [])
+    lain = list(lain) or ([v["otherConstraints"]] if v["otherConstraints"] else [])
     out = []
 
     def blok(kelas):
@@ -457,11 +633,13 @@ def _batasan(tag_name, data):
 
     if v["useLimitation"]:
         _set_char(blok("MD_Constraints"), "useLimitation", v["useLimitation"])
-    if v["accessConstraints"] or v["useConstraints"] or v["otherConstraints"]:
+    if v["accessConstraints"] or pakai or lain:
         c = blok("MD_LegalConstraints")
         _set_code(c, "accessConstraints", "MD_RestrictionCode", v["accessConstraints"])
-        _set_code(c, "useConstraints", "MD_RestrictionCode", v["useConstraints"])
-        _set_char(c, "otherConstraints", v["otherConstraints"])
+        for kode in pakai:  # _set_code mengisi elemen yang sudah ada; dibuat di wadah sementara agar tiap nilai baru
+            c.append(_set_code(ET.Element("_"), "useConstraints", "MD_RestrictionCode", kode))
+        for teks in lain:
+            ET.SubElement(ET.SubElement(c, _q(GMD, "otherConstraints")), _q(GCO, "CharacterString")).text = teks
     if v["classification"] or v["userNote"] or v["classificationSystem"] or v["handlingDescription"]:
         c = blok("MD_SecurityConstraints")
         _set_code(c, "classification", "MD_ClassificationCode", v["classification"])
@@ -519,11 +697,13 @@ def _rapikan(root, catatan):
     return root
 
 
-def export_to_gmd(iso3_root, template_path=None, catatan=None):
+def export_to_gmd(iso3_root, template_path=None, catatan=None, tidak_standar=None):
     """Mengekspor pohon data ISO 19115-3 ke dokumen XML ISO 19139 (gmd).
 
     `catatan` (opsional, list): diisi pesan untuk isian yang tidak punya padanan di ISO 19139
-    sehingga tidak ikut diekspor (tetap tersimpan di berkas ISO 19115-3)."""
+    sehingga tidak ikut diekspor (tetap tersimpan di berkas ISO 19115-3).
+    `tidak_standar` (opsional, list): diisi nilai daftar kode yang diekspor tetapi tidak ada di daftar
+    kode ISO 19139 — sah menurut XSD, namun katalog berbasis ISO 19139 bisa tidak mengenalinya."""
     if catatan is None:
         catatan = []
     register_gmd_namespaces()
@@ -550,6 +730,12 @@ def export_to_gmd(iso3_root, template_path=None, catatan=None):
         _set_language(gmd_root, "language", d1.get("language"))
         if "characterEncoding" in d1 and d1["characterEncoding"].strip():
             _set_code(gmd_root, "characterSet", "MD_CharacterSetCode", d1["characterEncoding"].strip())
+        if d1.get("country"):
+            # Negara hanya bisa dimuat lewat gmd:locale/PT_Locale (bersama bahasa & set karakter)
+            loc = _anak(gmd_root, "locale", "PT_Locale")
+            _set_language(loc, "languageCode", d1.get("language"))
+            _set_code(loc, "country", "Country", d1["country"])
+            _set_code(loc, "characterEncoding", "MD_CharacterSetCode", d1.get("characterEncoding"))
         _set_char(gmd_root, "parentIdentifier", d1.get("parentMetadata"))
         if "metadataScope" in d1:
             _set_code(gmd_root, "hierarchyLevel", "MD_ScopeCode", d1["metadataScope"])
@@ -678,6 +864,14 @@ def export_to_gmd(iso3_root, template_path=None, catatan=None):
                     if any(cd.values()):
                         ci_cit.append(_build_contact_element("citedResponsibleParty", cd))
 
+        # Identifier data (mis. DOI)
+        idf_baru = []
+        if d2.get("dataIdentifier"):
+            idf = ET.Element(_q(GMD, "identifier"))
+            _set_char(ET.SubElement(idf, _q(GMD, "MD_Identifier")), "code", d2["dataIdentifier"])
+            idf_baru.append(idf)
+        _ganti_semua(ci_cit, "identifier", idf_baru)
+
         # Deskripsi umum
         if "dataAbstract" in d2:
             _set_char(data_id, "abstract", d2["dataAbstract"])
@@ -685,6 +879,8 @@ def export_to_gmd(iso3_root, template_path=None, catatan=None):
             _set_char(data_id, "purpose", d2["dataPurpose"])
         if "dataCredit" in d2:
             _set_char(data_id, "credit", d2["dataCredit"])
+        if "dataSupplementalInformation" in d2:
+            _set_char(data_id, "supplementalInformation", d2["dataSupplementalInformation"])
         if "dataStatus" in d2:
             _set_code(data_id, "status", "MD_ProgressCode", d2["dataStatus"])
 
@@ -706,7 +902,11 @@ def export_to_gmd(iso3_root, template_path=None, catatan=None):
                 for inst in n.instances:
                     tcd = _collect_dict_from_nodes(inst.nodes)
                     t_val = tcd.get("topicCategory")
-                    if t_val:
+                    if t_val and t_val not in kesesuaian.enumerasi_19139("MD_TopicCategoryCode"):
+                        # enumerasi tertutup: nilai baru ISO 19115-3 (mis. disaster) membuat XML tidak valid
+                        catatan.append("Kategori topik «%s» hanya ada di ISO 19115-3, bukan di daftar tertutup "
+                                       "ISO 19139 — tidak diekspor." % t_val)
+                    elif t_val:
                         tc_el = ET.SubElement(data_id, _q(GMD, "topicCategory"))
                         tcc = ET.SubElement(tc_el, _q(GMD, "MD_TopicCategoryCode"))
                         tcc.text = t_val
@@ -830,10 +1030,10 @@ def export_to_gmd(iso3_root, template_path=None, catatan=None):
     s3 = sec_map.get(3)
     if s3:
         d3 = _collect_dict_from_nodes(s3.nodes)
+        # Grid / raster: MD_Georectified & MD_Georeferenceable (snippet "grid" / "georef")
         for n in s3.nodes:
-            if isinstance(n, layout.BOptional) and n.present and "Grid" in n.label:
-                catatan.append(f"Representasi spasial \"{n.label.replace('Aktifkan ', '')}\" belum didukung "
-                               "ekspor ISO 19139 — tidak diekspor.")
+            if isinstance(n, layout.BOptional) and n.present and n.snippet in ("grid", "georef"):
+                gmd_root.append(_georectified(n) if n.snippet == "grid" else _georeferenceable(n, catatan))
         if data_id is not None and "spatialRepresentationType" in d3:
             _set_code(data_id, "spatialRepresentationType", "MD_SpatialRepresentationTypeCode", d3["spatialRepresentationType"])
 
@@ -944,15 +1144,19 @@ def export_to_gmd(iso3_root, template_path=None, catatan=None):
         ft_names = []
         for n in s5.nodes:
             if isinstance(n, layout.BOptional) and n.present:
-                if "Citra" in n.label:
-                    catatan.append("Deskripsi citra (MD_ImageDescription) belum didukung ekspor ISO 19139 — tidak diekspor.")
+                if n.snippet in ("coverage", "image"):
+                    kelas = "MD_ImageDescription" if n.snippet == "image" else "MD_CoverageDescription"
+                    gmd_root.append(_deskripsi_cakupan(n, kelas, catatan))
+                    continue
                 for sub_n in n.nodes:
                     if isinstance(sub_n, layout.BList) and getattr(sub_n, "path", "") == "featureTypes":
                         for inst in sub_n.instances:
                             ft_d = _collect_dict_from_nodes(inst.nodes)
-                            nama = ft_d.get("name") or ft_d.get("code")
+                            nama = (ft_d.get("name") or "").strip()
+                            # Tanpa nama bukan tipe unsur: kode saja (mis. KAB/KEC bawaan template) tidak diekspor.
                             if nama:
-                                ft_names.append(nama)
+                                # "Kode" di formulir = codeSpace nama unsur (featureTypeName/@codeSpace)
+                                ft_names.append((nama, ft_d.get("code") or ""))
         fc_keys = ("featureCatalogueCompliance", "featureCatalogueIncluded", "catalogueTitle",
                    "catalogueAlternateTitle", "catalogueEdition", "catalogueURL")
         if any(k in d5 for k in fc_keys) or ft_names:
@@ -967,9 +1171,12 @@ def export_to_gmd(iso3_root, template_path=None, catatan=None):
                     b_el = ET.SubElement(feat_cat, _q(GMD, tag))
                     ET.SubElement(b_el, _q(GCO, "Boolean")).text = d5[key].strip().lower()
             # ISO 19139: featureTypes bertipe GenericName → gco:LocalName
-            for nama in ft_names:
+            for nama, kode in ft_names:
                 ft_el = ET.SubElement(feat_cat, _q(GMD, "featureTypes"))
-                ET.SubElement(ft_el, _q(GCO, "LocalName")).text = nama
+                ln = ET.SubElement(ft_el, _q(GCO, "LocalName"))
+                ln.text = nama
+                if kode:
+                    ln.set("codeSpace", kode)
             fc_cit = _anak(feat_cat, "featureCatalogueCitation", "CI_Citation")
             _set_char(fc_cit, "title", d5.get("catalogueTitle"))
             _set_char(fc_cit, "alternateTitle", d5.get("catalogueAlternateTitle"))
@@ -1175,7 +1382,10 @@ def export_to_gmd(iso3_root, template_path=None, catatan=None):
     if s10 and data_id is not None:
         d10 = _collect_dict_from_nodes(s10.nodes)
         # Dibuat dari isian (template tidak memuat blok batasan, jadi dulu tak pernah terekspor)
-        _ganti_semua(data_id, "resourceConstraints", _batasan("resourceConstraints", d10))
+        _ganti_semua(data_id, "resourceConstraints", _batasan(
+            "resourceConstraints", d10,
+            _daftar_nilai(s10.nodes, layout.PATH_USE_CONSTRAINTS, "useConstraints"),
+            _daftar_nilai(s10.nodes, layout.PATH_OTHER_CONSTRAINTS, "otherConstraints")))
         _ganti_semua(gmd_root, "metadataConstraints", _batasan("metadataConstraints", d10))
 
     # =========================================================================
@@ -1348,6 +1558,8 @@ def export_to_gmd(iso3_root, template_path=None, catatan=None):
     _rapikan(gmd_root, catatan)
     # Pesan yang sama (mis. dari beberapa tahap proses) cukup sekali
     catatan[:] = list(dict.fromkeys(catatan))
+    if tidak_standar is not None:
+        tidak_standar.extend(kesesuaian.kode_tidak_standar(gmd_root, "19139"))
     return gmd_root
 
 

@@ -279,6 +279,6 @@ def extract_vector(layer):
     other = [c.constraint.strip() for c in md.constraints() if (c.constraint or "").strip()]
     other += [x.strip() for x in list(md.licenses()) + list(md.rights()) if x.strip()]
     if other:
-        F((10, "otherConstraints", "\n".join(other)))
+        LST((10, layout.PATH_OTHER_CONSTRAINTS, [{"otherConstraints": v} for v in dict.fromkeys(other)]))
 
     return plan

@@ -149,6 +149,42 @@ def parse_online(res_el):
     }
 
 
+def _pos(prop):
+    """(lintang, bujur) dari properti berisi gml:Point/gml:pos — GML 3.2 (ekspor GeoMDB) atau 3.1."""
+    if prop is None:
+        return "", ""
+    for gml_ns in (GML32, GML):
+        pos = prop.find(f"{_q(gml_ns, 'Point')}/{_q(gml_ns, 'pos')}")
+        if pos is not None and (pos.text or "").split():
+            p = pos.text.split()
+            return p[0], (p[1] if len(p) > 1 else "")
+    return "", ""
+
+
+def _baca_sumber(src):
+    """Isian formulir dari satu LI_Source (sumber lineage atau sumber masukan tahap proses)."""
+    sd = get_text(src, _q(GMD, "description"))
+    sres = get_text(src, f"{_q(GMD, 'sourceSpatialResolution')}/{_q(GMD, 'MD_Resolution')}/{_q(GMD, 'distance')}") or get_text(src, f"{_q(GMD, 'sourceSpatialResolution')}/{_q(GMD, 'distance')}")
+    sref_c = get_text(src, f"{_q(GMD, 'sourceReferenceSystem')}/{_q(GMD, 'MD_ReferenceSystem')}/{_q(GMD, 'referenceSystemIdentifier')}/{_q(GMD, 'MD_Identifier')}/{_q(GMD, 'code')}") or get_text(src, f".//{_q(GMD, 'sourceReferenceSystem')}//{_q(GMD, 'code')}")
+    sref_cs = get_text(src, f"{_q(GMD, 'sourceReferenceSystem')}/{_q(GMD, 'MD_ReferenceSystem')}/{_q(GMD, 'referenceSystemIdentifier')}/{_q(GMD, 'MD_Identifier')}/{_q(GMD, 'codeSpace')}") or get_text(src, f".//{_q(GMD, 'sourceReferenceSystem')}//{_q(GMD, 'codeSpace')}")
+    scit = get_text(src, f"{_q(GMD, 'sourceCitation')}/{_q(GMD, 'CI_Citation')}/{_q(GMD, 'title')}")
+    scit_d = get_text(src, f"{_q(GMD, 'sourceCitation')}/{_q(GMD, 'CI_Citation')}/{_q(GMD, 'date')}/{_q(GMD, 'CI_Date')}/{_q(GMD, 'date')}")
+    scit_dt = get_code(src, f"{_q(GMD, 'sourceCitation')}/{_q(GMD, 'CI_Citation')}/{_q(GMD, 'date')}/{_q(GMD, 'CI_Date')}/{_q(GMD, 'dateType')}")
+    smeta = get_text(src, f"{_q(GMD, 'sourceMetadata')}/{_q(GMD, 'CI_Citation')}/{_q(GMD, 'title')}")
+    ssc = get_code(src, f"{_q(GMD, 'scope')}/{_q(GMD, 'level')}")
+    return {
+        "description": sd,
+        "spatialResolution": sres,
+        "referenceSystemCode": sref_c,
+        "referenceSystemCodeSpace": sref_cs,
+        "citationTitle": scit,
+        "citationDate": scit_d,
+        "citationDateType": scit_dt or "creation",
+        "metadataTitle": smeta,
+        "scopeLevel": ssc or "dataset",
+    }
+
+
 def extract_gmd_plan(gmd_root_or_path):
     """Mengekstrak seluruh nilai elemen dari berkas/akar XML ISO 19139 ke format Plan GeoMDB."""
     if isinstance(gmd_root_or_path, str):
@@ -261,6 +297,13 @@ def extract_gmd_plan(gmd_root_or_path):
             if cited_p:
                 LST((2, ID + "citation/citedResponsibleParty", cited_p))
 
+            # Identifier data — GeoNode menulis DOI sebagai gmx:Anchor (get_text membaca anak apa pun)
+            for idf in cit.findall(_q(GMD, "identifier")):
+                kode = next((get_text(kls, _q(GMD, "code")) for kls in idf), "")
+                if kode:
+                    F((2, "dataIdentifier", kode))
+                    break
+
         ab = get_text(data_id, _q(GMD, "abstract"))
         if ab:
             F((2, "dataAbstract", ab))
@@ -270,6 +313,9 @@ def extract_gmd_plan(gmd_root_or_path):
         cr = get_text(data_id, _q(GMD, "credit"))
         if cr:
             F((2, "dataCredit", cr))
+        si = get_text(data_id, _q(GMD, "supplementalInformation"))
+        if si:
+            F((2, "dataSupplementalInformation", si))
         st = get_code(data_id, _q(GMD, "status"))
         if st:
             F((2, "dataStatus", st))
@@ -396,10 +442,55 @@ def extract_gmd_plan(gmd_root_or_path):
             if goc:
                 F((3, "geometricObjectCount", goc))
 
+    # Grid / raster (MD_Georectified, MD_Georeferenceable). Kunci isian keduanya sama di formulir,
+    # jadi alamatnya diawali snippet bagian opsionalnya: "grid:..." / "georef:...".
+    for sri in gmd_root.findall(_q(GMD, "spatialRepresentationInfo")):
+        for gr in sri:
+            kelas = gr.tag.rsplit("}", 1)[-1]
+            if kelas not in ("MD_Georectified", "MD_Georeferenceable"):
+                continue
+            sn = "grid" if kelas == "MD_Georectified" else "georef"
+            OPT((3, sn))
+            F((3, sn + ":rasterNumDimensions", get_text(gr, _q(GMD, "numberOfDimensions"))))
+            dims = [{"dimName": get_code(dim, _q(GMD, "dimensionName")),
+                     "dimSize": get_text(dim, _q(GMD, "dimensionSize")),
+                     "dimRes": get_text(dim, _q(GMD, "resolution"))}
+                    for dim in gr.findall(f"{_q(GMD, 'axisDimensionProperties')}/{_q(GMD, 'MD_Dimension')}")]
+            if dims:
+                LST((3, sn + ":axisDimensionProperties", dims))
+            F((3, sn + ":rasterCellGeometry", get_code(gr, _q(GMD, "cellGeometry"))))
+            F((3, sn + ":rasterTransformationParams", get_text(gr, _q(GMD, "transformationParameterAvailability"))))
+            if sn == "grid":
+                F((3, "grid:rasterCheckPointAvailability", get_text(gr, _q(GMD, "checkPointAvailability"))))
+                F((3, "grid:rasterCheckPointDescription", get_text(gr, _q(GMD, "checkPointDescription"))))
+                for i, cp in enumerate(gr.findall(_q(GMD, "cornerPoints"))[:2], 1):
+                    lat, lon = _pos(cp)
+                    F((3, f"grid:rasterCornerPoint{i}Lat", lat))
+                    F((3, f"grid:rasterCornerPoint{i}Lon", lon))
+                lat, lon = _pos(gr.find(_q(GMD, "centerPoint")))
+                F((3, "grid:rasterCentrePointLat", lat))
+                F((3, "grid:rasterCentrePointLon", lon))
+                px = get_text(gr, _q(GMD, "pointInPixel"))
+                F((3, "grid:rasterPointPixel", {"center": "centre"}.get(px, px)))  # ISO 19139 → ISO 19115-3
+                F((3, "grid:rasterTransformationDimensionDescription",
+                   get_text(gr, _q(GMD, "transformationDimensionDescription"))))
+                maps = [{"value": get_text(m, ".")} for m in gr.findall(_q(GMD, "transformationDimensionMapping"))]
+                maps = [m for m in maps if m["value"]]
+                if maps:
+                    LST((3, "grid:transformationDimensionMapping", maps))
+            else:
+                F((3, "georef:controlPointAvailability", get_text(gr, _q(GMD, "controlPointAvailability"))))
+                F((3, "georef:orientationParameterAvailability", get_text(gr, _q(GMD, "orientationParameterAvailability"))))
+                F((3, "georef:orientationParameterDescription", get_text(gr, _q(GMD, "orientationParameterDescription"))))
+                F((3, "georef:georeferencedParameters", get_text(gr, _q(GMD, "georeferencedParameters"))))
+
     # --- TAHAP 4: SISTEM REFERENSI KOORDINAT ---
     rs_id = gmd_root.find(f"{_q(GMD, 'referenceSystemInfo')}/{_q(GMD, 'MD_ReferenceSystem')}/{_q(GMD, 'referenceSystemIdentifier')}")
     if rs_id is not None:
-        r_el = rs_id.find(_q(GMD, "RS_Identifier")) or rs_id.find(_q(GMD, "MD_Identifier"))
+        # `is None`, bukan `or`: Element tanpa anak bernilai False sehingga `or` bisa salah pilih
+        r_el = rs_id.find(_q(GMD, "RS_Identifier"))
+        if r_el is None:
+            r_el = rs_id.find(_q(GMD, "MD_Identifier"))
         if r_el is not None:
             code = get_text(r_el, _q(GMD, "code"))
             cs = get_text(r_el, _q(GMD, "codeSpace"))
@@ -446,6 +537,47 @@ def extract_gmd_plan(gmd_root_or_path):
             curl = get_text(fc_cit, f"{_q(GMD, 'onlineResource')}/{_q(GMD, 'CI_OnlineResource')}/{_q(GMD, 'linkage')}")
             if curl:
                 F((5, "catalogueURL", curl))
+
+    # Deskripsi cakupan / citra (MD_CoverageDescription, MD_ImageDescription) — alamat diawali
+    # snippet bagian opsionalnya ("coverage:" / "image:") karena kunci isian keduanya sama.
+    for ci in gmd_root.findall(_q(GMD, "contentInfo")):
+        for cd in ci:
+            kelas = cd.tag.rsplit("}", 1)[-1]
+            if kelas not in ("MD_ImageDescription", "MD_CoverageDescription"):
+                continue
+            sn = "image" if kelas == "MD_ImageDescription" else "coverage"
+            OPT((5, sn))
+            F((5, sn + ":coverageAttributeDescription", get_text(cd, _q(GMD, "attributeDescription"))))
+            bands = []
+            for dim in cd.findall(_q(GMD, "dimension")):
+                for b in dim:  # MD_Band / MD_RangeDimension
+                    bd = {"sequenceId": get_text(b, f"{_q(GMD, 'sequenceIdentifier')}/{_q(GCO, 'MemberName')}/{_q(GCO, 'aName')}"),
+                          "description": get_text(b, _q(GMD, "descriptor"))}
+                    for key in ("maxValue", "minValue", "scaleFactor", "bitsPerValue", "peakResponse", "toneGradation"):
+                        bd[key] = get_text(b, _q(GMD, key))
+                    bd = {k: v for k, v in bd.items() if v}
+                    if bd:
+                        bands.append(bd)
+            ct = get_code(cd, _q(GMD, "contentType"))
+            if ct or bands:
+                LST((5, sn + ":attributeGroup", [{"contentType": ct, "__lists__": {"attribute": bands}}]))
+            if sn == "image":
+                mdi = f"{_q(GMD, 'MD_Identifier')}"
+                F((5, "image:coverageProcessingLevelCode", get_text(cd, f"{_q(GMD, 'processingLevelCode')}/{mdi}/{_q(GMD, 'code')}")))
+                F((5, "image:imageQualityCode", get_text(cd, f"{_q(GMD, 'imageQualityCode')}/{mdi}/{_q(GMD, 'code')}")))
+                F((5, "image:imageQualityAuthority", get_text(
+                    cd, f"{_q(GMD, 'imageQualityCode')}/{mdi}/{_q(GMD, 'authority')}/{_q(GMD, 'CI_Citation')}/{_q(GMD, 'title')}")))
+                F((5, "image:imageImagingCondition", get_code(cd, _q(GMD, "imagingCondition"))))
+                for key, tag in (("imageIlluminationElevation", "illuminationElevationAngle"),
+                                 ("imageIlluminationAzimuth", "illuminationAzimuthAngle"),
+                                 ("imageCloudCoverPercentage", "cloudCoverPercentage"),
+                                 ("imageCompressionGenerationQuantity", "compressionGenerationQuantity"),
+                                 ("imageTriangulationIndicator", "triangulationIndicator"),
+                                 ("imageRadiometricCalibration", "radiometricCalibrationDataAvailability"),
+                                 ("imageCameraCalibration", "cameraCalibrationInformationAvailability"),
+                                 ("imageFilmDistortion", "filmDistortionInformationAvailability"),
+                                 ("imageLensDistortion", "lensDistortionInformationAvailability")):
+                    F((5, "image:" + key, get_text(cd, _q(GMD, tag))))
 
     # --- TAHAP 6: DISTRIBUSI & AKSES DATA ---
     dist = gmd_root.find(f"{_q(GMD, 'distributionInfo')}/{_q(GMD, 'MD_Distribution')}")
@@ -519,31 +651,15 @@ def extract_gmd_plan(gmd_root_or_path):
                     "referenceTitle": ref_t,
                     "scopeLevel": psc or "dataset",
                 })
+                ps_src = ps.find(f"{_q(GMD, 'source')}/{_q(GMD, 'LI_Source')}")
+                if ps_src is not None:
+                    steps[-1]["__opsional__"] = {"proc_source": _baca_sumber(ps_src)}
             if steps:
                 LST((8, "resourceLineage/processStep", steps))
 
             sources = []
             for src in lin.findall(f"{_q(GMD, 'source')}/{_q(GMD, 'LI_Source')}"):
-                sd = get_text(src, _q(GMD, "description"))
-                sres = get_text(src, f"{_q(GMD, 'sourceSpatialResolution')}/{_q(GMD, 'MD_Resolution')}/{_q(GMD, 'distance')}") or get_text(src, f"{_q(GMD, 'sourceSpatialResolution')}/{_q(GMD, 'distance')}")
-                sref_c = get_text(src, f"{_q(GMD, 'sourceReferenceSystem')}/{_q(GMD, 'MD_ReferenceSystem')}/{_q(GMD, 'referenceSystemIdentifier')}/{_q(GMD, 'MD_Identifier')}/{_q(GMD, 'code')}") or get_text(src, f".//{_q(GMD, 'sourceReferenceSystem')}//{_q(GMD, 'code')}")
-                sref_cs = get_text(src, f"{_q(GMD, 'sourceReferenceSystem')}/{_q(GMD, 'MD_ReferenceSystem')}/{_q(GMD, 'referenceSystemIdentifier')}/{_q(GMD, 'MD_Identifier')}/{_q(GMD, 'codeSpace')}") or get_text(src, f".//{_q(GMD, 'sourceReferenceSystem')}//{_q(GMD, 'codeSpace')}")
-                scit = get_text(src, f"{_q(GMD, 'sourceCitation')}/{_q(GMD, 'CI_Citation')}/{_q(GMD, 'title')}")
-                scit_d = get_text(src, f"{_q(GMD, 'sourceCitation')}/{_q(GMD, 'CI_Citation')}/{_q(GMD, 'date')}/{_q(GMD, 'CI_Date')}/{_q(GMD, 'date')}")
-                scit_dt = get_code(src, f"{_q(GMD, 'sourceCitation')}/{_q(GMD, 'CI_Citation')}/{_q(GMD, 'date')}/{_q(GMD, 'CI_Date')}/{_q(GMD, 'dateType')}")
-                smeta = get_text(src, f"{_q(GMD, 'sourceMetadata')}/{_q(GMD, 'CI_Citation')}/{_q(GMD, 'title')}")
-                ssc = get_code(src, f"{_q(GMD, 'scope')}/{_q(GMD, 'level')}")
-                sources.append({
-                    "description": sd,
-                    "spatialResolution": sres,
-                    "referenceSystemCode": sref_c,
-                    "referenceSystemCodeSpace": sref_cs,
-                    "citationTitle": scit,
-                    "citationDate": scit_d,
-                    "citationDateType": scit_dt or "creation",
-                    "metadataTitle": smeta,
-                    "scopeLevel": ssc or "dataset",
-                })
+                sources.append(_baca_sumber(src))
             if sources:
                 LST((8, "resourceLineage/source", sources))
         # Laporan kualitas (Tahap 7) — dibaca juga dari blok yang memuat lineage:
@@ -619,6 +735,9 @@ def extract_gmd_plan(gmd_root_or_path):
 
     # --- TAHAP 10: BATASAN & KEAMANAN ---
     if data_id is not None:
+        # Semua blok MD_LegalConstraints digabung ke daftar formulir — GeoNode menulis lisensi (+ DOI) dan
+        # batasan lain di blok terpisah; dulu kolom tunggal membuat blok terakhir menimpa yang lain.
+        pakai, lain = [], []
         for rc in data_id.findall(_q(GMD, "resourceConstraints")):
             mc = rc.find(_q(GMD, "MD_Constraints"))
             if mc is not None:
@@ -628,14 +747,20 @@ def extract_gmd_plan(gmd_root_or_path):
             lc = rc.find(_q(GMD, "MD_LegalConstraints"))
             if lc is not None:
                 ac = get_code(lc, _q(GMD, "accessConstraints"))
-                uc = get_code(lc, _q(GMD, "useConstraints"))
-                oc = get_text(lc, _q(GMD, "otherConstraints"))
                 if ac:
                     F((10, "accessConstraints", ac))
-                if uc:
-                    F((10, "useConstraints", uc))
-                if oc:
-                    F((10, "otherConstraints", oc))
+                for el in lc.findall(_q(GMD, "useConstraints")):
+                    uc = get_code(el, ".")
+                    if uc and uc not in pakai:
+                        pakai.append(uc)
+                for el in lc.findall(_q(GMD, "otherConstraints")):
+                    oc = get_text(el, ".")
+                    if oc and oc not in lain:
+                        lain.append(oc)
+        if pakai:
+            LST((10, layout.PATH_USE_CONSTRAINTS, [{"useConstraints": v} for v in pakai]))
+        if lain:
+            LST((10, layout.PATH_OTHER_CONSTRAINTS, [{"otherConstraints": v} for v in lain]))
             sc = rc.find(_q(GMD, "MD_SecurityConstraints"))
             if sc is not None:
                 cl = get_code(sc, _q(GMD, "classification"))
@@ -785,10 +910,49 @@ def extract_gmd_plan(gmd_root_or_path):
     return plan
 
 
-def convert_gmd_to_iso3(gmd_root_or_path, template_path):
+# Label slot formulir di template (jenis tanggal / jenis telepon): struktur, bukan data — tidak dibuang.
+KODE_SLOT = ("CI_DateTypeCode", "CI_TelephoneTypeCode")
+
+
+def bersihkan_template(iso3_root):
+    """Buang SEMUA nilai contoh/bawaan template plugin (teks & atribut codeSpace, mis. kode tipe unsur
+    KAB/KEC) kecuali label slot formulir (KODE_SLOT) dan satuan ukur. Dipakai saat formulir diisi dari
+    GeoNode supaya yang tampil benar-benar hanya data GeoNode. Mengembalikan jumlah nilai yang dibuang."""
+    n = 0
+    for el in iso3_root.iter():
+        if el.tag.rsplit("}", 1)[-1] in KODE_SLOT:
+            continue
+        if el.text and el.text.strip():
+            el.text = None
+            n += 1
+        for k in [k for k in el.attrib if k.rsplit("}", 1)[-1] == "codeSpace" and el.attrib[k].strip()]:
+            del el.attrib[k]
+            n += 1
+    return n
+
+
+# Teks pengisi template CSW GeoNode (catalogue/full_metadata.xml), bukan data: nilai kosong (Python None)
+# tercetak "None" (nama kontak, tujuan, pernyataan riwayat, ...) dan abstrak kosong menjadi "No abstract
+# provided". Bila ikut terambil, saat Perbarui teks itu tersimpan ke basis data GeoNode sebagai isian sungguhan.
+PENGISI_GEONODE = ("None", "No abstract provided")
+
+
+def buang_pengisi_geonode(gmd_root):
+    """Kosongkan teks pengisi template GeoNode pada elemen daun. Mengembalikan jumlah yang dibuang."""
+    n = 0
+    for el in gmd_root.iter():
+        if len(el) == 0 and (el.text or "").strip() in PENGISI_GEONODE:
+            el.text = None
+            n += 1
+    return n
+
+
+def convert_gmd_to_iso3(gmd_root_or_path, template_path, bersih=False):
     """Mengonversi dokumen gmd:MD_Metadata ke mdb:MD_Metadata (ISO 19115-3)
 
     berbasis template.xml sehingga dapat langsung dimuat ke EditorDialog GeoMDB.
+    bersih=True (mode GeoNode): template dikosongkan dulu dari nilai bawaan (bersihkan_template) dan teks
+    pengisi template GeoNode dibuang (buang_pengisi_geonode) — yang masuk formulir hanya data GeoNode.
     """
     if isinstance(gmd_root_or_path, str):
         gmd_root = ET.parse(gmd_root_or_path).getroot()  # nosec B314
@@ -796,6 +960,10 @@ def convert_gmd_to_iso3(gmd_root_or_path, template_path):
         gmd_root = gmd_root_or_path
 
     iso3_root, _ = model.load(template_path)
+    if bersih:
+        bersihkan_template(iso3_root)
+        gmd_root = copy.deepcopy(gmd_root)
+        buang_pengisi_geonode(gmd_root)
     plan = extract_gmd_plan(gmd_root)
 
     # Terapkan plan ke struktur iso3_root
@@ -809,10 +977,21 @@ def convert_gmd_to_iso3(gmd_root_or_path, template_path):
                     return r
         return None
 
+    def _lingkup(nodes, nama):
+        """Alamat "snippet:nama" → cari hanya di dalam blok opsional `snippet` (kunci isian
+        grid & georef, juga coverage & image, sama persis)."""
+        if ":" not in nama:
+            return nodes, nama
+        snip, nama = nama.split(":", 1)
+        bo = _find_node(nodes, lambda n: isinstance(n, layout.BOptional) and n.snippet == snip)
+        return (bo.nodes if bo is not None and bo.present else []), nama
+
     def _find_list(nodes, path):
+        nodes, path = _lingkup(nodes, path)
         return _find_node(nodes, lambda n: isinstance(n, layout.BList) and getattr(n, "path", None) == path)
 
     def _find_field(nodes, key):
+        nodes, key = _lingkup(nodes, key)
         return _find_node(nodes, lambda n: isinstance(n, layout.BField) and n.key == key and n.field is not None)
 
     def _stages():
@@ -854,6 +1033,11 @@ def convert_gmd_to_iso3(gmd_root_or_path, template_path):
                 nbl = _find_list(inst.nodes, npath)
                 if nbl is not None:
                     _ensure_count(nbl, len(sub))
+            # Bagian opsional di dalam entri daftar (mis. "Sumber Masukan Proses" pada tahap proses)
+            for snip in ip.get("__opsional__", {}):
+                bo = _find_node(inst.nodes, lambda n, s=snip: isinstance(n, layout.BOptional) and n.snippet == s)
+                if bo is not None and not bo.present:
+                    model.add_snippet(iso3_root, bo.container, bo.snippet)
 
     # 4) Tulis nilai ke field
     secs = _stages()
@@ -876,11 +1060,19 @@ def convert_gmd_to_iso3(gmd_root_or_path, template_path):
             continue
         for ip, inst in zip(insts, bl.instances):
             for key, val in ip.items():
-                if key == "__lists__":
+                if key in ("__lists__", "__opsional__"):
                     continue
                 bf = _find_field(inst.nodes, key)
                 if bf is not None:
                     put(bf, val)
+            for snip, vals in ip.get("__opsional__", {}).items():
+                bo = _find_node(inst.nodes, lambda n, s=snip: isinstance(n, layout.BOptional) and n.snippet == s)
+                if bo is None or not bo.present:
+                    continue
+                for key, val in vals.items():
+                    bf = _find_field(bo.nodes, key)
+                    if bf is not None:
+                        put(bf, val)
             for npath, sub in ip.get("__lists__", {}).items():
                 nbl = _find_list(inst.nodes, npath)
                 if nbl is None:

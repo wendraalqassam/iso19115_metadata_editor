@@ -8,7 +8,7 @@ import json
 import os
 import re
 
-from . import model
+from . import kesesuaian, model
 from .model import Field, local, VALUE_TYPES, ENUM_TEXT, MULTILINE
 
 with open(os.path.join(os.path.dirname(__file__), "big_assets.json"), encoding="utf-8") as _fh:
@@ -310,6 +310,10 @@ def ACQUISITION():
 
 
 ID = "identificationInfo/"
+# Batasan hukum sumber daya: beberapa nilai dalam satu MD_LegalConstraints (ISO: useConstraints & otherConstraints
+# 0..*) — mis. lisensi + DOI + batasan lain dari GeoNode, yang dulu saling menimpa di satu kolom.
+PATH_USE_CONSTRAINTS = ID + "resourceConstraints[~MD_LegalConstraints]/useConstraints"
+PATH_OTHER_CONSTRAINTS = ID + "resourceConstraints[~MD_LegalConstraints]/otherConstraints"
 REPORT_SNIPS = [(o["label"], "report_" + o["value"]) for o in OPTS["qualityTypeOptions"]]
 RESULT_SNIPS = [("Conformance Result", "res_conformance"), ("Quantitative Result", "res_quantitative"),
                 ("Descriptive Result", "res_descriptive"), ("Coverage Result", "res_coverage")]
@@ -345,6 +349,8 @@ SECTIONS = [
         F("dataRevisionDate", "Tanggal Revisi", ID + "citation/date[=revision]/date"),
         F("dataEdition", "Edisi", ID + "citation/edition"),
         F("dataEditionDate", "Tanggal Edisi Data", ID + "citation/editionDate"),
+        F("dataIdentifier", "Identifier Data (mis. DOI)", ID + "citation/identifier/code"),
+        F("dataSupplementalInformation", "Informasi Tambahan", ID + "supplementalInformation"),
         F("presentationForm", "Bentuk Penyajian", ID + "citation/presentationForm"),
         F("dataOnlineResourceURL", "Online Resource URL", ID + "citation/onlineResource/linkage"),
         F("dataOnlineResourceName", "Online Resource Name", ID + "citation/onlineResource/name"),
@@ -462,8 +468,10 @@ SECTIONS = [
         G("Batasan Data"),
         F("useLimitation", "Batasan Penggunaan", ID + "resourceConstraints[~MD_Constraints]/useLimitation"),
         F("accessConstraints", "Batasan Akses", ID + "resourceConstraints[~MD_LegalConstraints]/accessConstraints", "constraintOptions"),
-        F("useConstraints", "Batasan Penggunaan (Legal)", ID + "resourceConstraints[~MD_LegalConstraints]/useConstraints", "constraintOptions"),
-        F("otherConstraints", "Batasan Hukum Lainnya", ID + "resourceConstraints[~MD_LegalConstraints]/otherConstraints"),
+        L("Batasan Penggunaan (Legal)", PATH_USE_CONSTRAINTS,
+          [F("useConstraints", "Batasan Penggunaan (Legal)", ".", "constraintOptions")]),
+        L("Batasan Hukum Lainnya (lisensi, DOI, dll.)", PATH_OTHER_CONSTRAINTS,
+          [F("otherConstraints", "Batasan Hukum Lainnya", ".")]),
         F("securityClassification", "Klasifikasi Keamanan", ID + "resourceConstraints[~MD_SecurityConstraints]/classification", "classificationOptions"),
         F("securityUserNote", "User Note Keamanan", ID + "resourceConstraints[~MD_SecurityConstraints]/userNote"),
         F("securitySystem", "Sistem Klasifikasi", ID + "resourceConstraints[~MD_SecurityConstraints]/classificationSystem"),
@@ -881,9 +889,32 @@ class BSection:
         self.id, self.label, self.caption, self.nodes = sid, label, caption, nodes
 
 
+# Daftar pilihan formulir → daftar kode ISO 19115-3, untuk menandai pilihan yang tidak standar
+# (sebagian pilihan diambil dari aset BIG, mis. "facsimile", "license", "sensitiveButUnclassified").
+KODE_OPSI = {
+    "phoneTypeOptions": "CI_TelephoneTypeCode", "constraintOptions": "MD_RestrictionCode",
+    "classificationOptions": "MD_ClassificationCode", "roleOptions": "CI_RoleCode",
+    "dateTypeOptions": "CI_DateTypeCode", "onlineFunctionOptions": "CI_OnLineFunctionCode",
+    "maintenanceOptions": "MD_MaintenanceFrequencyCode", "statusOptions": "MD_ProgressCode",
+    "keywordTypeOptions": "MD_KeywordTypeCode", "scopeOptions": "MD_ScopeCode",
+    "spatialRepTypeOptions": "MD_SpatialRepresentationTypeCode", "topicCategoryOptions": "MD_TopicCategoryCode",
+    "referenceSystemTypeOptions": "MD_ReferenceSystemTypeCode",
+}
+TANDA_TIDAK_STANDAR = "  ⚠ tidak standar ISO"
+
+
 def _options(spec, f):
     if spec.opts:
-        return [(o["label"], o["value"], o.get("description", "")) for o in OPTS[spec.opts]]
+        sah = kesesuaian.daftar_kode("19115-3", KODE_OPSI.get(spec.opts))
+        out = []
+        for o in OPTS[spec.opts]:
+            label, desc = o["label"], o.get("description", "")
+            if sah and o["value"] and o["value"] not in sah:
+                label += TANDA_TIDAK_STANDAR
+                desc = (desc + "\n" if desc else "") + ("Nilai «%s» tidak ada di daftar kode ISO 19115-3 "
+                                                        "(%s); katalog lain bisa tidak mengenalinya." % (o["value"], KODE_OPSI[spec.opts]))
+            out.append((label, o["value"], desc))
+        return out
     if f is not None and f.kind in ("code", "enum"):
         return [(v, v, "") for v in model.CODELISTS.get(f.value_name, [])]
     return None

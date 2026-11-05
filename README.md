@@ -64,6 +64,56 @@
    - **Simpan / Ekspor ISO 19115-3** (format xml mdb).
    - **Ekspor ISO 19139 (GMD)** (format xml gmd untuk pycsw / Geoportal).
 
+## ☁️ Sinkronisasi dengan GeoNode
+
+Metadata dataset GeoNode bisa diambil ke formulir, disunting, lalu dikirim balik (ISO 19139) dengan akun
+GeoNode masing-masing pengguna; CSW GeoNode ikut terbarui.
+
+**Persiapan admin GeoNode (sekali):** Django admin → *Django OAuth Toolkit* → *Applications* → tambah:
+Client type `Public` (disarankan) atau `Confidential`, Authorization grant type `Authorization code`,
+Redirect URIs `http://127.0.0.1:7070/`. Bagikan **Client ID** (dan Client secret bila `Confidential`) ke
+pengguna. Beri group/pengguna izin *ubah metadata* hanya pada dataset miliknya.
+
+**Pengguna:**
+1. Klik **Ambil dari GeoNode...** di bagian atas editor. Isi URL GeoNode, klik **Buat konfigurasi OAuth2…**,
+   masukkan Client ID (dan secret bila ada; QGIS menyimpannya terenkripsi, PKCE dipakai pada QGIS ≥ 3.34),
+   lalu **Masuk & muat dataset** — browser terbuka untuk login GeoNode.
+2. Telusuri katalog dalam mode **Kartu** (thumbnail) atau **Daftar** (tabel, bisa diurutkan). Memilih dataset
+   menampilkan pratinjau peta dari layanan WMS-nya di atas peta dasar OpenStreetMap. Dataset yang tidak boleh
+   diubah akun Anda ditandai *Hanya lihat*.
+3. **Ambil ke formulir** (atau klik ganda) — record ISO dataset dari CSW GeoNode dimuat ke formulir dan editor
+   tertaut ke dataset itu.
+4. Sunting isian, lalu **☁ Kirim ke GeoNode...** di bawah formulir → dataset tertaut terpilih otomatis →
+   **Perbarui di GeoNode**.
+
+Plugin ini dimaksudkan **melengkapi** metadata GeoNode, jadi pengiriman selalu memakai mode *preserve*
+(`metadata_uploaded_preserve`): CSW GeoNode menyajikan XML GeoMDB apa adanya — kontak, riwayat/langkah proses,
+laporan kualitas, batasan, dsb. tetap utuh — sedangkan halaman dan pencarian GeoNode menampilkan kolom yang
+dikenalnya (judul, abstrak, kata kunci, …). Tautan WMS/WFS/unduhan dan thumbnail GeoNode disisipkan otomatis dan
+`fileIdentifier` diganti uuid dataset. Karena CSW menyajikan XML unggahan terakhir, sunting metadata dataset ini
+lewat GeoMDB (ambil → sunting → perbarui), bukan lewat form GeoNode. Setelah unggah, plugin memeriksa record CSW
+dan isian GeoNode, lalu memperingatkan bila XML belum diterapkan.
+
+Metadata yang diambil dari GeoNode dimuat ke formulir yang **dikosongkan dulu dari nilai bawaan template plugin**,
+dan teks pengisi template GeoNode ("None", "No abstract provided") dibuang, sehingga yang tampil hanya data GeoNode.
+Lisensi, DOI, batasan lain, dan informasi tambahan GeoNode ikut terbawa; `dateStamp` diisi waktu pengiriman.
+
+**Pengaman salah-tujuan** (GeoNode tidak punya *undo*):
+- Formulir hasil *Ambil dari GeoNode* dikunci ke dataset asalnya; tujuan lain hanya lewat **Ganti dataset tujuan…**.
+- Mengirim ke dataset yang bukan asal formulir wajib konfirmasi dengan **mengetik nama layer** tujuan.
+- Sebelum menimpa, metadata lama disimpan di `<profil QGIS>/geomdb_cadangan/<host>/<pk>-<layer>/` dan bisa
+  dikembalikan dengan **Pulihkan dari cadangan…** (hanya ke dataset asalnya, status *preserve* ikut dipulihkan).
+- Bila cakupan/sistem referensi formulir berbeda dengan GeoNode saat ini, plugin menanyakan nilai mana yang dikirim.
+- *Ambil Metadata dari Layer Aktif* pada formulir tertaut memperingatkan bahwa isiannya ikut terkirim ke dataset itu.
+
+**Versi GeoNode** dideteksi otomatis dari URL (tanpa login, juga saat membuat konfigurasi OAuth2) atau dipilih manual:
+
+| Versi | Ambil | Perbarui | Preserve |
+|---|---|---|---|
+| GeoNode 5.x, 4.4 | ✓ | ✓ | dinyalakan otomatis oleh plugin |
+| GeoNode 4.2.3 – 4.3 | ✓ | ✓ | harus dicentang admin: Django admin → Datasets → *Metadata uploaded preserve* |
+| GeoNode 4.0 – 4.2.2 | ✓ | ✗ (belum ada API unggah XML) | – |
+
 ## 📄 Lisensi
 
 Plugin ini berlisensi bebas dan terbuka di bawah lisensi [GNU General Public License v3.0 (GPLv3)](LICENSE).

@@ -348,6 +348,22 @@ def add_snippet(root, container, name):
     return new
 
 
+def urutkan(root):
+    """Urutkan properti setiap kelas menurut xs:sequence (ORDER). Berkas dari BIG/versi lama bisa
+    menyimpan urutan yang salah; properti di luar ORDER ditaruh di belakang."""
+    for el in root.iter():
+        urutan = ORDER.get(local(el.tag))
+        if not urutan or len(el) < 2:
+            continue
+        posisi = {p: i for i, p in enumerate(urutan)}
+        anak = sorted(el, key=lambda c: posisi.get(local(c.tag), len(posisi)))
+        if anak != list(el):
+            for c in list(el):
+                el.remove(c)
+            el.extend(anak)
+    return root
+
+
 def remove_block(parent, el):
     parent.remove(el)
 

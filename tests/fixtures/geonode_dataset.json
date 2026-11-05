@@ -1,0 +1,58 @@
+{
+ "pk": "3",
+ "uuid": "2ce08ce3-f1d2-4686-9c63-d16f79e56b66",
+ "alternate": "geonode:umkm_1000_lebih_1f9e51a74e9acea0c461050f6a9e113d",
+ "title": "umkm_1000_lebih_1f9e51a74e9acea0c461050f6a9e113d",
+ "perms": [
+  "view_resourcebase",
+  "download_resourcebase"
+ ],
+ "metadata_uploaded_preserve": false,
+ "thumbnail_url": "https://geonode.contoh.go.id/uploaded/thumbs/dataset-2ce08ce3-f1d2-4686-9c63-d16f79e56b66-thumb-1bd9e3ec-1ade-48b3-a954-27456e956e05.jpg",
+ "detail_url": "https://geonode.contoh.go.id/catalogue/#/dataset/3",
+ "links": [
+  {
+   "link_type": "metadata",
+   "extension": "xml",
+   "name": "ISO",
+   "mime": "text/xml",
+   "url": "https://geonode.contoh.go.id/catalogue/csw?request=GetRecordById&service=CSW&version=2.0.2&id=2ce08ce3-f1d2-4686-9c63-d16f79e56b66&outputschema=http%3A%2F%2Fwww.isotc211.org%2F2005%2Fgmd&elementsetname=full"
+  },
+  {
+   "link_type": "OGC:WMS",
+   "extension": "html",
+   "name": "OGC WMS: geonode Service",
+   "mime": "text/html",
+   "url": "https://geonode.contoh.go.id/geoserver/ows"
+  },
+  {
+   "link_type": "OGC:WFS",
+   "extension": "html",
+   "name": "OGC WFS: geonode Service",
+   "mime": "text/html",
+   "url": "https://geonode.contoh.go.id/geoserver/ows"
+  },
+  {
+   "link_type": "data",
+   "extension": "zip",
+   "name": "Zipped Shapefile",
+   "mime": "SHAPE-ZIP",
+   "url": "https://geonode.contoh.go.id/geoserver/ows?service=WFS&version=1.0.0&request=GetFeature&typename=geonode%3Aumkm_1000_lebih_1f9e51a74e9acea0c461050f6a9e113d&outputFormat=SHAPE-ZIP&srs=EPSG%3A4326&format_options=charset%3AUTF-8"
+  },
+  {
+   "link_type": "data",
+   "extension": "json",
+   "name": "GeoJSON",
+   "mime": "json",
+   "url": "https://geonode.contoh.go.id/geoserver/ows?service=WFS&version=1.0.0&request=GetFeature&typename=geonode%3Aumkm_1000_lebih_1f9e51a74e9acea0c461050f6a9e113d&outputFormat=json&srs=EPSG%3A4326&srsName=EPSG%3A4326"
+  },
+  {
+   "link_type": "html",
+   "extension": "html",
+   "name": "geonode:umkm_1000_lebih_1f9e51a74e9acea0c461050f6a9e113d",
+   "mime": "text/html",
+   "url": "https://geonode.contoh.go.id/catalogue/#/dataset/3"
+  }
+ ],
+ "_sumber": "Cuplikan respons publik GET /api/v2/datasets dari geonode.contoh.go.id (2026-11-05)"
+}
