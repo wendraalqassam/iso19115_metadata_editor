@@ -1,5 +1,6 @@
 import copy
 import datetime
+import html
 import json
 import os
 import re
@@ -2374,8 +2375,9 @@ class EditorDialog(QDialog):
         if not path.lower().endswith(".xml"):
             path += ".xml"
 
+        catatan = []
         try:
-            gmd_tree = gmd_exporter.export_to_gmd(self.root)
+            gmd_tree = gmd_exporter.export_to_gmd(self.root, catatan=catatan)
             gmd_exporter.save_gmd_to_file(gmd_tree, path)
         except Exception as e:
             QMessageBox.warning(self, TITLE, "Gagal mengekspor XML ISO 19139:\n%s" % e)
@@ -2386,13 +2388,14 @@ class EditorDialog(QDialog):
                 TITLE,
                 "Metadata berhasil diekspor ke ISO 19139 (gmd): %s" % path
             )
-        QMessageBox.information(
-            self,
-            "Ekspor ISO 19139 Berhasil",
-            "Berkas metadata berhasil diekspor dengan standar <b>ISO 19139</b> "
-            "(namespace <code>http://www.isotc211.org/2005/gmd</code>):<br><br>"
-            f"<b>Lokasi:</b> {path}"
-        )
+        pesan = ("Berkas metadata berhasil diekspor dengan standar <b>ISO 19139</b> "
+                 "(namespace <code>http://www.isotc211.org/2005/gmd</code>):<br><br>"
+                 f"<b>Lokasi:</b> {html.escape(path)}")
+        if catatan:
+            pesan += ("<br><br><b>Isian berikut tidak punya padanan di ISO 19139</b> dan tetap tersimpan "
+                      "di berkas ISO 19115-3:<ul>"
+                      + "".join(f"<li>{html.escape(c)}</li>" for c in catatan) + "</ul>")
+        QMessageBox.information(self, "Ekspor ISO 19139 Berhasil", pesan)
 
     def export(self):
         """Alias kompatibilitas untuk Simpan Sebagai."""

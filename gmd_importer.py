@@ -16,6 +16,7 @@ from . import layout, model
 GMD = "http://www.isotc211.org/2005/gmd"
 GCO = "http://www.isotc211.org/2005/gco"
 GML = "http://www.opengis.net/gml"
+GML32 = "http://www.opengis.net/gml/3.2"
 GTS = "http://www.isotc211.org/2005/gts/"
 
 ID = layout.ID
@@ -328,7 +329,8 @@ def extract_gmd_plan(gmd_root_or_path):
                     "specificUsage": su,
                     "userRole": cd.get("role", "user"),
                     "userOrganization": cd.get("organization", ""),
-                    "userIndividual": cd.get("individual", ""),
+                    # isian formulir "Posisi/jabatan pengguna" → positionName (ekspor lama: individualName)
+                    "userIndividual": cd.get("position") or cd.get("individual", ""),
                 })
         if usages:
             LST((2, ID + "resourceSpecificUsage", usages))
@@ -353,10 +355,14 @@ def extract_gmd_plan(gmd_root_or_path):
                     F((2, "southBound", s))
                 if n:
                     F((2, "northBound", n))
-            tp = ext.find(f"{_q(GMD, 'temporalElement')}/{_q(GMD, 'EX_TemporalExtent')}/{_q(GMD, 'extent')}/{_q(GML, 'TimePeriod')}")
+            tp = None
+            for gml_ns in (GML32, GML):  # ekspor baru memakai GML 3.2; berkas lama & sistem lain GML 3.1
+                tp = ext.find(f"{_q(GMD, 'temporalElement')}/{_q(GMD, 'EX_TemporalExtent')}/{_q(GMD, 'extent')}/{_q(gml_ns, 'TimePeriod')}")
+                if tp is not None:
+                    break
             if tp is not None:
-                tb = get_text(tp, _q(GML, "beginPosition"))
-                te = get_text(tp, _q(GML, "endPosition"))
+                tb = get_text(tp, _q(gml_ns, "beginPosition"))
+                te = get_text(tp, _q(gml_ns, "endPosition"))
                 if tb:
                     F((2, "timeBegin", tb))
                 if te:
@@ -489,7 +495,9 @@ def extract_gmd_plan(gmd_root_or_path):
             stmt = get_text(lin, _q(GMD, "statement"))
             if stmt:
                 F((8, "lineageStatement", stmt))
-            lsc = get_code(lin, f"{_q(GMD, 'scope')}/{_q(GMD, 'level')}")
+            # ISO 19139 tidak punya LI_Lineage/scope: ekspor baru memakai cakupan DQ_DataQuality
+            lsc = get_code(lin, f"{_q(GMD, 'scope')}/{_q(GMD, 'level')}") or \
+                get_code(dq, f"{_q(GMD, 'scope')}/{_q(GMD, 'DQ_Scope')}/{_q(GMD, 'level')}")
             if lsc:
                 F((8, "lineageScopeLevel", lsc))
 
@@ -538,52 +546,54 @@ def extract_gmd_plan(gmd_root_or_path):
                 })
             if sources:
                 LST((8, "resourceLineage/source", sources))
-        else:
-            # Data Quality Report (Tahap 7)
-            qsc = get_code(dq, f"{_q(GMD, 'scope')}/{_q(GMD, 'DQ_Scope')}/{_q(GMD, 'level')}") or get_code(dq, f".//{_q(GMD, 'level')}")
-            if qsc:
-                F((7, "qualityScope", qsc))
-            reports = []
-            for rep_wrap in dq.findall(_q(GMD, "report")):
-                for rep in rep_wrap:
-                    meas = get_text(rep, f".//{_q(GMD, 'nameOfMeasure')}") or get_text(rep, _q(GMD, "measureDescription"))
-                    desc = get_text(rep, f".//{_q(GMD, 'measureDescription')}/{_q(GMD, 'measureDescription')}") or meas
-                    eval_desc = ""
-                    for emd in rep.findall(f".//{_q(GMD, 'evaluationMethodDescription')}"):
-                        cs = emd.find(f"{{{GCO}}}CharacterString")
-                        if cs is not None and cs.text and cs.text.strip():
-                            eval_desc = cs.text.strip()
-                            break
-                    eval_type = get_code(rep, f".//{_q(GMD, 'evaluationMethodType')}")
-                    res_list = []
-                    for res_wrap in rep.findall(_q(GMD, "result")):
-                        for res in res_wrap:
-                            r_dt = get_text(res, f".//{_q(GMD, 'dateTime')}")
-                            r_sc = get_code(res, f".//{_q(GMD, 'resultScope')}/{_q(GMD, 'DQ_Scope')}/{_q(GMD, 'level')}")
-                            spec_t = get_text(res, f".//{_q(GMD, 'specification')}/{_q(GMD, 'CI_Citation')}/{_q(GMD, 'title')}")
-                            spec_at = get_text(res, f".//{_q(GMD, 'specification')}/{_q(GMD, 'CI_Citation')}/{_q(GMD, 'alternateTitle')}")
-                            exp = get_text(res, f".//{_q(GMD, 'explanation')}")
-                            pass_v = get_text(res, f".//{_q(GMD, 'pass')}")
-                            res_item = {
-                                "dateTime": r_dt,
-                                "resultScope": r_sc,
-                                "specificationTitle": spec_t,
-                                "specificationAlternate": spec_at,
-                                "explanation": exp,
-                                "pass": pass_v
-                            }
-                            res_list.append({k: v for k, v in res_item.items() if v})
-                    rep_item = {
-                        "measure": meas,
-                        "description": desc,
-                        "evaluationMethodDescription": eval_desc,
-                        "evaluationMethodType": eval_type
-                    }
-                    if res_list:
-                        rep_item["__lists__"] = {"result": res_list}
-                    reports.append({k: v for k, v in rep_item.items() if v})
-            if reports:
-                LST((7, "dataQualityInfo/report", reports))
+        # Laporan kualitas (Tahap 7) — dibaca juga dari blok yang memuat lineage:
+        # ekspor baru menyatukan keduanya dalam DQ_DataQuality pertama (yang dibaca OWSLib/GeoNode).
+        qsc = get_code(dq, f"{_q(GMD, 'scope')}/{_q(GMD, 'DQ_Scope')}/{_q(GMD, 'level')}") or get_code(dq, f".//{_q(GMD, 'level')}")
+        # Berkas lama: blok lineage terpisah juga ber-scope — jangan sampai menimpa cakupan laporan.
+        if qsc and (lin is None or dq.find(_q(GMD, "report")) is not None):
+            F((7, "qualityScope", qsc))
+        reports = []
+        for rep_wrap in dq.findall(_q(GMD, "report")):
+            for rep in rep_wrap:
+                meas = get_text(rep, f".//{_q(GMD, 'nameOfMeasure')}") or get_text(rep, _q(GMD, "measureDescription"))
+                desc = (get_text(rep, f".//{_q(GMD, 'measureDescription')}/{_q(GMD, 'measureDescription')}")
+                        or get_text(rep, _q(GMD, "measureDescription")) or meas)
+                eval_desc = ""
+                for emd in rep.findall(f".//{_q(GMD, 'evaluationMethodDescription')}"):
+                    cs = emd.find(f"{{{GCO}}}CharacterString")
+                    if cs is not None and cs.text and cs.text.strip():
+                        eval_desc = cs.text.strip()
+                        break
+                eval_type = get_code(rep, f".//{_q(GMD, 'evaluationMethodType')}")
+                res_list = []
+                for res_wrap in rep.findall(_q(GMD, "result")):
+                    for res in res_wrap:
+                        r_dt = get_text(res, f".//{_q(GMD, 'dateTime')}") or get_text(rep, _q(GMD, "dateTime"))
+                        r_sc = get_code(res, f".//{_q(GMD, 'resultScope')}/{_q(GMD, 'DQ_Scope')}/{_q(GMD, 'level')}")
+                        spec_t = get_text(res, f".//{_q(GMD, 'specification')}/{_q(GMD, 'CI_Citation')}/{_q(GMD, 'title')}")
+                        spec_at = get_text(res, f".//{_q(GMD, 'specification')}/{_q(GMD, 'CI_Citation')}/{_q(GMD, 'alternateTitle')}")
+                        exp = get_text(res, f".//{_q(GMD, 'explanation')}")
+                        pass_v = get_text(res, f".//{_q(GMD, 'pass')}")
+                        res_item = {
+                            "dateTime": r_dt,
+                            "resultScope": r_sc,
+                            "specificationTitle": spec_t,
+                            "specificationAlternate": spec_at,
+                            "explanation": exp,
+                            "pass": pass_v
+                        }
+                        res_list.append({k: v for k, v in res_item.items() if v})
+                rep_item = {
+                    "measure": meas,
+                    "description": desc,
+                    "evaluationMethodDescription": eval_desc,
+                    "evaluationMethodType": eval_type
+                }
+                if res_list:
+                    rep_item["__lists__"] = {"result": res_list}
+                reports.append({k: v for k, v in rep_item.items() if v})
+        if reports:
+            LST((7, "dataQualityInfo/report", reports))
 
     # --- TAHAP 9: KATALOG PENYAJIAN ---
     pc = gmd_root.find(_q(GMD, "portrayalCatalogueInfo"))
@@ -684,7 +694,9 @@ def extract_gmd_plan(gmd_root_or_path):
         if sa:
             F((11, "schemaAscii", sa))
         if gf is not None:
-            g_url = get_text(gf, f"{_q(GMD, 'CI_OnlineResource')}/{_q(GMD, 'linkage')}")
+            g_bin = gf.find(_q(GCO, "Binary"))  # ISO 19139: graphicsFile bertipe gco:Binary (atribut src)
+            g_url = (g_bin.get("src", "").strip() if g_bin is not None else "") or \
+                get_text(gf, f"{_q(GMD, 'CI_OnlineResource')}/{_q(GMD, 'linkage')}")
             g_nm = get_text(gf, f"{_q(GMD, 'CI_OnlineResource')}/{_q(GMD, 'name')}")
             if g_url:
                 F((11, "schemaGraphicsURL", g_url))

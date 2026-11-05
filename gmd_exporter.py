@@ -5,6 +5,7 @@ menghasilkan XML berbasis standar ISO 19139 menggunakan template gmd_template.xm
 """
 import copy
 import datetime
+import json
 import os
 import re
 import xml.etree.ElementTree as ET  # nosec B405
@@ -16,7 +17,8 @@ GMD_TEMPLATE = os.path.join(HERE, "gmd_template.xml")
 
 GMD = "http://www.isotc211.org/2005/gmd"
 GCO = "http://www.isotc211.org/2005/gco"
-GML = "http://www.opengis.net/gml"
+# Skema resmi ISO 19139 (gmd 1.0) mengimpor GML 3.2; OWSLib (GeoNode/pycsw) membaca keduanya.
+GML = "http://www.opengis.net/gml/3.2"
 GTS = "http://www.isotc211.org/2005/gts/"
 XLINK = "http://www.w3.org/1999/xlink"
 XSI = "http://www.w3.org/2001/XMLSchema-instance"
@@ -241,8 +243,289 @@ def _has_list_data(nodes, path_sub):
     return False
 
 
-def export_to_gmd(iso3_root, template_path=None):
-    """Mengekspor pohon data ISO 19115-3 ke dokumen XML ISO 19139 (gmd)."""
+def _lokal(tag):
+    return tag.rsplit("}", 1)[-1]
+
+
+def _bidang_langsung(nodes):
+    """Isian BField langsung saja. Berbeda dari _collect_dict_from_nodes, isian bagian opsional di
+    dalamnya tidak ikut digabung — di tahap proses, kunci seperti `description` milik bagian
+    "Sumber Masukan"/"Hasil Keluaran" akan menimpa deskripsi tahap prosesnya sendiri."""
+    out = {}
+    for n in nodes:
+        if isinstance(n, layout.BField):
+            v = (n.field.get() or "").strip()
+            if v:
+                out[n.key] = v
+    return out
+
+
+def _sumber_lineage(src_d, catatan):
+    """gmd:source/LI_Source (ISO 19139: description, sourceReferenceSystem, sourceCitation, ...)."""
+    wrap = ET.Element(_q(GMD, "source"))
+    li_src = ET.SubElement(wrap, _q(GMD, "LI_Source"))
+    _set_char(li_src, "description", src_d.get("description"))
+    if src_d.get("referenceSystemCode") or src_d.get("referenceSystemCodeSpace"):
+        # ISO 19139: MD_ReferenceSystem/referenceSystemIdentifier bertipe RS_Identifier
+        rs_id = _anak(li_src, "sourceReferenceSystem", "MD_ReferenceSystem", "referenceSystemIdentifier", "RS_Identifier")
+        _set_char(rs_id, "code", src_d.get("referenceSystemCode"))
+        _set_char(rs_id, "codeSpace", src_d.get("referenceSystemCodeSpace"))
+    if src_d.get("citationTitle") or src_d.get("citationDate"):
+        ci_s = _anak(li_src, "sourceCitation", "CI_Citation")
+        _set_char(ci_s, "title", src_d.get("citationTitle"))
+        if src_d.get("citationDate"):
+            ci_d = ET.SubElement(ET.SubElement(ci_s, _q(GMD, "date")), _q(GMD, "CI_Date"))
+            _set_date(ci_d, "date", src_d["citationDate"])
+            _set_code(ci_d, "dateType", "CI_DateTypeCode", src_d.get("citationDateType") or "creation")
+    if src_d.get("spatialResolution"):
+        catatan.append("Resolusi spasial sumber data (meter) tidak punya padanan di LI_Source ISO 19139 — tidak diekspor.")
+    if src_d.get("metadataTitle"):
+        catatan.append("Metadata sumber (sourceMetadata) tidak punya padanan di ISO 19139 — tidak diekspor.")
+    return wrap
+
+
+# Urutan & kewajiban properti tiap kelas ISO 19139: {kelas: [[properti, minOccurs], ...]},
+# diturunkan dari XSD resmi gmd 1.0 (urutan xs:sequence termasuk tipe induk; anggota xs:choice
+# dicatat minOccurs 0). Dipakai _rapikan() agar keluaran lolos validasi XSD.
+_GMD_ORDER = None
+
+
+def _gmd_order():
+    global _GMD_ORDER
+    if _GMD_ORDER is None:
+        with open(os.path.join(HERE, "gmd_order.json"), encoding="utf-8") as fh:
+            _GMD_ORDER = json.load(fh)
+    return _GMD_ORDER
+
+
+def _kosongkan_nilai(root):
+    """Template hanya dipakai sebagai kerangka. Semua nilai bawaannya dibuang supaya field yang
+    tidak diisi tidak membawa data contoh/placeholder ke hasil ekspor; sisa kerangka yang tetap
+    kosong dipangkas oleh _rapikan()."""
+    for el in root.iter():
+        if len(el) == 0:
+            el.text = None
+        if "codeListValue" in el.attrib:
+            el.set("codeListValue", "")
+
+
+def _anak(parent, *tags):
+    """Ambil anak gmd berantai, buat yang belum ada: _anak(dq, "scope", "DQ_Scope")."""
+    el = parent
+    for t in tags:
+        nxt = el.find(_q(GMD, t))
+        if nxt is None:
+            nxt = ET.SubElement(el, _q(GMD, t))
+        el = nxt
+    return el
+
+
+def _ganti_semua(parent, tag_name, baru):
+    """Ganti semua anak `tag_name` dengan elemen `baru` (posisi akhirnya diatur _rapikan)."""
+    for el in parent.findall(_q(GMD, tag_name)):
+        parent.remove(el)
+    for el in baru:
+        parent.append(el)
+
+
+def _datetime(value):
+    """gco:DateTime wajib memuat jam; tanggal saja dilengkapi T00:00:00."""
+    v = _clean_str(value)
+    return v if not v or "T" in v else v + "T00:00:00"
+
+
+def _set_date(parent, tag_name, value):
+    v = _clean_str(value)
+    if not v:
+        return None
+    el = parent.find(_q(GMD, tag_name))
+    if el is None:
+        el = ET.SubElement(parent, _q(GMD, tag_name))
+    for c in list(el):
+        el.remove(c)
+    sub = ET.SubElement(el, _q(GCO, "DateTime" if "T" in v else "Date"))
+    sub.text = v
+    return el
+
+
+def _set_language(parent, tag_name, value):
+    v = _clean_str(value)
+    if not v:
+        return None
+    el = parent.find(_q(GMD, tag_name))
+    if el is None:
+        el = ET.SubElement(parent, _q(GMD, tag_name))
+    for c in list(el):
+        el.remove(c)
+    lc = ET.SubElement(el, _q(GMD, "LanguageCode"))
+    lc.set("codeList", "./resources/codeList.xml#LanguageCode")
+    lc.set("codeListValue", v)
+    lc.text = v
+    return el
+
+
+def _set_dq_scope(dq, level, timpa=False):
+    """DQ_DataQuality wajib punya scope/DQ_Scope/level."""
+    sc = _anak(dq, "scope", "DQ_Scope")
+    lv = sc.find(f"{_q(GMD, 'level')}/{_q(GMD, 'MD_ScopeCode')}")
+    if timpa or lv is None or not lv.get("codeListValue"):
+        _set_code(sc, "level", "MD_ScopeCode", level)
+
+
+def _dq_pertama(gmd_root):
+    """DQ_DataQuality pertama (dibuat bila belum ada). Laporan kualitas dan lineage sengaja disatukan
+    di sini: OWSLib — yang dipakai GeoNode & pycsw — hanya membaca blok DQ_DataQuality pertama."""
+    dq = gmd_root.find(f"{_q(GMD, 'dataQualityInfo')}/{_q(GMD, 'DQ_DataQuality')}")
+    if dq is None:
+        dq = ET.SubElement(ET.SubElement(gmd_root, _q(GMD, "dataQualityInfo")), _q(GMD, "DQ_DataQuality"))
+    return dq
+
+
+# Kelas laporan ISO 19157 (formulir) yang namanya berbeda di ISO 19139.
+_DQ_19139 = {"DQ_NonQuantitativeAttributeCorrectness": "DQ_NonQuantitativeAttributeAccuracy"}
+
+
+def _laporan_dq(inst, catatan):
+    """gmd:report dari satu laporan kualitas formulir, dengan struktur DQ_Element ISO 19139:
+    nameOfMeasure, measureDescription, evaluationMethodType, evaluationMethodDescription,
+    dateTime, result (DQ_ConformanceResult: specification, explanation, pass)."""
+    rep_d = _collect_dict_from_nodes(inst.nodes)
+    hasil = []
+    for r_node in inst.nodes:
+        if isinstance(r_node, layout.BList) and getattr(r_node, "path", "") == "result":
+            hasil += [_collect_dict_from_nodes(ri.nodes) for ri in r_node.instances]
+    hasil = [h for h in hasil if any(h.values())]
+    if not any(rep_d.values()) and not hasil:
+        return None
+
+    kelas = next((_lokal(c.tag) for c in inst.el), "DQ_DomainConsistency")
+    kelas = _DQ_19139.get(kelas, kelas)
+    if kelas not in _gmd_order():
+        catatan.append(f"Laporan kualitas jenis {kelas} tidak dikenal ISO 19139 — tidak diekspor.")
+        return None
+
+    wrap = ET.Element(_q(GMD, "report"))
+    dq_el = ET.SubElement(wrap, _q(GMD, kelas))
+    _set_char(dq_el, "nameOfMeasure", rep_d.get("measure"))
+    _set_char(dq_el, "measureDescription", rep_d.get("description"))
+    _set_code(dq_el, "evaluationMethodType", "DQ_EvaluationMethodTypeCode", rep_d.get("evaluationMethodType"))
+    _set_char(dq_el, "evaluationMethodDescription", rep_d.get("evaluationMethodDescription"))
+    # ISO 19139 mencatat waktu evaluasi di DQ_Element, bukan di hasil
+    waktu = next((h["dateTime"] for h in hasil if h.get("dateTime")), "")
+    if waktu:
+        dt = ET.SubElement(dq_el, _q(GMD, "dateTime"))
+        ET.SubElement(dt, _q(GCO, "DateTime")).text = _datetime(waktu)
+    for h in hasil:
+        res = ET.SubElement(ET.SubElement(dq_el, _q(GMD, "result")), _q(GMD, "DQ_ConformanceResult"))
+        if h.get("specificationTitle") or h.get("specificationAlternate"):
+            spec = _anak(res, "specification", "CI_Citation")
+            _set_char(spec, "title", h.get("specificationTitle"))
+            _set_char(spec, "alternateTitle", h.get("specificationAlternate"))
+        _set_char(res, "explanation", h.get("explanation"))
+        if h.get("pass"):
+            ps = ET.SubElement(res, _q(GMD, "pass"))
+            ET.SubElement(ps, _q(GCO, "Boolean")).text = str(h["pass"]).strip().lower()
+    return wrap
+
+
+# Pemetaan properti batasan ISO 19139 → kunci formulir, untuk batasan sumber daya & metadata.
+_KUNCI_BATASAN = {
+    "resourceConstraints": {
+        "useLimitation": "useLimitation", "accessConstraints": "accessConstraints",
+        "useConstraints": "useConstraints", "otherConstraints": "otherConstraints",
+        "classification": "securityClassification", "userNote": "securityUserNote",
+        "classificationSystem": "securitySystem", "handlingDescription": "handlingDescription",
+    },
+    "metadataConstraints": {
+        "useLimitation": "metadataUseLimitation", "accessConstraints": "metadataAccessConstraints",
+        "useConstraints": "metadataUseConstraints", "otherConstraints": "metadataOtherConstraints",
+        "classification": "metadataSecurityClassification", "userNote": "metadataSecurityUserNote",
+        "classificationSystem": "metadataSecuritySystem", "handlingDescription": "metadataHandlingDescription",
+    },
+}
+
+
+def _batasan(tag_name, data):
+    """Blok batasan (MD_Constraints / MD_LegalConstraints / MD_SecurityConstraints) yang terisi."""
+    v = {prop: _clean_str(data.get(kunci)) for prop, kunci in _KUNCI_BATASAN[tag_name].items()}
+    out = []
+
+    def blok(kelas):
+        w = ET.Element(_q(GMD, tag_name))
+        out.append(w)
+        return ET.SubElement(w, _q(GMD, kelas))
+
+    if v["useLimitation"]:
+        _set_char(blok("MD_Constraints"), "useLimitation", v["useLimitation"])
+    if v["accessConstraints"] or v["useConstraints"] or v["otherConstraints"]:
+        c = blok("MD_LegalConstraints")
+        _set_code(c, "accessConstraints", "MD_RestrictionCode", v["accessConstraints"])
+        _set_code(c, "useConstraints", "MD_RestrictionCode", v["useConstraints"])
+        _set_char(c, "otherConstraints", v["otherConstraints"])
+    if v["classification"] or v["userNote"] or v["classificationSystem"] or v["handlingDescription"]:
+        c = blok("MD_SecurityConstraints")
+        _set_code(c, "classification", "MD_ClassificationCode", v["classification"])
+        _set_char(c, "userNote", v["userNote"])
+        _set_char(c, "classificationSystem", v["classificationSystem"])
+        _set_char(c, "handlingDescription", v["handlingDescription"])
+    return out
+
+
+def _rapikan(root, catatan):
+    """Rapikan hasil pemetaan agar sah menurut XSD ISO 19139:
+    1. properti yang tidak dikenal ISO 19139 di kelasnya dibuang (dicatat),
+    2. elemen tanpa nilai dipangkas,
+    3. properti wajib yang kosong diberi gco:nilReason="missing",
+    4. properti tiap kelas diurutkan menurut xs:sequence.
+    """
+    order = _gmd_order()
+    nil = _q(GCO, "nilReason")
+    href = _q(XLINK, "href")
+
+    def kelas(el):
+        return el.tag.startswith("{%s}" % GMD) and _lokal(el.tag) in order
+
+    for el in list(root.iter()):
+        if kelas(el):
+            sah = {p for p, _ in order[_lokal(el.tag)]}
+            for c in list(el):
+                if not c.tag.startswith("{%s}" % GMD) or _lokal(c.tag) not in sah:
+                    el.remove(c)
+                    catatan.append(f"Elemen {_lokal(el.tag)}/{_lokal(c.tag)} tidak dikenal ISO 19139 — tidak diekspor.")
+
+    def pangkas(el):
+        for c in list(el):
+            if not pangkas(c):
+                el.remove(c)
+        return bool(len(el) or (el.text or "").strip() or el.get(nil) or el.get(href) or el.get("src")
+                    or el.get("codeListValue", "").strip())
+
+    for c in list(root):
+        if not pangkas(c):
+            root.remove(c)
+
+    for el in list(root.iter()):
+        if not kelas(el):
+            continue
+        urutan = order[_lokal(el.tag)]
+        for prop, minimal in urutan:
+            if minimal and el.find(_q(GMD, prop)) is None:
+                ET.SubElement(el, _q(GMD, prop)).set(nil, "missing")
+        posisi = {p: i for i, (p, _) in enumerate(urutan)}
+        anak = sorted(el, key=lambda c: posisi.get(_lokal(c.tag), len(posisi)))
+        for c in list(el):
+            el.remove(c)
+        el.extend(anak)
+    return root
+
+
+def export_to_gmd(iso3_root, template_path=None, catatan=None):
+    """Mengekspor pohon data ISO 19115-3 ke dokumen XML ISO 19139 (gmd).
+
+    `catatan` (opsional, list): diisi pesan untuk isian yang tidak punya padanan di ISO 19139
+    sehingga tidak ikut diekspor (tetap tersimpan di berkas ISO 19115-3)."""
+    if catatan is None:
+        catatan = []
     register_gmd_namespaces()
     tmpl_file = template_path or GMD_TEMPLATE
     if not os.path.exists(tmpl_file):
@@ -250,6 +533,7 @@ def export_to_gmd(iso3_root, template_path=None):
 
     tree = ET.parse(tmpl_file)  # nosec B314
     gmd_root = tree.getroot()
+    _kosongkan_nilai(gmd_root)
 
     # Bangun struktur seksi dari form ISO 19115-3
     secs, _ = layout.build(iso3_root)
@@ -259,31 +543,14 @@ def export_to_gmd(iso3_root, template_path=None):
     # TAHAP 1: INFORMASI METADATA
     # =========================================================================
     s1 = sec_map.get(1)
+    d1 = _collect_dict_from_nodes(s1.nodes) if s1 else {}
     if s1:
-        d1 = _collect_dict_from_nodes(s1.nodes)
         if "metadataIdentifier" in d1 and d1["metadataIdentifier"].strip():
             _set_char(gmd_root, "fileIdentifier", d1["metadataIdentifier"].strip())
-        if "language" in d1 and d1["language"].strip():
-            lang_val = d1["language"].strip()
-            lang_el = gmd_root.find(_q(GMD, "language"))
-            if lang_el is None:
-                lang_el = ET.SubElement(gmd_root, _q(GMD, "language"))
-            for c in list(lang_el):
-                lang_el.remove(c)
-            lc = ET.SubElement(lang_el, _q(GMD, "LanguageCode"))
-            lc.set("codeList", "./resources/codeList.xml#LanguageCode")
-            lc.set("codeListValue", lang_val)
-            lc.text = lang_val
+        _set_language(gmd_root, "language", d1.get("language"))
         if "characterEncoding" in d1 and d1["characterEncoding"].strip():
             _set_code(gmd_root, "characterSet", "MD_CharacterSetCode", d1["characterEncoding"].strip())
-        p_val = _clean_str(d1.get("parentMetadata", ""))
-        pi_el = gmd_root.find(_q(GMD, "parentIdentifier"))
-        if pi_el is None:
-            pi_el = ET.SubElement(gmd_root, _q(GMD, "parentIdentifier"))
-        for c in list(pi_el):
-            pi_el.remove(c)
-        cs = ET.SubElement(pi_el, _q(GCO, "CharacterString"))
-        cs.text = p_val
+        _set_char(gmd_root, "parentIdentifier", d1.get("parentMetadata"))
         if "metadataScope" in d1:
             _set_code(gmd_root, "hierarchyLevel", "MD_ScopeCode", d1["metadataScope"])
         if "scopeName" in d1:
@@ -293,22 +560,15 @@ def export_to_gmd(iso3_root, template_path=None):
         if "metadataStandardEdition" in d1:
             _set_char(gmd_root, "metadataStandardVersion", d1["metadataStandardEdition"])
 
-        # Kontak Metadata (s1)
+        # Kontak Metadata (s1) — semua kontak, bukan hanya yang pertama
         for n in s1.nodes:
             if isinstance(n, layout.BList) and getattr(n, "path", "") == "contact":
+                kontak = []
                 for inst in n.instances:
                     cd = _collect_dict_from_nodes(inst.nodes)
                     if any(cd.values()):
-                        # Ganti atau perbarui gmd:contact
-                        old_c = gmd_root.find(_q(GMD, "contact"))
-                        new_c = _build_contact_element("contact", cd)
-                        if old_c is not None:
-                            idx = list(gmd_root).index(old_c)
-                            gmd_root.remove(old_c)
-                            gmd_root.insert(idx, new_c)
-                        else:
-                            gmd_root.append(new_c)
-                        break
+                        kontak.append(_build_contact_element("contact", cd))
+                _ganti_semua(gmd_root, "contact", kontak)
 
             # Tanggal Metadata (dateInfo)
             if isinstance(n, layout.BList) and getattr(n, "path", "") == "dateInfo":
@@ -335,6 +595,12 @@ def export_to_gmd(iso3_root, template_path=None):
     # TAHAP 2: IDENTITAS DATA
     # =========================================================================
     data_id = gmd_root.find(f"{_q(GMD, 'identificationInfo')}/{_q(GMD, 'MD_DataIdentification')}")
+    data_online = None
+    if data_id is not None:
+        # Formulir (gaya BIG) memakai satu bahasa & set karakter untuk metadata dan data;
+        # MD_DataIdentification/language wajib di ISO 19139.
+        _set_language(data_id, "language", d1.get("language"))
+        _set_code(data_id, "characterSet", "MD_CharacterSetCode", d1.get("characterEncoding"))
     s2 = sec_map.get(2)
     if s2 and data_id is not None:
         d2 = _collect_dict_from_nodes(s2.nodes)
@@ -353,6 +619,7 @@ def export_to_gmd(iso3_root, template_path=None):
             _set_char(ci_cit, "alternateTitle", d2["dataAlternateTitle"])
         if "dataEdition" in d2:
             _set_char(ci_cit, "edition", d2["dataEdition"])
+        _set_date(ci_cit, "editionDate", d2.get("dataEditionDate"))
         if "presentationForm" in d2:
             _set_code(ci_cit, "presentationForm", "CI_PresentationFormCode", d2["presentationForm"])
 
@@ -390,22 +657,16 @@ def export_to_gmd(iso3_root, template_path=None):
                     tc_el.set("codeListValue", type_code)
                     tc_el.text = type_code
 
-        # Online Resource Data
+        # Online Resource Data — ISO 19139 tidak punya CI_Citation/onlineResource; tautannya
+        # diekspor sebagai distributionInfo/transferOptions/onLine (setelah Tahap 6).
         if "dataOnlineResourceURL" in d2:
-            old_on = ci_cit.find(_q(GMD, "onlineResource"))
-            new_on = _build_online_resource_element(
-                "onlineResource",
+            data_online = _build_online_resource_element(
+                "onLine",
                 d2.get("dataOnlineResourceURL", ""),
                 d2.get("dataOnlineResourceProtocol", ""),
                 d2.get("dataOnlineResourceName", ""),
                 function=d2.get("dataOnlineResourceFunction", "information"),
             )
-            if old_on is not None:
-                idx = list(ci_cit).index(old_on)
-                ci_cit.remove(old_on)
-                ci_cit.insert(idx, new_on)
-            else:
-                ci_cit.append(new_on)
 
         # Kontak Sitasi Data (citedResponsibleParty)
         for n in s2.nodes:
@@ -489,6 +750,25 @@ def export_to_gmd(iso3_root, template_path=None):
                         if fd.get("formatEdition"):
                             _set_char(mdf, "version", fd["formatEdition"])
 
+            # Penggunaan spesifik (resourceSpecificUsage → MD_Usage)
+            if isinstance(n, layout.BList) and "resourceSpecificUsage" in getattr(n, "path", ""):
+                usages = []
+                for inst in n.instances:
+                    ud = _collect_dict_from_nodes(inst.nodes)
+                    if not any(ud.values()):
+                        continue
+                    wrap = ET.Element(_q(GMD, "resourceSpecificUsage"))
+                    usage = ET.SubElement(wrap, _q(GMD, "MD_Usage"))
+                    _set_char(usage, "specificUsage", ud.get("specificUsage"))
+                    if ud.get("userOrganization") or ud.get("userIndividual") or ud.get("userRole"):
+                        usage.append(_build_contact_element("userContactInfo", {
+                            "organization": ud.get("userOrganization"),
+                            "position": ud.get("userIndividual"),  # isian formulir: posisi/jabatan pengguna
+                            "role": ud.get("userRole"),
+                        }))
+                    usages.append(wrap)
+                _ganti_semua(data_id, "resourceSpecificUsage", usages)
+
         # Extent Bounding Box & Temporal
         ext_el = data_id.find(_q(GMD, "extent"))
         if ext_el is None:
@@ -550,6 +830,10 @@ def export_to_gmd(iso3_root, template_path=None):
     s3 = sec_map.get(3)
     if s3:
         d3 = _collect_dict_from_nodes(s3.nodes)
+        for n in s3.nodes:
+            if isinstance(n, layout.BOptional) and n.present and "Grid" in n.label:
+                catatan.append(f"Representasi spasial \"{n.label.replace('Aktifkan ', '')}\" belum didukung "
+                               "ekspor ISO 19139 — tidak diekspor.")
         if data_id is not None and "spatialRepresentationType" in d3:
             _set_code(data_id, "spatialRepresentationType", "MD_SpatialRepresentationTypeCode", d3["spatialRepresentationType"])
 
@@ -655,55 +939,43 @@ def export_to_gmd(iso3_root, template_path=None):
     # TAHAP 5: INFORMASI KONTEN
     # =========================================================================
     s5 = sec_map.get(5)
-    feat_cat = gmd_root.find(f"{_q(GMD, 'contentInfo')}/{_q(GMD, 'MD_FeatureCatalogueDescription')}")
-    if s5 and feat_cat is not None:
+    if s5:
         d5 = _collect_dict_from_nodes(s5.nodes)
-        if "featureCatalogueCompliance" in d5:
-            comp_el = feat_cat.find(_q(GMD, "complianceCode"))
-            if comp_el is None:
-                comp_el = ET.SubElement(feat_cat, _q(GMD, "complianceCode"))
-            comp_el.clear()
-            b_sub = ET.SubElement(comp_el, _q(GCO, "Boolean"))
-            b_sub.text = d5["featureCatalogueCompliance"]
-        if "featureCatalogueIncluded" in d5:
-            inc_el = feat_cat.find(_q(GMD, "includedWithDataset"))
-            if inc_el is None:
-                inc_el = ET.SubElement(feat_cat, _q(GMD, "includedWithDataset"))
-            inc_el.clear()
-            b_sub = ET.SubElement(inc_el, _q(GCO, "Boolean"))
-            b_sub.text = d5["featureCatalogueIncluded"]
-
-        # Feature Types
+        ft_names = []
         for n in s5.nodes:
             if isinstance(n, layout.BOptional) and n.present:
+                if "Citra" in n.label:
+                    catatan.append("Deskripsi citra (MD_ImageDescription) belum didukung ekspor ISO 19139 — tidak diekspor.")
                 for sub_n in n.nodes:
                     if isinstance(sub_n, layout.BList) and getattr(sub_n, "path", "") == "featureTypes":
-                        for old_ft in feat_cat.findall(_q(GMD, "featureTypes")):
-                            feat_cat.remove(old_ft)
                         for inst in sub_n.instances:
                             ft_d = _collect_dict_from_nodes(inst.nodes)
-                            ft_name = ft_d.get("name")
-                            if ft_name:
-                                ft_el = ET.SubElement(feat_cat, _q(GMD, "featureTypes"))
-                                cs = ET.SubElement(ft_el, _q(GCO, "CharacterString"))
-                                cs.text = ft_name
-
-        fc_cit = feat_cat.find(f"{_q(GMD, 'featureCatalogueCitation')}/{_q(GMD, 'CI_Citation')}")
-        if fc_cit is not None:
-            if "catalogueTitle" in d5:
-                _set_char(fc_cit, "title", d5["catalogueTitle"])
-            if "catalogueAlternateTitle" in d5:
-                _set_char(fc_cit, "alternateTitle", d5["catalogueAlternateTitle"])
-            if "catalogueEdition" in d5:
-                _set_char(fc_cit, "edition", d5["catalogueEdition"])
-            if "catalogueURL" in d5:
-                ol = fc_cit.find(_q(GMD, "onlineResource"))
-                if ol is None:
-                    ol = ET.SubElement(fc_cit, _q(GMD, "onlineResource"))
-                ci_ol = ol.find(_q(GMD, "CI_OnlineResource"))
-                if ci_ol is None:
-                    ci_ol = ET.SubElement(ol, _q(GMD, "CI_OnlineResource"))
-                _set_url(ci_ol, "linkage", d5["catalogueURL"])
+                            nama = ft_d.get("name") or ft_d.get("code")
+                            if nama:
+                                ft_names.append(nama)
+        fc_keys = ("featureCatalogueCompliance", "featureCatalogueIncluded", "catalogueTitle",
+                   "catalogueAlternateTitle", "catalogueEdition", "catalogueURL")
+        if any(k in d5 for k in fc_keys) or ft_names:
+            for ci_old in gmd_root.findall(_q(GMD, "contentInfo")):
+                if ci_old.find(_q(GMD, "MD_FeatureCatalogueDescription")) is not None:
+                    gmd_root.remove(ci_old)
+            feat_cat = ET.SubElement(ET.SubElement(gmd_root, _q(GMD, "contentInfo")),
+                                     _q(GMD, "MD_FeatureCatalogueDescription"))
+            for key, tag in (("featureCatalogueCompliance", "complianceCode"),
+                             ("featureCatalogueIncluded", "includedWithDataset")):
+                if d5.get(key):
+                    b_el = ET.SubElement(feat_cat, _q(GMD, tag))
+                    ET.SubElement(b_el, _q(GCO, "Boolean")).text = d5[key].strip().lower()
+            # ISO 19139: featureTypes bertipe GenericName → gco:LocalName
+            for nama in ft_names:
+                ft_el = ET.SubElement(feat_cat, _q(GMD, "featureTypes"))
+                ET.SubElement(ft_el, _q(GCO, "LocalName")).text = nama
+            fc_cit = _anak(feat_cat, "featureCatalogueCitation", "CI_Citation")
+            _set_char(fc_cit, "title", d5.get("catalogueTitle"))
+            _set_char(fc_cit, "alternateTitle", d5.get("catalogueAlternateTitle"))
+            _set_char(fc_cit, "edition", d5.get("catalogueEdition"))
+            if d5.get("catalogueURL"):
+                catatan.append("URL katalog unsur tidak punya padanan di CI_Citation ISO 19139 — tidak diekspor.")
 
     # =========================================================================
     # TAHAP 6: DISTRIBUSI & AKSES DATA
@@ -713,75 +985,76 @@ def export_to_gmd(iso3_root, template_path=None):
     if s6 and dist_info is not None:
         d6 = _collect_dict_from_nodes(s6.nodes)
 
-        # Distribution Format
         for n in s6.nodes:
-            if isinstance(n, layout.BList) and "distributionFormat" in getattr(n, "path", ""):
-                for old_df in dist_info.findall(_q(GMD, "distributionFormat")):
-                    dist_info.remove(old_df)
+            if not isinstance(n, layout.BList):
+                continue
+            path = getattr(n, "path", "")
+            # Distribution Format
+            if "distributionFormat" in path:
+                formats = []
                 for inst in n.instances:
                     df_d = _collect_dict_from_nodes(inst.nodes)
                     df_title = df_d.get("title") or df_d.get("alternateTitle")
                     if df_title:
-                        df_el = ET.SubElement(dist_info, _q(GMD, "distributionFormat"))
+                        df_el = ET.Element(_q(GMD, "distributionFormat"))
                         mdf = ET.SubElement(df_el, _q(GMD, "MD_Format"))
                         _set_char(mdf, "name", df_title)
-                        if df_d.get("edition"):
-                            _set_char(mdf, "version", df_d["edition"])
+                        _set_char(mdf, "version", df_d.get("edition"))
+                        formats.append(df_el)
+                _ganti_semua(dist_info, "distributionFormat", formats)
+
+            # Distributor Contact — ISO 19139: satu distributorContact per MD_Distributor
+            elif "distributorContact" in path:
+                distributors = []
+                for inst in n.instances:
+                    cd = _collect_dict_from_nodes(inst.nodes)
+                    if any(cd.values()):
+                        dist_el = ET.Element(_q(GMD, "distributor"))
+                        md_dist = ET.SubElement(dist_el, _q(GMD, "MD_Distributor"))
+                        md_dist.append(_build_contact_element("distributorContact", cd))
+                        distributors.append(dist_el)
+                _ganti_semua(dist_info, "distributor", distributors)
+
+            # Online Transfer Options
+            elif "onLine" in path:
+                to_el = _anak(dist_info, "transferOptions", "MD_DigitalTransferOptions")
+                online = []
+                for inst in n.instances:
+                    od = _collect_dict_from_nodes(inst.nodes)
+                    if od.get("url"):
+                        online.append(_build_online_resource_element(
+                            "onLine",
+                            od["url"],
+                            od.get("protocol", ""),
+                            od.get("name", ""),
+                            od.get("description", ""),
+                            od.get("function", "download"),
+                        ))
+                _ganti_semua(to_el, "onLine", online)
+
         if dist_info.find(_q(GMD, "distributionFormat")) is None:
             df_el = ET.SubElement(dist_info, _q(GMD, "distributionFormat"))
             df_el.set(_q(GCO, "nilReason"), "missing")
 
-            # Distributor Contact
-            if isinstance(n, layout.BList) and "distributorContact" in getattr(n, "path", ""):
-                dist_el = dist_info.find(_q(GMD, "distributor"))
-                if dist_el is None:
-                    dist_el = ET.SubElement(dist_info, _q(GMD, "distributor"))
-                md_dist = dist_el.find(_q(GMD, "MD_Distributor"))
-                if md_dist is None:
-                    md_dist = ET.SubElement(dist_el, _q(GMD, "MD_Distributor"))
-                for inst in n.instances:
-                    cd = _collect_dict_from_nodes(inst.nodes)
-                    if any(cd.values()):
-                        old_dc = md_dist.find(_q(GMD, "distributorContact"))
-                        new_dc = _build_contact_element("distributorContact", cd)
-                        if old_dc is not None:
-                            idx = list(md_dist).index(old_dc)
-                            md_dist.remove(old_dc)
-                            md_dist.insert(idx, new_dc)
-                        else:
-                            md_dist.append(new_dc)
-                        break
-
-            # Online Transfer Options
-            if isinstance(n, layout.BList) and "onLine" in getattr(n, "path", ""):
-                to_el = dist_info.find(f"{_q(GMD, 'transferOptions')}/{_q(GMD, 'MD_DigitalTransferOptions')}")
-                if to_el is not None:
-                    for old_ol in to_el.findall(_q(GMD, "onLine")):
-                        to_el.remove(old_ol)
-                    for inst in n.instances:
-                        od = _collect_dict_from_nodes(inst.nodes)
-                        if od.get("url"):
-                            to_el.append(_build_online_resource_element(
-                                "onLine",
-                                od["url"],
-                                od.get("protocol", ""),
-                                od.get("name", ""),
-                                od.get("description", ""),
-                                od.get("function", "download"),
-                            ))
-
         # Units and Transfer Size
-        to_el = dist_info.find(f"{_q(GMD, 'transferOptions')}/{_q(GMD, 'MD_DigitalTransferOptions')}")
-        if to_el is not None:
-            if "unitsOfDistribution" in d6:
-                _set_char(to_el, "unitsOfDistribution", d6["unitsOfDistribution"])
-            if "transferSize" in d6:
-                ts_el = to_el.find(_q(GMD, "transferSize"))
-                if ts_el is None:
-                    ts_el = ET.SubElement(to_el, _q(GMD, "transferSize"))
-                ts_el.clear()
-                sub_r = ET.SubElement(ts_el, _q(GCO, "Real"))
-                sub_r.text = str(d6["transferSize"])
+        to_el = _anak(dist_info, "transferOptions", "MD_DigitalTransferOptions")
+        _set_char(to_el, "unitsOfDistribution", d6.get("distributionUnits") or d6.get("unitsOfDistribution"))
+        if "transferSize" in d6:
+            ts_el = to_el.find(_q(GMD, "transferSize"))
+            if ts_el is None:
+                ts_el = ET.SubElement(to_el, _q(GMD, "transferSize"))
+            ts_el.clear()
+            sub_r = ET.SubElement(ts_el, _q(GCO, "Real"))
+            sub_r.text = str(d6["transferSize"])
+
+    # Online Resource Data dari Tahap 2 → onLine pertama (bila URL-nya belum ada)
+    if data_online is not None:
+        to_el = _anak(gmd_root, "distributionInfo", "MD_Distribution", "transferOptions", "MD_DigitalTransferOptions")
+        url_baru = data_online.findtext(f"{_q(GMD, 'CI_OnlineResource')}/{_q(GMD, 'linkage')}/{_q(GMD, 'URL')}")
+        url_ada = {ol.findtext(f"{_q(GMD, 'CI_OnlineResource')}/{_q(GMD, 'linkage')}/{_q(GMD, 'URL')}")
+                   for ol in to_el.findall(_q(GMD, "onLine"))}
+        if url_baru not in url_ada:
+            to_el.insert(0, data_online)
 
     # =========================================================================
     # TAHAP 7: KUALITAS DATA
@@ -791,86 +1064,13 @@ def export_to_gmd(iso3_root, template_path=None):
         d7 = _collect_dict_from_nodes(s7.nodes)
         has_reports = _has_list_data(s7.nodes, "report")
         if any(d7.values()) or has_reports:
-            dq_report = None
-            for dq_el in gmd_root.findall(f"{_q(GMD, 'dataQualityInfo')}/{_q(GMD, 'DQ_DataQuality')}"):
-                if dq_el.find(_q(GMD, "lineage")) is None:
-                    dq_report = dq_el
-                    break
-            if dq_report is None:
-                dqi = ET.SubElement(gmd_root, _q(GMD, "dataQualityInfo"))
-                dq_report = ET.SubElement(dqi, _q(GMD, "DQ_DataQuality"))
-
-            if "qualityScope" in d7:
-                sc_el = dq_report.find(f"{_q(GMD, 'scope')}/{_q(GMD, 'DQ_Scope')}")
-                if sc_el is None:
-                    sc_wrap = ET.SubElement(dq_report, _q(GMD, "scope"))
-                    sc_el = ET.SubElement(sc_wrap, _q(GMD, "DQ_Scope"))
-                _set_code(sc_el, "level", "MD_ScopeCode", d7["qualityScope"])
-
+            dq = _dq_pertama(gmd_root)
+            if d7.get("qualityScope"):
+                _set_dq_scope(dq, d7["qualityScope"], timpa=True)
             for n in s7.nodes:
                 if isinstance(n, layout.BList) and "report" in getattr(n, "path", ""):
-                    for old_rep in dq_report.findall(_q(GMD, "report")):
-                        dq_report.remove(old_rep)
-                    for inst in n.instances:
-                        rep_d = _collect_dict_from_nodes(inst.nodes)
-                        rep_wrap = ET.SubElement(dq_report, _q(GMD, "report"))
-                        dq_elem = ET.SubElement(rep_wrap, _q(GMD, "DQ_DomainConsistency"))
-
-                        if rep_d.get("measure") or rep_d.get("description"):
-                            md_wrap = ET.SubElement(dq_elem, _q(GMD, "measureDescription"))
-                            md_inner = ET.SubElement(md_wrap, _q(GMD, "measureDescription"))
-                            if rep_d.get("measure"):
-                                _set_char(md_inner, "nameOfMeasure", rep_d["measure"])
-                            if rep_d.get("description"):
-                                _set_char(md_inner, "measureDescription", rep_d["description"])
-
-                        if rep_d.get("evaluationMethodDescription") or rep_d.get("evaluationMethodType"):
-                            emd_wrap = ET.SubElement(dq_elem, _q(GMD, "evaluationMethodDescription"))
-                            emd_inner = ET.SubElement(emd_wrap, _q(GMD, "evaluationMethodDescription"))
-                            emd_deep = ET.SubElement(emd_inner, _q(GMD, "evaluationMethodDescription"))
-                            if rep_d.get("evaluationMethodDescription"):
-                                _set_char(emd_deep, "evaluationMethodDescription", rep_d["evaluationMethodDescription"])
-                            if rep_d.get("evaluationMethodType"):
-                                _set_code(emd_deep, "evaluationMethodType", "DQ_EvaluationMethodTypeCode", rep_d["evaluationMethodType"], "./resources/codeList.xml#DQ_EvaluationMethodTypeCode")
-
-                        for r_node in inst.nodes:
-                            if isinstance(r_node, layout.BList) and getattr(r_node, "path", "") == "result":
-                                for r_inst in r_node.instances:
-                                    res_d = _collect_dict_from_nodes(r_inst.nodes)
-                                    res_wrap = ET.SubElement(dq_elem, _q(GMD, "result"))
-                                    conf_res = ET.SubElement(res_wrap, _q(GMD, "DQ_ConformanceResult"))
-                                    if res_d.get("dateTime"):
-                                        dt_wrap = ET.SubElement(conf_res, _q(GMD, "dateTime"))
-                                        sub_dt = ET.SubElement(dt_wrap, _q(GCO, "DateTime"))
-                                        sub_dt.text = res_d["dateTime"]
-                                    if res_d.get("resultScope"):
-                                        rsc_wrap = ET.SubElement(conf_res, _q(GMD, "resultScope"))
-                                        rsc_dq = ET.SubElement(rsc_wrap, _q(GMD, "DQ_Scope"))
-                                        _set_code(rsc_dq, "level", "MD_ScopeCode", res_d["resultScope"])
-                                    if res_d.get("specificationTitle") or res_d.get("specificationAlternate"):
-                                        sp_wrap = ET.SubElement(conf_res, _q(GMD, "specification"))
-                                        ci_sp = ET.SubElement(sp_wrap, _q(GMD, "CI_Citation"))
-                                        if res_d.get("specificationTitle"):
-                                            _set_char(ci_sp, "title", res_d["specificationTitle"])
-                                        if res_d.get("specificationAlternate"):
-                                            _set_char(ci_sp, "alternateTitle", res_d["specificationAlternate"])
-                                        # date wajib di CI_Citation spesifikasi
-                                        if ci_sp.find(_q(GMD, "date")) is None:
-                                            d_sub = ET.SubElement(ci_sp, _q(GMD, "date"))
-                                            ci_d = ET.SubElement(d_sub, _q(GMD, "CI_Date"))
-                                            dt_sub = ET.SubElement(ci_d, _q(GMD, "date"))
-                                            dt_sub.set(_q(GCO, "nilReason"), "missing")
-                                            dt_type = ET.SubElement(ci_d, _q(GMD, "dateType"))
-                                            tc = ET.SubElement(dt_type, _q(GMD, "CI_DateTypeCode"))
-                                            tc.set("codeList", "./resources/codeList.xml#CI_DateTypeCode")
-                                            tc.set("codeListValue", "publication")
-                                            tc.text = "publication"
-                                    if res_d.get("explanation"):
-                                        _set_char(conf_res, "explanation", res_d["explanation"])
-                                    if res_d.get("pass"):
-                                        p_el = ET.SubElement(conf_res, _q(GMD, "pass"))
-                                        b_sub = ET.SubElement(p_el, _q(GCO, "Boolean"))
-                                        b_sub.text = str(res_d["pass"]).lower()
+                    laporan = [r for r in (_laporan_dq(inst, catatan) for inst in n.instances) if r is not None]
+                    _ganti_semua(dq, "report", laporan)
 
     # =========================================================================
     # TAHAP 8: RIWAYAT DATA (LINEAGE)
@@ -882,119 +1082,55 @@ def export_to_gmd(iso3_root, template_path=None):
         has_steps = _has_list_data(s8.nodes, "processStep")
         has_sources = _has_list_data(s8.nodes, "source")
         if has_lineage or has_steps or has_sources:
-            dq_lineage = None
-            for dq_el in gmd_root.findall(f"{_q(GMD, 'dataQualityInfo')}/{_q(GMD, 'DQ_DataQuality')}"):
-                if dq_el.find(_q(GMD, "lineage")) is not None:
-                    dq_lineage = dq_el
-                    break
-            if dq_lineage is None:
-                dqi = ET.SubElement(gmd_root, _q(GMD, "dataQualityInfo"))
-                dq_lineage = ET.SubElement(dqi, _q(GMD, "DQ_DataQuality"))
-                sc = ET.SubElement(dq_lineage, _q(GMD, "scope"))
-                dqs = ET.SubElement(sc, _q(GMD, "DQ_Scope"))
-                lvl = ET.SubElement(dqs, _q(GMD, "level"))
-                sc_code = ET.SubElement(lvl, _q(GMD, "MD_ScopeCode"))
-                sc_code.set("codeList", "./resources/codeList.xml#MD_ScopeCode")
-                sc_code.set("codeListValue", "dataset")
-                sc_code.text = "dataset"
-                lin_wrap = ET.SubElement(dq_lineage, _q(GMD, "lineage"))
-                ET.SubElement(lin_wrap, _q(GMD, "LI_Lineage"))
+            dq = _dq_pertama(gmd_root)
+            # ISO 19139 tidak punya LI_Lineage/scope: cakupan lineage menjadi cakupan DQ_DataQuality
+            # bila Tahap 7 tidak menetapkannya.
+            if d8.get("lineageScopeLevel"):
+                _set_dq_scope(dq, d8["lineageScopeLevel"])
+            for old_lin in dq.findall(_q(GMD, "lineage")):
+                dq.remove(old_lin)
+            lin_el = _anak(dq, "lineage", "LI_Lineage")
+            _set_char(lin_el, "statement", d8.get("lineageStatement"))
 
-            lin_el = dq_lineage.find(f"{_q(GMD, 'lineage')}/{_q(GMD, 'LI_Lineage')}")
-            if lin_el is not None:
-                if "lineageStatement" in d8:
-                    _set_char(lin_el, "statement", d8["lineageStatement"])
+            for n in s8.nodes:
+                if isinstance(n, layout.BList) and getattr(n, "path", "").endswith("processStep"):
+                    for inst in n.instances:
+                        ps_d = _bidang_langsung(inst.nodes)
+                        opsional = [o for o in inst.nodes if isinstance(o, layout.BOptional) and o.present]
+                        if not ps_d and not opsional:
+                            continue
+                        li_ps = ET.SubElement(ET.SubElement(lin_el, _q(GMD, "processStep")), _q(GMD, "LI_ProcessStep"))
+                        _set_char(li_ps, "description", ps_d.get("description"))
+                        _set_char(li_ps, "rationale", ps_d.get("rationale"))
+                        if ps_d.get("stepDateTime"):
+                            dt_wrap = ET.SubElement(li_ps, _q(GMD, "dateTime"))
+                            ET.SubElement(dt_wrap, _q(GCO, "DateTime")).text = _datetime(ps_d["stepDateTime"])
+                        if ps_d.get("processorName"):
+                            li_ps.append(_build_contact_element("processor", {
+                                "organization": ps_d["processorName"],
+                                "role": ps_d.get("processorRole", "processor"),
+                            }))
+                        if ps_d.get("referenceTitle"):
+                            catatan.append("Referensi tahap proses (\"%s\") tidak punya padanan di ISO 19139 — "
+                                           "tidak diekspor." % ps_d["referenceTitle"])
+                        for opt in opsional:
+                            if opt.label.startswith("Sumber"):
+                                src_d = _collect_dict_from_nodes(opt.nodes)
+                                if any(src_d.values()):
+                                    li_ps.append(_sumber_lineage(src_d, catatan))
+                            else:
+                                catatan.append(f"Bagian tahap proses \"{opt.label}\" (ISO 19115-2) tidak didukung "
+                                               "ISO 19139 — tidak diekspor.")
 
-                if "lineageScopeLevel" in d8:
-                    sc_el = lin_el.find(_q(GMD, "scope"))
-                    if sc_el is None:
-                        sc_el = ET.SubElement(lin_el, _q(GMD, "scope"))
-                    _set_code(sc_el, "level", "MD_ScopeCode", d8["lineageScopeLevel"])
+                elif isinstance(n, layout.BList) and getattr(n, "path", "").endswith("source"):
+                    for inst in n.instances:
+                        src_d = _collect_dict_from_nodes(inst.nodes)
+                        if any(src_d.values()):
+                            lin_el.append(_sumber_lineage(src_d, catatan))
 
-                for n in s8.nodes:
-                    if isinstance(n, layout.BList) and getattr(n, "path", "").endswith("processStep"):
-                        for old_ps in lin_el.findall(_q(GMD, "processStep")):
-                            lin_el.remove(old_ps)
-                        for inst in n.instances:
-                            ps_d = _collect_dict_from_nodes(inst.nodes)
-                            if not any(ps_d.values()):
-                                continue
-                            ps_wrap = ET.SubElement(lin_el, _q(GMD, "processStep"))
-                            li_ps = ET.SubElement(ps_wrap, _q(GMD, "LI_ProcessStep"))
-                            if ps_d.get("description"):
-                                _set_char(li_ps, "description", ps_d["description"])
-                            if ps_d.get("rationale"):
-                                _set_char(li_ps, "rationale", ps_d["rationale"])
-                            if ps_d.get("stepDateTime"):
-                                dt_wrap = ET.SubElement(li_ps, _q(GMD, "dateTime"))
-                                sub_dt = ET.SubElement(dt_wrap, _q(GCO, "DateTime"))
-                                sub_dt.text = ps_d["stepDateTime"]
-                            if ps_d.get("processorName"):
-                                proc_data = {
-                                    "organization": ps_d["processorName"],
-                                    "role": ps_d.get("processorRole", "processor"),
-                                }
-                                li_ps.append(_build_contact_element("processor", proc_data))
-                            if ps_d.get("referenceTitle"):
-                                ps_src = ET.SubElement(li_ps, _q(GMD, "source"))
-                                ci_ps = ET.SubElement(ps_src, _q(GMD, "CI_Citation"))
-                                _set_char(ci_ps, "title", ps_d["referenceTitle"])
-                            if ps_d.get("scopeLevel"):
-                                sc_ps = ET.SubElement(li_ps, _q(GMD, "scope"))
-                                _set_code(sc_ps, "level", "MD_ScopeCode", ps_d["scopeLevel"])
-
-                    elif isinstance(n, layout.BList) and getattr(n, "path", "").endswith("source"):
-                        for old_src in lin_el.findall(_q(GMD, "source")):
-                            lin_el.remove(old_src)
-                        for inst in n.instances:
-                            src_d = _collect_dict_from_nodes(inst.nodes)
-                            if not any(src_d.values()):
-                                continue
-                            src_wrap = ET.SubElement(lin_el, _q(GMD, "source"))
-                            li_src = ET.SubElement(src_wrap, _q(GMD, "LI_Source"))
-                            if src_d.get("description"):
-                                _set_char(li_src, "description", src_d["description"])
-                            if src_d.get("spatialResolution"):
-                                sr_wrap = ET.SubElement(li_src, _q(GMD, "sourceSpatialResolution"))
-                                md_res = ET.SubElement(sr_wrap, _q(GMD, "MD_Resolution"))
-                                dist_el = ET.SubElement(md_res, _q(GMD, "distance"))
-                                sub_dist = ET.SubElement(dist_el, _q(GCO, "Distance"))
-                                sub_dist.set("uom", "m")
-                                sub_dist.text = str(src_d["spatialResolution"])
-                            if src_d.get("referenceSystemCode") or src_d.get("referenceSystemCodeSpace"):
-                                srs_wrap = ET.SubElement(li_src, _q(GMD, "sourceReferenceSystem"))
-                                md_rs = ET.SubElement(srs_wrap, _q(GMD, "MD_ReferenceSystem"))
-                                rs_id = ET.SubElement(md_rs, _q(GMD, "referenceSystemIdentifier"))
-                                md_id = ET.SubElement(rs_id, _q(GMD, "MD_Identifier"))
-                                if src_d.get("referenceSystemCode"):
-                                    _set_char(md_id, "code", src_d["referenceSystemCode"])
-                                if src_d.get("referenceSystemCodeSpace"):
-                                    _set_char(md_id, "codeSpace", src_d["referenceSystemCodeSpace"])
-                            if src_d.get("citationTitle") or src_d.get("citationDate"):
-                                cit_s = ET.SubElement(li_src, _q(GMD, "sourceCitation"))
-                                ci_s = ET.SubElement(cit_s, _q(GMD, "CI_Citation"))
-                                if src_d.get("citationTitle"):
-                                    _set_char(ci_s, "title", src_d["citationTitle"])
-                                if src_d.get("citationDate"):
-                                    d_wrap = ET.SubElement(ci_s, _q(GMD, "date"))
-                                    ci_d = ET.SubElement(d_wrap, _q(GMD, "CI_Date"))
-                                    dt_wrap = ET.SubElement(ci_d, _q(GMD, "date"))
-                                    tag_t = "DateTime" if "T" in src_d["citationDate"] else "Date"
-                                    sub_dt = ET.SubElement(dt_wrap, _q(GCO, tag_t))
-                                    sub_dt.text = src_d["citationDate"]
-                                    dt_type = ET.SubElement(ci_d, _q(GMD, "dateType"))
-                                    tc_el = ET.SubElement(dt_type, _q(GMD, "CI_DateTypeCode"))
-                                    tc_el.set("codeList", "./resources/codeList.xml#CI_DateTypeCode")
-                                    tc_val = src_d.get("citationDateType") or "creation"
-                                    tc_el.set("codeListValue", tc_val)
-                                    tc_el.text = tc_val
-                            if src_d.get("metadataTitle"):
-                                sm_s = ET.SubElement(li_src, _q(GMD, "sourceMetadata"))
-                                ci_sm = ET.SubElement(sm_s, _q(GMD, "CI_Citation"))
-                                _set_char(ci_sm, "title", src_d["metadataTitle"])
-                            if src_d.get("scopeLevel"):
-                                sc_s = ET.SubElement(li_src, _q(GMD, "scope"))
-                                _set_code(sc_s, "level", "MD_ScopeCode", src_d["scopeLevel"])
+    # Setiap DQ_DataQuality wajib punya cakupan; bawaannya dataset.
+    for dq in gmd_root.findall(f"{_q(GMD, 'dataQualityInfo')}/{_q(GMD, 'DQ_DataQuality')}"):
+        _set_dq_scope(dq, "dataset")
 
     # =========================================================================
     # TAHAP 9: KATALOG PENYAJIAN (PORTRAYAL)
@@ -1020,14 +1156,8 @@ def export_to_gmd(iso3_root, template_path=None):
                 _set_char(ci_pc, "title", d9["portrayalCatalogueTitle"])
             if "portrayalCatalogueAlternateTitle" in d9:
                 _set_char(ci_pc, "alternateTitle", d9["portrayalCatalogueAlternateTitle"])
-            if "portrayalCatalogueURL" in d9:
-                ol_wrap = ci_pc.find(_q(GMD, "onlineResource"))
-                if ol_wrap is None:
-                    ol_wrap = ET.SubElement(ci_pc, _q(GMD, "onlineResource"))
-                ci_ol = ol_wrap.find(_q(GMD, "CI_OnlineResource"))
-                if ci_ol is None:
-                    ci_ol = ET.SubElement(ol_wrap, _q(GMD, "CI_OnlineResource"))
-                _set_url(ci_ol, "linkage", d9["portrayalCatalogueURL"])
+            if d9.get("portrayalCatalogueURL"):
+                catatan.append("URL katalog penyajian tidak punya padanan di CI_Citation ISO 19139 — tidak diekspor.")
 
             for n in s9.nodes:
                 if isinstance(n, layout.BList) and "citedResponsibleParty" in getattr(n, "path", ""):
@@ -1044,54 +1174,35 @@ def export_to_gmd(iso3_root, template_path=None):
     s10 = sec_map.get(10)
     if s10 and data_id is not None:
         d10 = _collect_dict_from_nodes(s10.nodes)
-        for rc in data_id.findall(f"{_q(GMD, 'resourceConstraints')}/{_q(GMD, 'MD_Constraints')}"):
-            if "useLimitation" in d10:
-                _set_char(rc, "useLimitation", d10["useLimitation"])
-        for rc in data_id.findall(f"{_q(GMD, 'resourceConstraints')}/{_q(GMD, 'MD_LegalConstraints')}"):
-            if "accessConstraints" in d10:
-                _set_code(rc, "accessConstraints", "MD_RestrictionCode", d10["accessConstraints"])
-            if "useConstraints" in d10:
-                _set_code(rc, "useConstraints", "MD_RestrictionCode", d10["useConstraints"])
-            if "otherConstraints" in d10:
-                _set_char(rc, "otherConstraints", d10["otherConstraints"])
-        for rc in data_id.findall(f"{_q(GMD, 'resourceConstraints')}/{_q(GMD, 'MD_SecurityConstraints')}"):
-            if "securityClassification" in d10:
-                _set_code(rc, "classification", "MD_ClassificationCode", d10["securityClassification"])
-            if "securityUserNote" in d10:
-                _set_char(rc, "userNote", d10["securityUserNote"])
-            if "securitySystem" in d10:
-                _set_char(rc, "classificationSystem", d10["securitySystem"])
-
-        # Metadata Constraints (di root)
-        for mc in gmd_root.findall(f"{_q(GMD, 'metadataConstraints')}/{_q(GMD, 'MD_Constraints')}"):
-            if "metadataUseLimitation" in d10:
-                _set_char(mc, "useLimitation", d10["metadataUseLimitation"])
-        for mc in gmd_root.findall(f"{_q(GMD, 'metadataConstraints')}/{_q(GMD, 'MD_LegalConstraints')}"):
-            if "metadataOtherConstraints" in d10:
-                _set_char(mc, "otherConstraints", d10["metadataOtherConstraints"])
-        for mc in gmd_root.findall(f"{_q(GMD, 'metadataConstraints')}/{_q(GMD, 'MD_SecurityConstraints')}"):
-            if "metadataSecurityClassification" in d10:
-                _set_code(mc, "classification", "MD_ClassificationCode", d10["metadataSecurityClassification"])
-            if "metadataSecurityUserNote" in d10:
-                _set_char(mc, "userNote", d10["metadataSecurityUserNote"])
+        # Dibuat dari isian (template tidak memuat blok batasan, jadi dulu tak pernah terekspor)
+        _ganti_semua(data_id, "resourceConstraints", _batasan("resourceConstraints", d10))
+        _ganti_semua(gmd_root, "metadataConstraints", _batasan("metadataConstraints", d10))
 
     # =========================================================================
     # TAHAP 11: SKEMA APLIKASI
     # =========================================================================
     s11 = sec_map.get(11)
-    app_schema = gmd_root.find(f"{_q(GMD, 'applicationSchemaInfo')}/{_q(GMD, 'MD_ApplicationSchemaInformation')}")
-    if s11 and app_schema is not None:
+    if s11:
         d11 = _collect_dict_from_nodes(s11.nodes)
-        if "schemaName" in d11:
-            nm_cit = app_schema.find(f"{_q(GMD, 'name')}/{_q(GMD, 'CI_Citation')}")
-            if nm_cit is not None:
-                _set_char(nm_cit, "title", d11["schemaName"])
-        if "schemaLanguage" in d11:
-            _set_char(app_schema, "schemaLanguage", d11["schemaLanguage"])
-        if "schemaConstraintLanguage" in d11:
-            _set_char(app_schema, "constraintLanguage", d11["schemaConstraintLanguage"])
-        if "schemaAscii" in d11:
-            _set_char(app_schema, "schemaAscii", d11["schemaAscii"])
+        kunci11 = ("schemaName", "schemaAlternateTitle", "schemaLanguage", "schemaConstraintLanguage",
+                   "schemaAscii", "schemaGraphicsURL")
+        if any(d11.get(k) for k in kunci11):
+            # Dibuat dari isian (template tidak memuat blok skema aplikasi)
+            for old_as in gmd_root.findall(_q(GMD, "applicationSchemaInfo")):
+                gmd_root.remove(old_as)
+            app_schema = _anak(gmd_root, "applicationSchemaInfo", "MD_ApplicationSchemaInformation")
+            nm_cit = _anak(app_schema, "name", "CI_Citation")
+            _set_char(nm_cit, "title", d11.get("schemaName"))
+            _set_char(nm_cit, "alternateTitle", d11.get("schemaAlternateTitle"))
+            _set_char(app_schema, "schemaLanguage", d11.get("schemaLanguage"))
+            _set_char(app_schema, "constraintLanguage", d11.get("schemaConstraintLanguage"))
+            _set_char(app_schema, "schemaAscii", d11.get("schemaAscii"))
+            if d11.get("schemaGraphicsURL"):
+                gf = ET.SubElement(app_schema, _q(GMD, "graphicsFile"))
+                ET.SubElement(gf, _q(GCO, "Binary")).set("src", _clean_str(d11["schemaGraphicsURL"]))
+            if d11.get("schemaGraphicsName"):
+                catatan.append("Nama berkas grafik skema tidak punya padanan di ISO 19139 (hanya tautan "
+                               "berkasnya) — tidak diekspor.")
 
     # =========================================================================
     # TAHAP 12: PEMELIHARAAN DATA & METADATA
@@ -1208,7 +1319,7 @@ def export_to_gmd(iso3_root, template_path=None):
                 if "extensionOnlineDescription" in d13:
                     _set_char(ci_ol, "description", d13["extensionOnlineDescription"])
                 if "extensionOnlineFunction" in d13:
-                    _set_code(ci_ol, "function", "CI_OnLineFunctionCode", d13["extensionOnlineFunction"], "./resources/codeList.xml#CI_OnLineFunctionCode")
+                    _set_code(ci_ol, "function", "CI_OnLineFunctionCode", d13["extensionOnlineFunction"])
 
             if any(k in d13 for k, _ in elem_keys):
                 eei_wrap = ext_el.find(_q(GMD, "extendedElementInformation"))
@@ -1221,9 +1332,11 @@ def export_to_gmd(iso3_root, template_path=None):
                 for k, tag in elem_keys:
                     if k in d13:
                         if tag == "obligation":
-                            _set_code(md_eei, "obligation", "MD_ObligationCode", d13[k], "./resources/codeList.xml#MD_ObligationCode")
+                            # MD_ObligationCode di ISO 19139 adalah enumerasi (teks), bukan codelist
+                            ob = _anak(md_eei, "obligation", "MD_ObligationCode")
+                            ob.text = _clean_str(d13[k])
                         elif tag == "dataType":
-                            _set_code(md_eei, "dataType", "MD_DatatypeCode", d13[k], "./resources/codeList.xml#MD_DatatypeCode")
+                            _set_code(md_eei, "dataType", "MD_DatatypeCode", d13[k])
                         else:
                             _set_char(md_eei, tag, d13[k])
 
@@ -1232,6 +1345,9 @@ def export_to_gmd(iso3_root, template_path=None):
         if el.text and ("<" in el.text or "&lt;" in el.text):
             el.text = _clean_str(el.text)
 
+    _rapikan(gmd_root, catatan)
+    # Pesan yang sama (mis. dari beberapa tahap proses) cukup sekali
+    catatan[:] = list(dict.fromkeys(catatan))
     return gmd_root
 
 
