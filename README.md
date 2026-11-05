@@ -69,15 +69,25 @@
 Metadata dataset GeoNode bisa diambil ke formulir, disunting, lalu dikirim balik (ISO 19139) dengan akun
 GeoNode masing-masing pengguna; CSW GeoNode ikut terbarui.
 
-**Persiapan admin GeoNode (sekali):** Django admin → *Django OAuth Toolkit* → *Applications* → tambah:
+**Dua cara login** (keduanya tersimpan terenkripsi di Authentication Manager QGIS):
+
+| | Username/password | OAuth2 (disarankan) |
+|---|---|---|
+| Persiapan admin | tidak ada | daftarkan aplikasi OAuth2 sekali (lihat di bawah) |
+| Dataset yang sudah dipublikasikan | ambil, perbarui, cadangan, pemeriksaan CSW | sama |
+| Dataset tidak publik | hanya perbarui (CSW GeoNode tidak mengenali login ini, jadi ambil, cadangan & pemeriksaan CSW tidak bisa) | semua fungsi |
+| Akun SSO/LDAP tanpa password lokal | tidak bisa | bisa |
+
+**Persiapan admin GeoNode untuk OAuth2 (sekali):** Django admin → *Django OAuth Toolkit* → *Applications* → tambah:
 Client type `Public` (disarankan) atau `Confidential`, Authorization grant type `Authorization code`,
 Redirect URIs `http://127.0.0.1:7070/`. Bagikan **Client ID** (dan Client secret bila `Confidential`) ke
-pengguna. Beri group/pengguna izin *ubah metadata* hanya pada dataset miliknya.
+pengguna. Apa pun cara loginnya, beri group/pengguna izin *ubah metadata* hanya pada dataset miliknya.
 
 **Pengguna:**
-1. Klik **Ambil dari GeoNode...** di bagian atas editor. Isi URL GeoNode, klik **Buat konfigurasi OAuth2…**,
-   masukkan Client ID (dan secret bila ada; QGIS menyimpannya terenkripsi, PKCE dipakai pada QGIS ≥ 3.34),
-   lalu **Masuk & muat dataset** — browser terbuka untuk login GeoNode.
+1. Klik **Ambil dari GeoNode...** di bagian atas editor dan isi URL GeoNode. Lalu pilih salah satu:
+   **Login username/password…** (username & password akun GeoNode), atau **Buat konfigurasi OAuth2…** (Client ID,
+   dan secret bila ada; PKCE dipakai pada QGIS ≥ 3.34). Klik **Masuk & muat dataset**; untuk OAuth2 browser
+   terbuka untuk login GeoNode.
 2. Telusuri katalog dalam mode **Kartu** (thumbnail) atau **Daftar** (tabel, bisa diurutkan). Memilih dataset
    menampilkan pratinjau peta dari layanan WMS-nya di atas peta dasar OpenStreetMap. Dataset yang tidak boleh
    diubah akun Anda ditandai *Hanya lihat*.

@@ -19,7 +19,7 @@ from qgis.PyQt.QtWidgets import (
 from . import gmd_importer
 from . import geonode_sync as gs
 from .geonode_klien import GeoNodeError
-from .geonode_panel import KUNCI, PanelKoneksi
+from .geonode_panel import KUNCI, PanelKoneksi, satu_aksi
 
 JUDUL = "Ambil Metadata dari GeoNode"
 UKURAN_HALAMAN = 24
@@ -139,7 +139,7 @@ class DialogKatalogGeoNode(QDialog):
         self.b_ambil.setToolTip("Isi formulir GeoMDB dengan metadata dataset terpilih (record ISO dari CSW GeoNode) "
                                 "untuk disunting. Klik ganda kartu/baris juga mengambilnya.")
         self.b_ambil.setEnabled(False)
-        self.b_ambil.clicked.connect(self.ambil)
+        self.b_ambil.clicked.connect(lambda *_: self.ambil())
         b_tutup = QPushButton("Tutup")
         b_tutup.clicked.connect(self.reject)
 
@@ -218,6 +218,7 @@ class DialogKatalogGeoNode(QDialog):
         self._unduh.clear()
 
     # ------------------------------------------------------------------ katalog
+    @satu_aksi
     def muat(self, halaman=1):
         try:
             k = self.panel.klien()
@@ -240,7 +241,9 @@ class DialogKatalogGeoNode(QDialog):
             r = gs.ringkas_dataset(d)
             pk = str(r["pk"])
             bisa += r["boleh_ubah"]
-            if r["thumbnail"] and r["thumbnail"] not in self._thumb:
+            # Satu URL diunduh sekali walau dipakai beberapa dataset (mis. thumbnail bawaan GeoNode): dua unduhan
+            # serentak URL yang sama membuat QGIS crash saat balasannya diproses di tengah aksi lain.
+            if r["thumbnail"] and r["thumbnail"] not in self._thumb and r["thumbnail"] not in self._unduh:
                 self._unduh_thumbnail(r["thumbnail"])
             it = QListWidgetItem(QIcon(self._gambar_kartu(r)), "%s\n%s" % (
                 _potong(r["judul"], 56), " · ".join(x for x in (r["jenis"], r["pemilik"]) if x and x != "-")))
@@ -482,6 +485,7 @@ class DialogKatalogGeoNode(QDialog):
         self.kanvas.refresh()
 
     # ------------------------------------------------------------------ aksi
+    @satu_aksi
     def ambil(self):
         """Isi formulir dengan metadata dataset terpilih (record ISO dari CSW GeoNode) dan tautkan editor."""
         d = self._data.get(self._pk) if self._pk else None
@@ -500,6 +504,8 @@ class DialogKatalogGeoNode(QDialog):
                 ) != QMessageBox.StandardButton.Yes:
                     return
             self._catat("Mengambil record ISO «%s» dari CSW GeoNode …" % d.get("title"))
+            if self.panel.basic() and not k.terlihat_publik(d["pk"]):
+                raise GeoNodeError(gs.SARAN_BASIC_PRIVAT)
             md = gs.ambil_md_metadata(k.csw_record(d["uuid"]))
             if md is None:
                 raise GeoNodeError("Record ISO dataset ini tidak ditemukan di CSW GeoNode.")

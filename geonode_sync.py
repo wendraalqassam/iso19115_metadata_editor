@@ -492,6 +492,12 @@ SARAN_CSW_RUSAK = ("Biasanya karena metadata dataset ini tersimpan rusak di GeoN
                    % URL_ALAT_TAMBAL)
 
 
+SARAN_BASIC_PRIVAT = ("Dataset ini tidak publik. CSW GeoNode hanya mengenali login OAuth2, sehingga dengan login "
+                      "username/password record ISO dataset tidak publik tidak bisa dibaca (ambil, cadangan, dan "
+                      "pemeriksaan CSW). Pakai konfigurasi OAuth2 («Buat konfigurasi OAuth2…»), atau publikasikan "
+                      "datasetnya dulu.")
+
+
 def gejala_bug_preserve(pesan):
     """Pesan galat GeoNode yang khas bug preserve: metadata_xml tersimpan sebagai "b'<...'" lalu gagal di-parse."""
     p = pesan or ""

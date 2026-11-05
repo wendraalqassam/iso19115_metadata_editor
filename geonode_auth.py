@@ -1,4 +1,5 @@
-"""Konfigurasi OAuth2 QGIS untuk login ke GeoNode dengan akun masing-masing pengguna.
+"""Konfigurasi login QGIS ke GeoNode dengan akun masing-masing pengguna: OAuth2 (disarankan) atau
+username/password (HTTP Basic: cepat, tetapi CSW GeoNode tidak mengenalinya — dataset privat tak terbaca).
 
 Admin GeoNode cukup sekali mendaftarkan aplikasi di Django admin → Django OAuth Toolkit →
 Applications: grant "Authorization code", Redirect URIs http://127.0.0.1:7070/ (sama dengan
@@ -45,19 +46,16 @@ def konfigurasi_oauth2(url, client_id, client_secret=""):
     }
 
 
-def buat_authcfg(url, client_id, client_secret=""):
-    """Simpan konfigurasi OAuth2 baru di Authentication Manager QGIS; kembalikan ID authcfg."""
-    if not client_id.strip():
-        raise ValueError("Client ID aplikasi OAuth2 GeoNode wajib diisi.")
+def _siapkan(metode):
     am = QgsApplication.authManager()
-    if "OAuth2" not in am.authMethodsKeys():
-        raise RuntimeError("Metode autentikasi OAuth2 tidak tersedia di instalasi QGIS ini.")
+    if metode not in am.authMethodsKeys():
+        raise RuntimeError("Metode autentikasi %s tidak tersedia di instalasi QGIS ini." % metode)
     if not am.setMasterPassword(True):  # minta master password bila belum dibuka
         raise RuntimeError("Master password QGIS diperlukan untuk menyimpan kredensial.")
-    cfg = QgsAuthMethodConfig("OAuth2")
-    cfg.setName("GeoMDB — GeoNode %s" % gs.url_dasar(url).split("://", 1)[-1])
-    cfg.setUri(gs.url_dasar(url))
-    cfg.setConfig("oauth2config", json.dumps(konfigurasi_oauth2(url, client_id, client_secret)))
+    return am
+
+
+def _simpan(am, cfg):
     hasil = am.storeAuthenticationConfig(cfg)
     ok = hasil[0] if isinstance(hasil, tuple) else hasil
     if isinstance(hasil, tuple) and len(hasil) > 1:
@@ -65,3 +63,45 @@ def buat_authcfg(url, client_id, client_secret=""):
     if not ok or not cfg.id():
         raise RuntimeError("Gagal menyimpan konfigurasi autentikasi QGIS.")
     return cfg.id()
+
+
+def buat_authcfg(url, client_id, client_secret=""):
+    """Simpan konfigurasi OAuth2 baru di Authentication Manager QGIS; kembalikan ID authcfg."""
+    if not client_id.strip():
+        raise ValueError("Client ID aplikasi OAuth2 GeoNode wajib diisi.")
+    am = _siapkan("OAuth2")
+    cfg = QgsAuthMethodConfig("OAuth2")
+    cfg.setName("GeoMDB — GeoNode %s" % gs.url_dasar(url).split("://", 1)[-1])
+    cfg.setUri(gs.url_dasar(url))
+    cfg.setConfig("oauth2config", json.dumps(konfigurasi_oauth2(url, client_id, client_secret)))
+    return _simpan(am, cfg)
+
+
+def buat_authcfg_basic(url, username, password):
+    """Login username/password akun GeoNode (HTTP Basic), tersimpan terenkripsi di Authentication Manager QGIS.
+    API GeoNode (/api/v2) menerimanya; CSW & userinfo GeoNode hanya mengenali OAuth2 (lihat geonode_klien)."""
+    if not username.strip():
+        raise ValueError("Username akun GeoNode wajib diisi.")
+    am = _siapkan("Basic")
+    cfg = QgsAuthMethodConfig("Basic")
+    cfg.setName("GeoMDB — GeoNode %s (%s)" % (gs.url_dasar(url).split("://", 1)[-1], username.strip()))
+    cfg.setUri(gs.url_dasar(url))
+    cfg.setConfig("username", username.strip())
+    cfg.setConfig("password", password)
+    cfg.setConfig("realm", "")
+    return _simpan(am, cfg)
+
+
+def info_authcfg(authcfg):
+    """(metode, username) konfigurasi autentikasi QGIS, mis. ("Basic", "budi") atau ("OAuth2", ""); ("", "") bila
+    kosong atau tidak terbaca. Membaca username perlu master password QGIS (sama seperti saat memakainya)."""
+    if not authcfg:
+        return "", ""
+    cfg = QgsAuthMethodConfig()
+    hasil = QgsApplication.authManager().loadAuthenticationConfig(authcfg, cfg, True)
+    ok = hasil[0] if isinstance(hasil, tuple) else hasil
+    if isinstance(hasil, tuple) and len(hasil) > 1:
+        cfg = hasil[1]
+    if not ok:
+        return "", ""
+    return cfg.method(), (cfg.config("username", "") or "").strip()

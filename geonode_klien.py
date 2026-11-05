@@ -90,8 +90,36 @@ class KlienGeoNode:
 
     # ------------------------------------------------------------------ API
     def userinfo(self):
-        """Profil pengguna yang sedang login; GeoNodeError(status=401) bila belum login."""
+        """Profil pengguna yang sedang login (OAuth2); GeoNodeError(status=401) bila belum login."""
         return gs.bersihkan_userinfo(self._json("GET", gs.ALAMAT["userinfo"]))
+
+    def info_pengguna_basic(self, username):
+        """Profil untuk login username/password: /api/o/v4/userinfo hanya mengenali OAuth2, jadi dipakai API pengguna
+        (/api/v2/users, wajib login). Password salah → GeoNodeError(status=401). Bentuk hasil seperti userinfo()."""
+        j = self._json("GET", "/api/v2/users", kueri={"filter{username}": username, "page_size": 1})
+        u = (j.get("users") or [{}])[0]
+        grup = []
+        if u.get("pk") is not None:
+            try:
+                grup = [g.get("title") or g.get("name") or g.get("slug") for g in
+                        self._json("GET", "/api/v2/users/%s/groups" % u["pk"]).get("groups") or []]
+            except GeoNodeError:
+                grup = []
+        if u.get("is_superuser"):
+            grup.append("admin")
+        nama = " ".join(x for x in (u.get("first_name"), u.get("last_name")) if x)
+        return {"preferred_username": u.get("username") or username, "name": nama, "groups": [g for g in grup if g]}
+
+    def terlihat_publik(self, pk):
+        """Dataset bisa dilihat pengguna anonim? CSW GeoNode memperlakukan login username/password sebagai anonim,
+        jadi record dataset yang tidak publik tak terbaca dengan login itu."""
+        try:
+            KlienGeoNode(self.base).dataset(pk)
+            return True
+        except GeoNodeError as e:
+            if e.status in (401, 403, 404):
+                return False
+            raise
 
     def datasets(self, cari="", halaman=1, ukuran=50):
         kueri = {"page": halaman, "page_size": ukuran}
@@ -178,7 +206,12 @@ class KlienGeoNode:
         if authcfg:
             QgsApplication.authManager().updateNetworkReply(reply, authcfg)
 
+        sudah = []
+
         def _beres():
+            if sudah:  # finished hanya diproses sekali per balasan
+                return
+            sudah.append(True)
             isi = bytes(reply.readAll()) if reply.error() == QNetworkReply.NetworkError.NoError else None
             reply.deleteLater()
             selesai(isi)

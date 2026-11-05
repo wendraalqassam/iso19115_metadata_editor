@@ -29,7 +29,7 @@ from qgis.PyQt.QtWidgets import (
 from . import gmd_importer, kesesuaian, layout
 from . import geonode_sync as gs
 from .geonode_klien import GeoNodeError
-from .geonode_panel import KUNCI, PanelKoneksi
+from .geonode_panel import KUNCI, PanelKoneksi, satu_aksi
 
 JUDUL = "Kirim Metadata ke GeoNode"
 PK, UBAH = Qt.ItemDataRole.UserRole, Qt.ItemDataRole.UserRole + 1
@@ -75,7 +75,7 @@ class DialogGeoNode(QDialog):
         self.log.setReadOnly(True)
         self.log.setMaximumBlockCount(500)
         self.panel = PanelKoneksi(JUDUL, self._catat, self)
-        self.panel.tersambung.connect(self.muat_dataset)
+        self.panel.tersambung.connect(lambda *_: self.muat_dataset())
         self.e_url = self.panel.e_url
         self.e_url.editingFinished.connect(self._atur_kunci)
 
@@ -88,7 +88,7 @@ class DialogGeoNode(QDialog):
 
         self.e_cari = QLineEdit()
         self.e_cari.setPlaceholderText("Cari dataset (Enter)…")
-        self.e_cari.returnPressed.connect(self.muat_dataset)
+        self.e_cari.returnPressed.connect(lambda *_: self.muat_dataset())
         self.lst = QListWidget()
         self.lst.currentItemChanged.connect(self._pilihan_berubah)
 
@@ -108,11 +108,11 @@ class DialogGeoNode(QDialog):
 
         b_pulihkan = QPushButton("Pulihkan dari cadangan…")
         b_pulihkan.setToolTip("Kembalikan metadata dataset GeoNode ke keadaan sebelum ditimpa (cadangan otomatis plugin).")
-        b_pulihkan.clicked.connect(self.pulihkan)
+        b_pulihkan.clicked.connect(lambda *_: self.pulihkan())
         self.b_kirim = QPushButton("⬆ Perbarui di GeoNode")
         self.b_kirim.setToolTip("Ganti metadata dataset terpilih di GeoNode dengan isian formulir GeoMDB saat ini.")
         self.b_kirim.setEnabled(False)
-        self.b_kirim.clicked.connect(self.kirim)
+        self.b_kirim.clicked.connect(lambda *_: self.kirim())
         b_tutup = QPushButton("Tutup")
         b_tutup.clicked.connect(self.reject)
 
@@ -238,9 +238,8 @@ class DialogGeoNode(QDialog):
             return
         rusak = []
         for d in gs.dataset_preserve(data)[:3]:
-            try:
-                if gs.ambil_md_metadata(k.csw_record(d["uuid"])) is None:
-                    rusak.append(d.get("title") or str(d.get("pk")))
+            try:  # bukti = galat server (HTTP 500 / ExceptionReport); "tak ditemukan" bisa karena record tak terlihat
+                k.csw_record(d["uuid"])  # (mis. dataset tidak publik + login username/password)
             except GeoNodeError:
                 rusak.append(d.get("title") or str(d.get("pk")))
         if rusak:
@@ -268,6 +267,7 @@ class DialogGeoNode(QDialog):
         self._atur_kunci()
         self.muat_dataset()
 
+    @satu_aksi
     def muat_dataset(self):
         self._atur_kunci()
         try:
@@ -379,6 +379,7 @@ class DialogGeoNode(QDialog):
         except GeoNodeError:
             return False
 
+    @satu_aksi
     def kirim(self):
         item = self.lst.currentItem()
         if item is None:
@@ -402,6 +403,8 @@ class DialogGeoNode(QDialog):
                 raise GeoNodeError("Akun Anda tidak punya izin mengubah metadata dataset ini.")
             if not gs.tautan_cocok(self._tautan(), k.base, pk) and not self._konfirmasi_nama(ds):
                 return
+            # Login username/password: CSW GeoNode menganggapnya anonim → record dataset tidak publik tak terlihat
+            csw_bisa = not (self.panel.basic() and not k.terlihat_publik(pk))
             preserve = self._pakai_preserve()
             g, catatan, tidak_standar = self._siapkan(ds, preserve)
             beda = gs.bandingkan_cakupan(g, ds)
@@ -427,6 +430,8 @@ class DialogGeoNode(QDialog):
             judul = gs.judul_xml(g)
             self._catat("1/5 XML ISO 19139 disiapkan (fileIdentifier = %s)." % ds.get("uuid"))
             try:
+                if not csw_bisa:
+                    raise GeoNodeError(gs.SARAN_BASIC_PRIVAT)
                 cadangan = self._cadangkan(k, ds, versi)
                 self._catat("2/5 Cadangan metadata lama: %s" % cadangan)
             except (GeoNodeError, OSError) as e:
@@ -448,7 +453,7 @@ class DialogGeoNode(QDialog):
             status, pesan = self._unggah(k, pk, g, ds)
             pulih_otomatis = False
             if preserve and ((status != gs.SELESAI and gs.gejala_bug_preserve(pesan)) or
-                             (status == gs.SELESAI and not self._csw_terbaca(k, ds))):
+                             (status == gs.SELESAI and csw_bisa and not self._csw_terbaca(k, ds))):
                 # Server ternyata BELUM ditambal: matikan preserve (GeoNode membuat ulang record dari template),
                 # kirim ulang tanpa preserve, tandai server, tunjukkan alat tambal.
                 self._catat("    Gejala bug preserve GeoNode — server belum ditambal. Dikirim ulang tanpa preserve.")
@@ -460,12 +465,15 @@ class DialogGeoNode(QDialog):
                 status, pesan = self._unggah(k, pk, g, ds)
             if status != gs.SELESAI:
                 raise GeoNodeError("Pemrosesan GeoNode %s: %s" % (status or "tidak selesai", pesan or "-"))
-            masalah_csw = gs.periksa_record_csw(k.csw_record(ds["uuid"]), ds["uuid"], g, preserve=preserve)
-            if preserve and not masalah_csw:
-                tandai_tambal(k.base, "sudah")  # terbukti: XML GeoMDB tersaji utuh
+            masalah_csw = []
+            if csw_bisa:
+                masalah_csw = gs.periksa_record_csw(k.csw_record(ds["uuid"]), ds["uuid"], g, preserve=preserve)
+                if preserve and not masalah_csw:
+                    tandai_tambal(k.base, "sudah")  # terbukti: XML GeoMDB tersaji utuh
             masalah_db = gs.periksa_dataset(k.dataset(pk), g)
             self._catat("5/5 CSW GeoNode %s\n    Isian GeoNode (%s) %s" % (
-                "sesuai." if not masalah_csw else "BELUM sesuai: " + " ".join(masalah_csw),
+                ("sesuai." if not masalah_csw else "BELUM sesuai: " + " ".join(masalah_csw)) if csw_bisa else
+                "tidak diperiksa (dataset tidak publik + login username/password; perlu OAuth2).",
                 gs.halaman_metadata(versi, ds),
                 "sesuai." if not masalah_db else "BELUM sesuai: " + " ".join(masalah_db)))
             masalah = masalah_csw + masalah_db
@@ -497,6 +505,7 @@ class DialogGeoNode(QDialog):
         finally:
             self._pilihan_berubah(self.lst.currentItem())
 
+    @satu_aksi
     def pulihkan(self):
         """Unggah kembali cadangan ke dataset ASALNYA (uuid dicocokkan) TANPA preserve — sekaligus memperbaiki
         record CSW yang rusak oleh bug preserve GeoNode (gs.BUG_PRESERVE) — dengan tanggal dataset semula."""
@@ -551,15 +560,18 @@ class DialogGeoNode(QDialog):
             status, pesan = gs.ringkas_status(k.tunggu_eksekusi(exec_id))
             if status != gs.SELESAI:
                 raise GeoNodeError("Pemrosesan GeoNode %s: %s" % (status or "tidak selesai", pesan or "-"))
-            try:  # record CSW harus kembali terbaca
-                sehat = gs.ambil_md_metadata(k.csw_record(ds["uuid"])) is not None
-            except GeoNodeError as e:
-                sehat, pesan = False, str(e)
-            self._catat("Pulihkan selesai — record CSW %s." % ("terbaca kembali" if sehat else "BELUM terbaca: %s" % pesan))
+            if self.panel.basic() and not k.terlihat_publik(ds["pk"]):
+                sehat, ket = True, "Record CSW tidak diperiksa (dataset tidak publik + login username/password)."
+            else:
+                try:  # record CSW harus kembali terbaca
+                    sehat = gs.ambil_md_metadata(k.csw_record(ds["uuid"])) is not None
+                    ket = "Record CSW GeoNode terbaca kembali." if sehat else "Record CSW GeoNode belum terbaca."
+                except GeoNodeError as e:
+                    sehat, ket = False, "Record CSW GeoNode belum terbaca:\n%s" % e
+            self._catat("Pulihkan selesai — %s" % ket.replace("\n", " "))
             (QMessageBox.information if sehat else QMessageBox.warning)(
                 self, JUDUL, "Metadata dataset «%s» dipulihkan dari cadangan %s.\n%s" % (
-                    ds.get("title"), info.get("waktu"),
-                    "Record CSW GeoNode terbaca kembali." if sehat else "Record CSW GeoNode belum terbaca:\n%s" % pesan))
+                    ds.get("title"), info.get("waktu"), ket))
         except (GeoNodeError, OSError, ValueError, KeyError) as e:
             self._catat("Gagal memulihkan: %s" % e)
             QMessageBox.warning(self, JUDUL, "Gagal memulihkan dari cadangan:\n%s" % e)
