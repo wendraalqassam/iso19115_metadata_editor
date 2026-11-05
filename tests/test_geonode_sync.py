@@ -324,6 +324,27 @@ class BolakBalikGeoNode(unittest.TestCase):
                                 gs.baca_waktu("2026-11-05T12:51:40Z"))
         self.assertEqual(info["date"], "2026-05-06T05:18:37Z")
 
+    def test_peran_geonode_jadi_kode_iso(self):
+        """Template CSW GeoNode menulis label peran ("Metadata Author", "Point of Contact") — dulu ikut terkirim dan
+        ditandai di luar ISO 19139 (uji nyata staging). Mode GeoNode memetakannya ke kode ISO."""
+        tidak_standar = []
+        md = record_template_staging()
+        uuid = md.findtext("%s/{%s}CharacterString" % (q("fileIdentifier"), GCO))
+        from .. import gmd_importer
+        form = gmd_importer.convert_gmd_to_iso3(md, os.path.join(HERE, "template.xml"), bersih=True)
+        g = gs.siapkan_xml(form, dataset(uuid=uuid), tidak_standar=tidak_standar)
+        peran = sorted({e.get("codeListValue") for e in g.iter(q("CI_RoleCode"))})
+        self.assertEqual(peran, ["author", "owner", "pointOfContact"])
+        self.assertFalse([t for t in tidak_standar if "CI_RoleCode" in t], tidak_standar)
+        for label, kode in (("Resource User", "user"), ("principal_investigator", "principalInvestigator"),
+                            ("poc", "pointOfContact"), ("author", None)):
+            el = gmd_exporter.ET.fromstring('<gmd:CI_RoleCode xmlns:gmd="%s" codeListValue="%s">%s</gmd:CI_RoleCode>'
+                                            % (GMD, label, label))
+            akar = gmd_exporter.ET.Element("r")
+            akar.append(el)
+            self.assertEqual(gmd_importer.normalkan_peran_geonode(akar), 0 if kode is None else 1)
+            self.assertEqual(el.get("codeListValue"), kode or label)
+
     def test_teks_pengisi_geonode_dibuang(self):
         g = self.kirim(record_template_staging())
         nilai = {(e.text or "").strip() for e in g.iter()}

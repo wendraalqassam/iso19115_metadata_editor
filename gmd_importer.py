@@ -937,6 +937,30 @@ def bersihkan_template(iso3_root):
 PENGISI_GEONODE = ("None", "No abstract provided")
 
 
+# Peran kontak GeoNode (geonode/people Roles) → CI_RoleCode ISO. Template CSW GeoNode menulis LABEL tampilannya
+# sebagai codeListValue ("Metadata Author", "Point of Contact"), bukan kode ISO ("author", "pointOfContact");
+# katalog lain tidak mengenalinya. Kunci dinormalkan: huruf kecil, garis bawah = spasi (nama internal ikut cocok).
+PERAN_GEONODE = {
+    "owner": "owner", "metadata author": "author", "processor": "processor", "publisher": "publisher",
+    "custodian": "custodian", "point of contact": "pointOfContact", "poc": "pointOfContact",
+    "distributor": "distributor", "resource user": "user", "resource provider": "resourceProvider",
+    "originator": "originator", "principal investigator": "principalInvestigator",
+}
+
+
+def normalkan_peran_geonode(gmd_root):
+    """Ganti label peran GeoNode pada CI_RoleCode dengan kode ISO. Mengembalikan jumlah yang diganti."""
+    n = 0
+    for el in gmd_root.iter(_q(GMD, "CI_RoleCode")):
+        nilai = el.get("codeListValue") or el.text or ""
+        kode = PERAN_GEONODE.get(" ".join(nilai.replace("_", " ").split()).lower())
+        if kode and (el.get("codeListValue") != kode or (el.text or "").strip() != kode):
+            el.set("codeListValue", kode)
+            el.text = kode
+            n += 1
+    return n
+
+
 def buang_pengisi_geonode(gmd_root):
     """Kosongkan teks pengisi template GeoNode pada elemen daun. Mengembalikan jumlah yang dibuang."""
     n = 0
@@ -951,8 +975,9 @@ def convert_gmd_to_iso3(gmd_root_or_path, template_path, bersih=False):
     """Mengonversi dokumen gmd:MD_Metadata ke mdb:MD_Metadata (ISO 19115-3)
 
     berbasis template.xml sehingga dapat langsung dimuat ke EditorDialog GeoMDB.
-    bersih=True (mode GeoNode): template dikosongkan dulu dari nilai bawaan (bersihkan_template) dan teks
-    pengisi template GeoNode dibuang (buang_pengisi_geonode) — yang masuk formulir hanya data GeoNode.
+    bersih=True (mode GeoNode): template dikosongkan dulu dari nilai bawaan (bersihkan_template), teks
+    pengisi template GeoNode dibuang (buang_pengisi_geonode) dan label peran GeoNode diganti kode ISO
+    (normalkan_peran_geonode) — yang masuk formulir hanya data GeoNode, dalam kode standar.
     """
     if isinstance(gmd_root_or_path, str):
         gmd_root = ET.parse(gmd_root_or_path).getroot()  # nosec B314
@@ -964,6 +989,7 @@ def convert_gmd_to_iso3(gmd_root_or_path, template_path, bersih=False):
         bersihkan_template(iso3_root)
         gmd_root = copy.deepcopy(gmd_root)
         buang_pengisi_geonode(gmd_root)
+        normalkan_peran_geonode(gmd_root)
     plan = extract_gmd_plan(gmd_root)
 
     # Terapkan plan ke struktur iso3_root
