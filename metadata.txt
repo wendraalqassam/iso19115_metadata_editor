@@ -4,7 +4,7 @@ qgisMinimumVersion=3.0
 qgisMaximumVersion=4.99
 description=Metadata Editor: Editor Metadata Spasial ISO 19115-3 dan ISO 19139 Standar
 about=GeoMDB - Metadata Editor adalah plugin QGIS untuk membuat, mengedit, memvalidasi kelengkapan per tahapan, menyimpan draft (Save / Save As), dan mengekspor XML metadata spasial berbasis standar ISO 19115-3 dan ISO 19139, serta mengambil dan memperbarui metadata dataset GeoNode dengan akun GeoNode masing-masing. Dikembangkan untuk memudahkan pengelola Simpul Jaringan Informasi Geospasial
-version=1.1.1
+version=1.1.2
 author=Wendra, Hari Kurniadi, Andre Bejo
 email=wendraedogawa@gmail.com
 tags=ISO 19115-3, ISO 19139, Metadata Geospasial Editor, JIGN, Simpul Jaringan, GeoNode, CSW
@@ -16,7 +16,8 @@ supportsQt6=True
 homepage=https://github.com/wendraalqassam/iso19115_metadata_editor
 tracker=https://github.com/wendraalqassam/iso19115_metadata_editor/issues
 repository=https://github.com/wendraalqassam/iso19115_metadata_editor
-changelog=1.1.1: Login with a GeoNode username/password (enough for published datasets; non-public datasets need OAuth2). Fix: QGIS crash in the GeoNode catalogue when several datasets share the same thumbnail; GeoNode actions no longer run concurrently.
+changelog=1.1.2: Fix username/password login (GeoNode 5 returns user groups as a list).
+    1.1.1: Login with a GeoNode username/password (enough for published datasets; non-public datasets need OAuth2). Fix: QGIS crash in the GeoNode catalogue when several datasets share the same thumbnail; GeoNode actions no longer run concurrently.
     1.1.0: GeoNode integration - pull metadata from a GeoNode catalogue (card/list view with WMS map preview) and update it back with each user's own GeoNode account (OAuth2), GeoNode 4.2.3 - 5.x with version detection; preserve mode for patched servers with detection of unpatched ones; automatic backup and restore; wrong-target safeguards. Valid ISO 19139 export (XSD), including raster; ISO 19115-3 output valid (XSD + Schematron) when "Kompatibel Sistem BIG" is off; notes on values outside ISO codelists. New fields: data identifier (DOI), supplemental information, multiple legal constraints.
     1.0.5: Add QGIS 4 / Qt6 compatibility support (qgisMaximumVersion=4.99).
     1.0.4: Native security validation with inline annotations (0 warnings, no external config files).
