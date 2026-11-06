@@ -100,9 +100,8 @@ class KlienGeoNode:
         u = (j.get("users") or [{}])[0]
         grup = []
         if u.get("pk") is not None:
-            try:
-                grup = [g.get("title") or g.get("name") or g.get("slug") for g in
-                        self._json("GET", "/api/v2/users/%s/groups" % u["pk"]).get("groups") or []]
+            try:  # informasi tambahan — gagal membacanya tidak boleh menggagalkan login
+                grup = gs.nama_grup(self._json("GET", "/api/v2/users/%s/groups" % u["pk"]))
             except GeoNodeError:
                 grup = []
         if u.get("is_superuser"):

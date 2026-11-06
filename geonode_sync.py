@@ -498,6 +498,14 @@ SARAN_BASIC_PRIVAT = ("Dataset ini tidak publik. CSW GeoNode hanya mengenali log
                       "datasetnya dulu.")
 
 
+def nama_grup(respons):
+    """Nama grup dari /api/v2/users/{pk}/groups. GeoNode 5 mengembalikan DAFTAR GroupProfile (pk, title, slug, …);
+    bentuk objek {"groups": [...]} juga diterima."""
+    daftar = respons if isinstance(respons, list) else (respons or {}).get("groups") or []
+    nama = [(g.get("title") or g.get("slug") or g.get("name")) if isinstance(g, dict) else g for g in daftar]
+    return [str(n) for n in nama if n]
+
+
 def gejala_bug_preserve(pesan):
     """Pesan galat GeoNode yang khas bug preserve: metadata_xml tersimpan sebagai "b'<...'" lalu gagal di-parse."""
     p = pesan or ""

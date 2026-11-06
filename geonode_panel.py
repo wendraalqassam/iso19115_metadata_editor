@@ -230,4 +230,8 @@ class PanelKoneksi(QWidget):
             self.catat("Gagal: %s" % e)
             QMessageBox.warning(self, self.judul, str(e))
             return
+        except Exception as e:  # galat tak terduga (mis. bentuk respons GeoNode lain): tampilkan, jangan traceback QGIS
+            self.catat("Galat: %s" % e)
+            QMessageBox.warning(self, self.judul, "Galat tak terduga saat masuk:\n%s" % e)
+            return
         self.tersambung.emit()

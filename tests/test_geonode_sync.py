@@ -447,6 +447,15 @@ class AlurAmbilPerbarui(unittest.TestCase):
         self.assertEqual(gs.judul_formulir(root), gs.judul_formulir(contoh()))
         self.assertIsNone(gs.ambil_md_metadata(b"<bukan-xml"))
 
+    def test_nama_grup_pengguna(self):
+        # bentuk nyata GeoNode 5: DAFTAR GroupProfile (dulu dikira {"groups": [...]} → galat saat login Basic)
+        g5 = [{"pk": 1, "title": "Produsen Contoh", "slug": "produsen-contoh", "group": {"pk": 2}},
+              {"pk": 3, "title": "", "slug": "walidata"}]
+        self.assertEqual(gs.nama_grup(g5), ["Produsen Contoh", "walidata"])
+        self.assertEqual(gs.nama_grup({"groups": [{"name": "a"}]}), ["a"])
+        self.assertEqual(gs.nama_grup([]), [])
+        self.assertEqual(gs.nama_grup(None), [])
+
     def test_gejala_bug_preserve(self):
         # pesan nyata dari staging (unggah dengan preserve di GeoNode yang belum ditambal)
         nyata = ("Start tag expected, '<' not found, line 1, column 1 (<string>, line 1); {'errors': ['Task: "
