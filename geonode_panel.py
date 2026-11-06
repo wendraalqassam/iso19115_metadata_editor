@@ -5,7 +5,7 @@ import html
 
 from qgis.core import QgsSettings
 from qgis.gui import QgsAuthConfigSelect
-from qgis.PyQt.QtCore import pyqtSignal
+from qgis.PyQt.QtCore import QTimer, pyqtSignal
 from qgis.PyQt.QtWidgets import (
     QComboBox, QFormLayout, QHBoxLayout, QInputDialog, QLabel, QLineEdit, QMessageBox, QPushButton, QVBoxLayout,
     QWidget,
@@ -38,9 +38,12 @@ def satu_aksi(fungsi):
 
 class PanelKoneksi(QWidget):
     """`tersambung` dipancarkan setelah Masuk berhasil (login, atau anonim bila belum ada authcfg);
-    `versi_berubah` setelah versi GeoNode terdeteksi atau dipilih manual."""
+    `versi_berubah` setelah versi GeoNode terdeteksi atau dipilih manual; `autentikasi_berganti` saat pilihan
+    autentikasi diganti/dihapus — dialog wajib membuang daftar lama (izin & dataset tak publik milik login
+    sebelumnya), lalu panel otomatis Masuk ulang dengan pilihan baru."""
     tersambung = pyqtSignal()
     versi_berubah = pyqtSignal()
+    autentikasi_berganti = pyqtSignal()
 
     def __init__(self, judul, catat, parent=None):
         super().__init__(parent)
@@ -96,6 +99,26 @@ class PanelKoneksi(QWidget):
         baris.addWidget(self.b_masuk)
         baris.addWidget(self.lbl_user, 1)
         lay.addLayout(baris)
+
+        # Pilihan autentikasi diganti/dihapus → buang daftar lama, lalu Masuk ulang (dihubungkan SETELAH pilihan
+        # awal dipasang, supaya membuka dialog tidak memicunya; ditunda sebentar agar pergantian beruntun digabung).
+        self._tunda_masuk = QTimer(self)
+        self._tunda_masuk.setSingleShot(True)
+        self._tunda_masuk.setInterval(300)
+        self._tunda_masuk.timeout.connect(self._masuk_ulang)
+        self.sel_auth.selectedConfigIdChanged.connect(self._autentikasi_diganti)
+        self.sel_auth.selectedConfigIdRemoved.connect(self._autentikasi_diganti)
+
+    def _autentikasi_diganti(self, *_):
+        self.metode = ""
+        self.lbl_user.setText("Autentikasi diganti — memuat ulang daftar dataset …")
+        self.autentikasi_berganti.emit()
+        if gs.url_dasar(self.e_url.text()):
+            self._tunda_masuk.start()
+
+    def _masuk_ulang(self):
+        self.catat("Autentikasi diganti — masuk ulang.")
+        self.masuk()
 
     # ------------------------------------------------------------------ versi
     def versi(self):

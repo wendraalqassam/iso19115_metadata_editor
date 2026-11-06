@@ -57,6 +57,7 @@ class DialogKatalogGeoNode(QDialog):
         self.status = QLabel("")
         self.panel = PanelKoneksi(JUDUL, self._catat, self)
         self.panel.tersambung.connect(lambda: self.muat(1))
+        self.panel.autentikasi_berganti.connect(self._kosongkan)
 
         self.e_cari = QLineEdit()
         self.e_cari.setPlaceholderText("Cari dataset (Enter)…")
@@ -211,6 +212,22 @@ class DialogKatalogGeoNode(QDialog):
         self.lbl_hal.setText("Hal. %d/%d · %d dataset" % (self._halaman, jml, self._total) if self._total else "")
         self.b_sebelum.setEnabled(self._halaman > 1)
         self.b_sesudah.setEnabled(self._halaman < jml)
+
+    def _kosongkan(self):
+        """Autentikasi berganti: buang daftar lama — dataset tidak publik & izin milik login sebelumnya tidak boleh
+        tertinggal, juga bila login baru gagal. Daftar dimuat ulang oleh Masuk otomatis panel."""
+        if getattr(self, "_sibuk", False):
+            return  # aksi lain sedang berjalan; Masuk ulang memuat ulang daftar sesudahnya
+        self._batalkan_unduhan()
+        for v in (self.kartu, self.daftar):
+            v.blockSignals(True)
+            v.clear()
+            v.blockSignals(False)
+        self._data, self._klien, self._total, self._halaman = {}, None, 0, 1
+        self._halaman_navigasi()
+        self._pk = None
+        self._pilih(None)
+        self._catat("Autentikasi diganti — daftar dataset dikosongkan.")
 
     def _batalkan_unduhan(self):
         for reply in list(self._unduh.values()):

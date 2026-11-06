@@ -76,6 +76,7 @@ class DialogGeoNode(QDialog):
         self.log.setMaximumBlockCount(500)
         self.panel = PanelKoneksi(JUDUL, self._catat, self)
         self.panel.tersambung.connect(lambda *_: self.muat_dataset())
+        self.panel.autentikasi_berganti.connect(self._kosongkan)
         self.e_url = self.panel.e_url
         self.e_url.editingFinished.connect(self._atur_kunci)
 
@@ -151,6 +152,15 @@ class DialogGeoNode(QDialog):
     def _catat(self, teks):
         self.log.appendPlainText(teks)
         QApplication.processEvents()
+
+    def _kosongkan(self):
+        """Autentikasi berganti: buang daftar & hasil deteksi milik login sebelumnya (lihat PanelKoneksi)."""
+        if getattr(self, "_sibuk", False):
+            return
+        self.lst.clear()
+        self._rusak, self._diperiksa = [], set()
+        self._atur_versi()
+        self._catat("Autentikasi diganti — daftar dataset dikosongkan.")
 
     def _klien(self):
         return self.panel.klien()
