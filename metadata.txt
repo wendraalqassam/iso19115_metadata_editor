@@ -4,7 +4,7 @@ qgisMinimumVersion=3.0
 qgisMaximumVersion=4.99
 description=Metadata Editor: Editor Metadata Spasial ISO 19115-3 dan ISO 19139 Standar
 about=GeoMDB - Metadata Editor adalah plugin QGIS untuk membuat, mengedit, memvalidasi kelengkapan per tahapan, menyimpan draft (Save / Save As), dan mengekspor XML metadata spasial berbasis standar ISO 19115-3 dan ISO 19139, serta mengambil dan memperbarui metadata dataset GeoNode dengan akun GeoNode masing-masing. Dikembangkan untuk memudahkan pengelola Simpul Jaringan Informasi Geospasial
-version=1.1.4
+version=1.1.5
 author=Wendra, Hari Kurniadi, Andre Bejo
 email=wendraedogawa@gmail.com
 tags=ISO 19115-3, ISO 19139, Metadata Geospasial Editor, JIGN, Simpul Jaringan, GeoNode, CSW
@@ -16,7 +16,8 @@ supportsQt6=True
 homepage=https://github.com/wendraalqassam/iso19115_metadata_editor
 tracker=https://github.com/wendraalqassam/iso19115_metadata_editor/issues
 repository=https://github.com/wendraalqassam/iso19115_metadata_editor
-changelog=1.1.4: The "Send to GeoNode" dialog lists datasets like the catalogue (cards with thumbnails or a sortable list, search, paging; the form's source dataset is marked; double-click never sends). Requests stopped in front of GeoNode by a bot check (e.g. Cloudflare challenge) or a firewall are reported as such instead of "wrong username/password". Long messages no longer widen the catalogue dialog.
+changelog=1.1.5: Bot-check message: the fix is on the server's Cloudflare side (exclude the plugin's paths or allow the network); switching networks is not presented as a solution any more.
+    1.1.4:The "Send to GeoNode" dialog lists datasets like the catalogue (cards with thumbnails or a sortable list, search, paging; the form's source dataset is marked; double-click never sends). Requests stopped in front of GeoNode by a bot check (e.g. Cloudflare challenge) or a firewall are reported as such instead of "wrong username/password". Long messages no longer widen the catalogue dialog.
     1.1.3: GeoNode dialogs refresh automatically when the authentication is changed or removed (no list of the previous login left on screen).
     1.1.2: Fix username/password login (GeoNode 5 returns user groups as a list).
     1.1.1: Login with a GeoNode username/password (enough for published datasets; non-public datasets need OAuth2). Fix: QGIS crash in the GeoNode catalogue when several datasets share the same thumbnail; GeoNode actions no longer run concurrently.
