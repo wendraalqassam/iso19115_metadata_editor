@@ -498,6 +498,37 @@ SARAN_BASIC_PRIVAT = ("Dataset ini tidak publik. CSW GeoNode hanya mengenali log
                       "datasetnya dulu.")
 
 
+# Path GeoNode yang dipakai plugin (API, token OAuth2, CSW, WMS GeoServer) — harus lolos dari cek bot di depan GeoNode.
+PATH_PLUGIN = ("/api/", "/o/token/", "/catalogue/csw", "/geoserver/")
+
+
+def pesan_penghalang(status, header, isi, base="", harap_json=False):
+    """Pesan bila respons dibuat lapisan di depan GeoNode (cek bot Cloudflare, WAF, proxy), bukan GeoNode; "" bila
+    bukan. `header`: nama huruf kecil → nilai. Cloudflare menandai tantangan cek bot dengan header
+    `cf-mitigated: challenge`: browser lolos karena menjalankan JavaScript tantangannya, QGIS tidak bisa. Tantangan
+    ini bergantung pada jaringan/IP asal (kasus nyata Belitung: jaringan BIG kena, server lain lolos)."""
+    host = urlsplit(url_dasar(base)).hostname or base or "server"
+    teks = (isi or b"")[:4000].decode("utf-8", "replace").lower()
+    web = "<html" in teks
+    jalur = ", ".join(PATH_PLUGIN)
+    if (header.get("cf-mitigated") or "").strip().lower() == "challenge":
+        return ("Permintaan QGIS ke %s dihadang cek bot Cloudflare (HTTP %s) sebelum sampai ke GeoNode — bukan karena "
+                "username/password atau dataset. Di browser situsnya terbuka karena browser bisa menjalankan tantangan "
+                "Cloudflare; QGIS tidak bisa. Cek bot ini biasanya bergantung pada jaringan/IP Anda: coba dari jaringan "
+                "lain (mis. hotspot), atau minta pengelola Cloudflare server mengizinkan jaringan Anda (IP Access Rules "
+                "→ Allow) atau mengecualikan path %s dari cek bot." % (host, status, jalur))
+    if status in (403, 429, 503) and web and "cloudflare" in (header.get("server") or "").lower() \
+            and "cloudflare" in teks:
+        return ("Permintaan QGIS ke %s diblokir Cloudflare (HTTP %s) sebelum sampai ke GeoNode — bukan karena "
+                "username/password atau dataset. Coba dari jaringan lain, atau minta pengelola Cloudflare server "
+                "mengizinkan jaringan Anda atau path %s." % (host, status, jalur))
+    if harap_json and status in (401, 403) and web:
+        return ("Permintaan QGIS ke %s ditolak (HTTP %s) oleh lapisan di depan GeoNode (firewall/WAF/proxy): "
+                "balasannya halaman web, bukan API GeoNode — bukan tanda username/password salah. Periksa URL "
+                "GeoNode-nya, atau minta admin server mengizinkan path %s untuk QGIS." % (host, status, jalur))
+    return ""
+
+
 def nama_grup(respons):
     """Nama grup dari /api/v2/users/{pk}/groups. GeoNode 5 mengembalikan DAFTAR GroupProfile (pk, title, slug, …);
     bentuk objek {"groups": [...]} juga diterima."""
@@ -550,6 +581,11 @@ def judul_formulir(iso3_root):
 def tautan_cocok(tautan, base, pk):
     """Apakah formulir diambil dari dataset `pk` di GeoNode `base` (lihat EditorDialog.muat_dari_geonode)."""
     return bool(tautan) and url_dasar(tautan.get("url")) == url_dasar(base) and str(tautan.get("pk")) == str(pk)
+
+
+def pk_tautan(tautan, base):
+    """pk (str) dataset asal formulir bila formulir diambil dari GeoNode `base`; None bila tidak."""
+    return str(tautan.get("pk")) if tautan and url_dasar(tautan.get("url")) == url_dasar(base) else None
 
 
 def _teks_identifikasi(md, jalur):

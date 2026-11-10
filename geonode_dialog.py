@@ -22,17 +22,18 @@ from urllib.parse import urlsplit
 from qgis.core import QgsApplication, QgsSettings
 from qgis.PyQt.QtCore import Qt
 from qgis.PyQt.QtWidgets import (
-    QApplication, QCheckBox, QDialog, QFileDialog, QHBoxLayout, QInputDialog, QLabel, QLineEdit, QListWidget,
-    QListWidgetItem, QMessageBox, QPlainTextEdit, QPushButton, QVBoxLayout,
+    QApplication, QCheckBox, QDialog, QFileDialog, QHBoxLayout, QInputDialog, QLabel, QMessageBox, QPlainTextEdit,
+    QPushButton, QSplitter, QVBoxLayout, QWidget,
 )
 
 from . import gmd_importer, kesesuaian, layout
 from . import geonode_sync as gs
-from .geonode_klien import GeoNodeError
+from .geonode_daftar import DaftarDataset
+from .geonode_klien import GeoNodeDiblokir, GeoNodeError
 from .geonode_panel import KUNCI, PanelKoneksi, satu_aksi
 
 JUDUL = "Kirim Metadata ke GeoNode"
-PK, UBAH = Qt.ItemDataRole.UserRole, Qt.ItemDataRole.UserRole + 1
+UKURAN_HALAMAN = 24
 YA = QMessageBox.StandardButton.Yes
 
 
@@ -67,7 +68,7 @@ class DialogGeoNode(QDialog):
         super().__init__(parent or editor)
         self.editor = editor
         self.setWindowTitle(JUDUL)
-        self.resize(760, 660)
+        self.resize(1000, 840)
         tautan = getattr(editor, "geonode_tautan", None)
         self._kunci = bool(tautan)  # tujuan dikunci ke dataset asal formulir (lihat _kunci_aktif)
 
@@ -87,11 +88,10 @@ class DialogGeoNode(QDialog):
         self.b_ganti.setToolTip("Buka pilihan dataset lain. Mengirim ke dataset lain mengganti seluruh metadatanya.")
         self.b_ganti.clicked.connect(self.ganti_tujuan)
 
-        self.e_cari = QLineEdit()
-        self.e_cari.setPlaceholderText("Cari dataset (Enter)…")
-        self.e_cari.returnPressed.connect(lambda *_: self.muat_dataset())
-        self.lst = QListWidget()
-        self.lst.currentItemChanged.connect(self._pilihan_berubah)
+        # Klik ganda sengaja tidak mengirim: memperbarui metadata hanya lewat tombol «Perbarui di GeoNode».
+        self.katalog = DaftarDataset(UKURAN_HALAMAN)
+        self.katalog.muat.connect(lambda h: self.muat_dataset(h))
+        self.katalog.dipilih.connect(self._pilihan_berubah)
 
         self.cb_tambal = QCheckBox("Server GeoNode ini sudah ditambal — pakai preserve (CSW menyajikan metadata "
                                    "GeoMDB lengkap)")
@@ -123,12 +123,20 @@ class DialogGeoNode(QDialog):
         baris_tautan.addWidget(self.lbl_tautan, 1)
         baris_tautan.addWidget(self.b_ganti)
         lay.addLayout(baris_tautan)
-        lay.addWidget(self.e_cari)
-        lay.addWidget(self.lst, 2)
-        lay.addWidget(self.cb_tambal)
-        lay.addWidget(self.lbl_preserve)
-        lay.addWidget(QLabel("Log:"))
-        lay.addWidget(self.log, 1)
+        bawah = QWidget()
+        vb = QVBoxLayout(bawah)
+        vb.setContentsMargins(0, 0, 0, 0)
+        vb.addWidget(self.cb_tambal)
+        vb.addWidget(self.lbl_preserve)
+        vb.addWidget(QLabel("Log:"))
+        vb.addWidget(self.log, 1)
+        split = QSplitter(Qt.Orientation.Vertical)
+        split.addWidget(self.katalog)
+        split.addWidget(bawah)
+        split.setStretchFactor(0, 3)
+        split.setStretchFactor(1, 1)
+        split.setSizes([480, 220])
+        lay.addWidget(split, 1)
         tombol = QHBoxLayout()
         tombol.addWidget(b_pulihkan)
         tombol.addStretch(1)
@@ -148,6 +156,10 @@ class DialogGeoNode(QDialog):
         if tautan:
             self.panel.masuk()
 
+    def done(self, hasil):
+        self.katalog.tutup()
+        super().done(hasil)
+
     # ------------------------------------------------------------------ bantu
     def _catat(self, teks):
         self.log.appendPlainText(teks)
@@ -157,7 +169,7 @@ class DialogGeoNode(QDialog):
         """Autentikasi berganti: buang daftar & hasil deteksi milik login sebelumnya (lihat PanelKoneksi)."""
         if getattr(self, "_sibuk", False):
             return
-        self.lst.clear()
+        self.katalog.kosongkan()
         self._rusak, self._diperiksa = [], set()
         self._atur_versi()
         self._catat("Autentikasi diganti — daftar dataset dikosongkan.")
@@ -177,7 +189,7 @@ class DialogGeoNode(QDialog):
 
     def _atur_kunci(self):
         t, aktif = self._tautan(), self._kunci_aktif()
-        self.e_cari.setVisible(not aktif)
+        self.katalog.atur_cari(not aktif)
         self.b_ganti.setVisible(aktif)
         if aktif:
             teks = ("🔒 Tujuan dikunci ke dataset asal formulir: <b>%s</b> (#%s)." % (
@@ -233,7 +245,7 @@ class DialogGeoNode(QDialog):
                      "rusak (%s). Perbaiki lewat «Pulihkan dari cadangan…», lalu minta admin menjalankan %s.</span>"
                      % (html.escape(", ".join(self._rusak[:3])), TAUTAN_TAMBAL))
         self.lbl_preserve.setText(teks)
-        self._pilihan_berubah(self.lst.currentItem())
+        self._pilihan_berubah()
 
     def _periksa_tambal(self, k):
         """Deteksi server belum ditambal TANPA mengubah apa pun: record CSW dataset ber-preserve yang rusak (bug
@@ -250,6 +262,8 @@ class DialogGeoNode(QDialog):
         for d in gs.dataset_preserve(data)[:3]:
             try:  # bukti = galat server (HTTP 500 / ExceptionReport); "tak ditemukan" bisa karena record tak terlihat
                 k.csw_record(d["uuid"])  # (mis. dataset tidak publik + login username/password)
+            except GeoNodeDiblokir:
+                return  # CSW diblokir proteksi bot di depan GeoNode: bukan bukti, tidak bisa diperiksa
             except GeoNodeError:
                 rusak.append(d.get("title") or str(d.get("pk")))
         if rusak:
@@ -259,9 +273,9 @@ class DialogGeoNode(QDialog):
             self._catat("Server belum ditambal: record CSW dataset ber-preserve rusak (%s). Alat tambal: %s"
                         % (", ".join(rusak), gs.URL_ALAT_TAMBAL))
 
-    def _pilihan_berubah(self, item, _sebelum=None):
-        p = self._profil()
-        self.b_kirim.setEnabled(bool(item and item.data(UBAH) and p and p["unggah"]))
+    def _pilihan_berubah(self, *_):
+        p, d = self._profil(), self.katalog.terpilih()
+        self.b_kirim.setEnabled(bool(d and gs.boleh_ubah(d) and p and p["unggah"]))
 
     # ------------------------------------------------------------------ daftar dataset
     def masuk(self):
@@ -278,33 +292,20 @@ class DialogGeoNode(QDialog):
         self.muat_dataset()
 
     @satu_aksi
-    def muat_dataset(self):
+    def muat_dataset(self, halaman=1):
         self._atur_kunci()
         try:
             k = self._klien()
             if self._kunci_aktif():
-                data, total = [k.dataset(self._tautan()["pk"])], 1
+                data, total, halaman = [k.dataset(self._tautan()["pk"])], 1, 1
             else:
-                data, total = k.datasets(cari=self.e_cari.text().strip())
+                data, total = k.datasets(cari=self.katalog.cari(), halaman=max(1, halaman), ukuran=UKURAN_HALAMAN)
         except GeoNodeError as e:
             self._catat("Gagal memuat dataset: %s" % e)
             return
-        self.lst.clear()
-        bisa = 0
-        for d in data:
-            ubah = gs.boleh_ubah(d)
-            bisa += ubah
-            it = QListWidgetItem("%s%s   [%s]" % ("" if ubah else "🔒 ", d.get("title") or d.get("alternate"), d.get("alternate")))
-            it.setData(PK, d.get("pk"))
-            it.setData(UBAH, ubah)
-            it.setToolTip("Boleh diubah oleh akun Anda." if ubah else
-                          "Akun Anda tidak punya izin ubah metadata dataset ini (perms GeoNode).")
-            if not ubah:
-                it.setForeground(Qt.GlobalColor.gray)
-            self.lst.addItem(it)
-            if gs.tautan_cocok(self._tautan(), self.e_url.text(), d.get("pk")):
-                self.lst.setCurrentItem(it)
-        self._catat("%d dataset dimuat (dari %d), %d boleh diubah akun ini." % (len(data), total, bisa))
+        self.katalog.isi(k, data, total, halaman, utama=gs.pk_tautan(self._tautan(), k.base))
+        self._catat("%d dataset dimuat (dari %d), %d boleh diubah akun ini." % (
+            len(data), total, sum(gs.boleh_ubah(d) for d in data)))
         self._periksa_tambal(k)
 
     # ------------------------------------------------------------------ pengaman
@@ -384,17 +385,19 @@ class DialogGeoNode(QDialog):
         return gs.ringkas_status(st)
 
     def _csw_terbaca(self, k, ds):
+        """True/False; None bila CSW tak bisa diperiksa (diblokir proteksi bot di depan GeoNode) — bukan gejala bug."""
         try:
             return gs.ambil_md_metadata(k.csw_record(ds["uuid"])) is not None
+        except GeoNodeDiblokir:
+            return None
         except GeoNodeError:
             return False
 
     @satu_aksi
     def kirim(self):
-        item = self.lst.currentItem()
-        if item is None:
+        pk = self.katalog.pk()
+        if pk is None:
             return
-        pk = item.data(PK)
         versi = self.panel.versi()
         profil = gs.VERSI.get(versi)
         try:
@@ -415,6 +418,7 @@ class DialogGeoNode(QDialog):
                 return
             # Login username/password: CSW GeoNode menganggapnya anonim → record dataset tidak publik tak terlihat
             csw_bisa = not (self.panel.basic() and not k.terlihat_publik(pk))
+            alasan_csw = "" if csw_bisa else "dataset tidak publik + login username/password; perlu OAuth2"
             preserve = self._pakai_preserve()
             g, catatan, tidak_standar = self._siapkan(ds, preserve)
             beda = gs.bandingkan_cakupan(g, ds)
@@ -463,7 +467,7 @@ class DialogGeoNode(QDialog):
             status, pesan = self._unggah(k, pk, g, ds)
             pulih_otomatis = False
             if preserve and ((status != gs.SELESAI and gs.gejala_bug_preserve(pesan)) or
-                             (status == gs.SELESAI and csw_bisa and not self._csw_terbaca(k, ds))):
+                             (status == gs.SELESAI and csw_bisa and self._csw_terbaca(k, ds) is False)):
                 # Server ternyata BELUM ditambal: matikan preserve (GeoNode membuat ulang record dari template),
                 # kirim ulang tanpa preserve, tandai server, tunjukkan alat tambal.
                 self._catat("    Gejala bug preserve GeoNode — server belum ditambal. Dikirim ulang tanpa preserve.")
@@ -477,13 +481,16 @@ class DialogGeoNode(QDialog):
                 raise GeoNodeError("Pemrosesan GeoNode %s: %s" % (status or "tidak selesai", pesan or "-"))
             masalah_csw = []
             if csw_bisa:
-                masalah_csw = gs.periksa_record_csw(k.csw_record(ds["uuid"]), ds["uuid"], g, preserve=preserve)
-                if preserve and not masalah_csw:
-                    tandai_tambal(k.base, "sudah")  # terbukti: XML GeoMDB tersaji utuh
+                try:
+                    masalah_csw = gs.periksa_record_csw(k.csw_record(ds["uuid"]), ds["uuid"], g, preserve=preserve)
+                    if preserve and not masalah_csw:
+                        tandai_tambal(k.base, "sudah")  # terbukti: XML GeoMDB tersaji utuh
+                except GeoNodeDiblokir:
+                    alasan_csw = "CSW diblokir proteksi bot di depan GeoNode"
             masalah_db = gs.periksa_dataset(k.dataset(pk), g)
             self._catat("5/5 CSW GeoNode %s\n    Isian GeoNode (%s) %s" % (
-                ("sesuai." if not masalah_csw else "BELUM sesuai: " + " ".join(masalah_csw)) if csw_bisa else
-                "tidak diperiksa (dataset tidak publik + login username/password; perlu OAuth2).",
+                "tidak diperiksa (%s)." % alasan_csw if alasan_csw else
+                "sesuai." if not masalah_csw else "BELUM sesuai: " + " ".join(masalah_csw),
                 gs.halaman_metadata(versi, ds),
                 "sesuai." if not masalah_db else "BELUM sesuai: " + " ".join(masalah_db)))
             masalah = masalah_csw + masalah_db
@@ -502,7 +509,8 @@ class DialogGeoNode(QDialog):
                         "otomatis mengirim ulang tanpa preserve dan record CSW-nya sehat." + mode)
             (QMessageBox.information if not masalah and not pulih_otomatis else QMessageBox.warning)(
                 self, JUDUL, "Metadata «%s» terkirim ke GeoNode dan %s.%s<br><br>%s%s" % (
-                    html.escape(judul), "terverifikasi di CSW & isian GeoNode" if not masalah
+                    html.escape(judul), ("terverifikasi di isian GeoNode (CSW tidak diperiksa: %s)" % html.escape(
+                        alasan_csw) if alasan_csw else "terverifikasi di CSW & isian GeoNode") if not masalah
                     else "<b>belum terbukti diterapkan — periksa catatan di bawah</b>", mode, isi,
                     ("<br>Metadata sebelumnya dicadangkan; bisa dikembalikan lewat «Pulihkan dari cadangan…»:<br>"
                      "<code>%s</code>" % html.escape(cadangan)) if cadangan else ""))
@@ -513,7 +521,7 @@ class DialogGeoNode(QDialog):
             self._catat("Galat: %s" % e)
             QMessageBox.warning(self, JUDUL, "Galat tak terduga:\n%s" % e)
         finally:
-            self._pilihan_berubah(self.lst.currentItem())
+            self._pilihan_berubah()
 
     @satu_aksi
     def pulihkan(self):

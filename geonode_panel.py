@@ -13,7 +13,7 @@ from qgis.PyQt.QtWidgets import (
 
 from . import geonode_auth
 from . import geonode_sync as gs
-from .geonode_klien import GeoNodeError, KlienGeoNode
+from .geonode_klien import GeoNodeDiblokir, GeoNodeError, KlienGeoNode
 
 KUNCI = "GeoMDB/geonode/"
 OTOMATIS = "auto"
@@ -50,6 +50,7 @@ class PanelKoneksi(QWidget):
         self.judul = judul
         self.catat = catat
         self._terdeteksi = {}  # url dasar → generasi GeoNode (None = tak dapat dipastikan)
+        self._diblokir = set()  # url dasar yang permintaannya dihadang lapisan di depan GeoNode saat deteksi
         self.metode = ""  # metode login authcfg saat Masuk: "OAuth2" | "Basic" | "" (anonim / lainnya)
         s = QgsSettings()
         self.e_url = QLineEdit(s.value(KUNCI + "url", "", type=str))
@@ -65,6 +66,7 @@ class PanelKoneksi(QWidget):
                                  "API GeoNode (tanpa login); pilih manual bila hasil deteksi keliru.")
         self.cb_versi.currentIndexChanged.connect(self._versi_dipilih)
         self.lbl_versi = QLabel("")
+        self.lbl_versi.setWordWrap(True)
         self.lbl_versi.setStyleSheet("color: #475569;")
         self.sel_auth = QgsAuthConfigSelect(self)
         self.sel_auth.setConfigId(s.value(KUNCI + "authcfg", "", type=str))
@@ -137,10 +139,13 @@ class PanelKoneksi(QWidget):
         if url in self._terdeteksi and not paksa:
             self._tampil_versi()
             return self._terdeteksi[url]
+        self._diblokir.discard(url)
         try:
             v = (klien or KlienGeoNode(url)).deteksi_versi()
         except GeoNodeError as e:
             v = None
+            if isinstance(e, GeoNodeDiblokir):
+                self._diblokir.add(url)
             if not diam:
                 self.catat("Versi GeoNode tidak dapat dideteksi: %s" % e)
         self._terdeteksi[url] = v
@@ -156,6 +161,9 @@ class PanelKoneksi(QWidget):
             teks = "Terdeteksi: %s" % gs.VERSI[v]["label"]
             if pilih not in (OTOMATIS, v):
                 teks += " — berbeda dengan pilihan manual"
+        elif url in self._diblokir:
+            teks = ("Tidak terdeteksi — permintaan QGIS dihadang di depan GeoNode (mis. cek bot Cloudflare); klik "
+                    "«Masuk» untuk rinciannya.")
         elif url in self._terdeteksi:
             teks = "Tidak terdeteksi — masuk dulu, atau pilih versinya secara manual."
         else:
@@ -240,6 +248,8 @@ class PanelKoneksi(QWidget):
                     " — login username/password: cukup untuk dataset yang sudah dipublikasikan; dataset tidak "
                     "publik perlu OAuth2." if self.basic() else ""))
             except GeoNodeError as e:
+                if isinstance(e, GeoNodeDiblokir):  # belum sampai ke GeoNode: bukan soal password
+                    raise
                 if self.basic() and e.status in (401, 403):
                     raise GeoNodeError("Username atau password GeoNode salah (konfigurasi «%s»)." % k.authcfg, e.status)
                 if e.status in (401, 403):
@@ -250,6 +260,8 @@ class PanelKoneksi(QWidget):
             if not self.deteksi(diam=True):  # 4.x tanpa dataset publik: ulangi dengan akun yang login
                 self.deteksi(klien=k, diam=True, paksa=True)
         except GeoNodeError as e:
+            self.lbl_user.setText("Belum masuk — permintaan QGIS dihadang di depan GeoNode (lihat pesan)."
+                                  if isinstance(e, GeoNodeDiblokir) else "Belum masuk.")
             self.catat("Gagal: %s" % e)
             QMessageBox.warning(self, self.judul, str(e))
             return

@@ -484,6 +484,45 @@ class AlurAmbilPerbarui(unittest.TestCase):
         self.assertTrue(gs.tautan_cocok(t, "https://geonode.contoh.go.id", "3"))
         self.assertFalse(gs.tautan_cocok(t, "https://geonode.contoh.go.id", 2))
         self.assertFalse(gs.tautan_cocok(None, "https://geonode.contoh.go.id", 3))
+        self.assertEqual(gs.pk_tautan(t, "https://geonode.contoh.go.id"), "3")
+        self.assertIsNone(gs.pk_tautan(t, "https://geoportal.belitung.go.id"))
+        self.assertIsNone(gs.pk_tautan(None, "https://geonode.contoh.go.id"))
+
+
+class PenghalangDiDepanGeoNode(unittest.TestCase):
+    """Respons yang tidak berasal dari GeoNode tidak boleh dibaca sebagai «password salah» (kasus nyata Belitung:
+    cek bot Cloudflare menjawab HTTP 403 untuk semua permintaan QGIS)."""
+    BASE = "https://geoportal.belitung.go.id"
+    HALAMAN_CF = b"<!DOCTYPE html><html lang='en-US'><head><title>Just a moment...</title></head><body>" \
+                 b"<script src='https://challenges.cloudflare.com/cdn-cgi/challenge-platform/'></script></body></html>"
+
+    def test_tantangan_cloudflare(self):
+        h = {"server": "cloudflare", "cf-mitigated": "challenge", "content-type": "text/html; charset=UTF-8"}
+        p = gs.pesan_penghalang(403, h, self.HALAMAN_CF, self.BASE, harap_json=True)
+        self.assertIn("cek bot Cloudflare", p)
+        self.assertIn("geoportal.belitung.go.id", p)
+        self.assertIn("bukan karena username/password", p)
+        for jalur in gs.PATH_PLUGIN:
+            self.assertIn(jalur, p)
+        # badan kosong (dibaca terpotong) tetap dikenali dari header-nya; juga untuk CSW (XML) & 503
+        self.assertTrue(gs.pesan_penghalang(403, h, b"", self.BASE))
+        self.assertTrue(gs.pesan_penghalang(503, h, b"", self.BASE))
+
+    def test_blokir_cloudflare_dan_lapisan_lain(self):
+        blok = b"<html><head><title>Attention Required! | Cloudflare</title></head><body>Sorry, you have been blocked"
+        self.assertIn("diblokir Cloudflare", gs.pesan_penghalang(403, {"server": "cloudflare"}, blok, self.BASE))
+        waf = b"<html><body><h1>403 Forbidden</h1><hr>nginx</body></html>"
+        self.assertIn("firewall/WAF/proxy", gs.pesan_penghalang(403, {"server": "nginx"}, waf, self.BASE, True))
+        self.assertEqual(gs.pesan_penghalang(403, {"server": "nginx"}, waf, self.BASE, harap_json=False), "")
+
+    def test_respons_geonode_bukan_penghalang(self):
+        cf = {"server": "cloudflare"}  # situs di belakang Cloudflare: SEMUA respons ber-header server cloudflare
+        salah = json.dumps({"detail": "Invalid username/password."}).encode()
+        self.assertEqual(gs.pesan_penghalang(403, cf, salah, self.BASE, harap_json=True), "")
+        self.assertEqual(gs.pesan_penghalang(401, cf, b'{"detail": "User is not authenticated"}', self.BASE, True), "")
+        self.assertEqual(gs.pesan_penghalang(200, cf, b'{"datasets": []}', self.BASE, True), "")
+        # record CSW rusak (bug preserve): halaman galat 500 Django tetap galat GeoNode
+        self.assertEqual(gs.pesan_penghalang(500, cf, b"<html><body>Server Error (500)</body></html>", self.BASE), "")
 
 
 if __name__ == "__main__":

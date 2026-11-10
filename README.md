@@ -93,8 +93,9 @@ pengguna. Apa pun cara loginnya, beri group/pengguna izin *ubah metadata* hanya 
    diubah akun Anda ditandai *Hanya lihat*.
 3. **Ambil ke formulir** (atau klik ganda) — record ISO dataset dari CSW GeoNode dimuat ke formulir dan editor
    tertaut ke dataset itu.
-4. Sunting isian, lalu **☁ Kirim ke GeoNode...** di bawah formulir → dataset tertaut terpilih otomatis →
-   **Perbarui di GeoNode**.
+4. Sunting isian, lalu **☁ Kirim ke GeoNode...** di bawah formulir → dataset tertaut terpilih otomatis (bertanda
+   *Asal formulir*; daftar kartu/daftar yang sama dengan katalog) → **Perbarui di GeoNode**. Klik ganda di dialog
+   ini tidak mengirim apa pun.
 
 **Dua mode pengiriman:**
 - **Mode biasa (bawaan)**: GeoNode memperbarui kolom yang dikenalnya (judul, abstrak, kata kunci, …) dan membuat
@@ -135,6 +136,13 @@ karena GeoNode mengisi tanggal dataset dari `dateStamp` (tanggalnya jadi tidak b
 | GeoNode 5.x, 4.4 | ✓ | ✓ | diatur plugin (server harus sudah ditambal) |
 | GeoNode 4.2.3 – 4.3 | ✓ | ✓ | hanya lewat Django admin → Datasets → *Metadata uploaded preserve* (server harus sudah ditambal) |
 | GeoNode 4.0 – 4.2.2 | ✓ | ✗ (belum ada API unggah XML) | – |
+
+**GeoNode di balik Cloudflare / WAF:** cek bot (mis. Cloudflare *Managed Challenge*, *Bot Fight Mode*, *I'm Under
+Attack*) bisa menolak permintaan QGIS sebelum sampai ke GeoNode, padahal situsnya terbuka di browser. Plugin
+mengenalinya dan menampilkan "dihadang cek bot", bukan "password salah". Penolakan ini biasanya bergantung pada
+jaringan/IP asal (reputasi IP): coba dari jaringan lain, atau minta pengelola Cloudflare server mengizinkan jaringan
+Anda (*IP Access Rules → Allow*, mis. per ASN) atau mengecualikan path `/api/`, `/o/token/`, `/catalogue/csw`, dan
+`/geoserver/` dari cek bot. Path ini juga dipakai klien WMS dan harvester CSW (mis. Ina-Geoportal).
 
 ## 📄 Lisensi
 

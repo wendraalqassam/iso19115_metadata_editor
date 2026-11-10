@@ -18,6 +18,11 @@ class GeoNodeError(Exception):
         self.status = status
 
 
+class GeoNodeDiblokir(GeoNodeError):
+    """Permintaan ditolak lapisan di depan GeoNode (cek bot Cloudflare, WAF, proxy) — belum sampai ke GeoNode, jadi
+    bukan tanda password salah, dataset tak terlihat, atau record CSW rusak."""
+
+
 def _pesan_galat(status, isi):
     """Ringkas pesan galat API GeoNode (DRF: {"errors": [...]} / {"detail": ...})."""
     try:
@@ -70,14 +75,19 @@ class KlienGeoNode:
             reply.abort()
             reply.deleteLater()
             raise GeoNodeError("Waktu tunggu habis menghubungi %s" % self.base)
-        status = reply.attribute(QNetworkRequest.Attribute.HttpStatusCodeAttribute) or 0
+        status = int(reply.attribute(QNetworkRequest.Attribute.HttpStatusCodeAttribute) or 0)
         isi = bytes(reply.readAll())
+        header = {bytes(n).decode("latin-1").lower(): bytes(reply.rawHeader(n)).decode("latin-1")
+                  for n in reply.rawHeaderList()}
         galat = reply.error()
         teks_galat = reply.errorString()
         reply.deleteLater()
         if status == 0 and galat != QNetworkReply.NetworkError.NoError:
             raise GeoNodeError("Gagal terhubung ke %s: %s" % (self.base, teks_galat))
-        return int(status), isi
+        hambat = gs.pesan_penghalang(status, header, isi, self.base, harap_json=terima == "application/json")
+        if hambat:
+            raise GeoNodeDiblokir(hambat, status)
+        return status, isi
 
     def _json(self, metode, path, sah=(200,), **kw):
         status, isi = self._kirim(metode, path, **kw)
@@ -115,6 +125,8 @@ class KlienGeoNode:
         try:
             KlienGeoNode(self.base).dataset(pk)
             return True
+        except GeoNodeDiblokir:
+            raise
         except GeoNodeError as e:
             if e.status in (401, 403, 404):
                 return False
