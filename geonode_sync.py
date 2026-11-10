@@ -505,8 +505,9 @@ PATH_PLUGIN = ("/api/", "/o/token/", "/catalogue/csw", "/geoserver/")
 def pesan_penghalang(status, header, isi, base="", harap_json=False):
     """Pesan bila respons dibuat lapisan di depan GeoNode (cek bot Cloudflare, WAF, proxy), bukan GeoNode; "" bila
     bukan. `header`: nama huruf kecil → nilai. Cloudflare menandai tantangan cek bot dengan header
-    `cf-mitigated: challenge`: browser lolos karena menjalankan JavaScript tantangannya, QGIS tidak bisa. Tantangan
-    ini bergantung pada jaringan/IP asal (kasus nyata Belitung: jaringan BIG kena, server lain lolos)."""
+    `cf-mitigated: challenge`: browser lolos karena menjalankan JavaScript tantangannya, QGIS tidak bisa. Solusinya
+    di pengelola Cloudflare server; berpindah jaringan tidak bisa diandalkan (kasus nyata Belitung: jaringan BIG
+    maupun jaringan lain sama-sama kena)."""
     host = urlsplit(url_dasar(base)).hostname or base or "server"
     teks = (isi or b"")[:4000].decode("utf-8", "replace").lower()
     web = "<html" in teks
@@ -514,14 +515,14 @@ def pesan_penghalang(status, header, isi, base="", harap_json=False):
     if (header.get("cf-mitigated") or "").strip().lower() == "challenge":
         return ("Permintaan QGIS ke %s dihadang cek bot Cloudflare (HTTP %s) sebelum sampai ke GeoNode — bukan karena "
                 "username/password atau dataset. Di browser situsnya terbuka karena browser bisa menjalankan tantangan "
-                "Cloudflare; QGIS tidak bisa. Cek bot ini biasanya bergantung pada jaringan/IP Anda: coba dari jaringan "
-                "lain (mis. hotspot), atau minta pengelola Cloudflare server mengizinkan jaringan Anda (IP Access Rules "
-                "→ Allow) atau mengecualikan path %s dari cek bot." % (host, status, jalur))
+                "Cloudflare; QGIS tidak bisa. Minta pengelola Cloudflare server mengecualikan path %s dari cek bot "
+                "(atau mengizinkan jaringan Anda lewat IP Access Rules → Allow). Mencoba dari jaringan lain kadang "
+                "membantu, tetapi tidak bisa diandalkan." % (host, status, jalur))
     if status in (403, 429, 503) and web and "cloudflare" in (header.get("server") or "").lower() \
             and "cloudflare" in teks:
         return ("Permintaan QGIS ke %s diblokir Cloudflare (HTTP %s) sebelum sampai ke GeoNode — bukan karena "
-                "username/password atau dataset. Coba dari jaringan lain, atau minta pengelola Cloudflare server "
-                "mengizinkan jaringan Anda atau path %s." % (host, status, jalur))
+                "username/password atau dataset. Minta pengelola Cloudflare server mengizinkan path %s (atau "
+                "jaringan Anda)." % (host, status, jalur))
     if harap_json and status in (401, 403) and web:
         return ("Permintaan QGIS ke %s ditolak (HTTP %s) oleh lapisan di depan GeoNode (firewall/WAF/proxy): "
                 "balasannya halaman web, bukan API GeoNode — bukan tanda username/password salah. Periksa URL "

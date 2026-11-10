@@ -139,10 +139,10 @@ karena GeoNode mengisi tanggal dataset dari `dateStamp` (tanggalnya jadi tidak b
 
 **GeoNode di balik Cloudflare / WAF:** cek bot (mis. Cloudflare *Managed Challenge*, *Bot Fight Mode*, *I'm Under
 Attack*) bisa menolak permintaan QGIS sebelum sampai ke GeoNode, padahal situsnya terbuka di browser. Plugin
-mengenalinya dan menampilkan "dihadang cek bot", bukan "password salah". Penolakan ini biasanya bergantung pada
-jaringan/IP asal (reputasi IP): coba dari jaringan lain, atau minta pengelola Cloudflare server mengizinkan jaringan
-Anda (*IP Access Rules → Allow*, mis. per ASN) atau mengecualikan path `/api/`, `/o/token/`, `/catalogue/csw`, dan
-`/geoserver/` dari cek bot. Path ini juga dipakai klien WMS dan harvester CSW (mis. Ina-Geoportal).
+mengenalinya dan menampilkan "dihadang cek bot", bukan "password salah". Solusinya ada di pengelola Cloudflare
+server: kecualikan path `/api/`, `/o/token/`, `/catalogue/csw`, dan `/geoserver/` dari cek bot (path ini juga
+dipakai klien WMS dan harvester CSW, mis. Ina-Geoportal), atau izinkan jaringan tertentu (*IP Access Rules →
+Allow*, mis. per ASN). Berpindah jaringan tidak bisa diandalkan.
 
 ## 📄 Lisensi
 

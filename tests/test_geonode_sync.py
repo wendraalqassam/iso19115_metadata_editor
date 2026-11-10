@@ -504,6 +504,9 @@ class PenghalangDiDepanGeoNode(unittest.TestCase):
         self.assertIn("bukan karena username/password", p)
         for jalur in gs.PATH_PLUGIN:
             self.assertIn(jalur, p)
+        # solusinya di pengelola Cloudflare; pindah jaringan terbukti tidak bisa diandalkan (Belitung)
+        self.assertLess(p.index("pengelola Cloudflare"), p.index("jaringan lain"))
+        self.assertIn("tidak bisa diandalkan", p)
         # badan kosong (dibaca terpotong) tetap dikenali dari header-nya; juga untuk CSW (XML) & 503
         self.assertTrue(gs.pesan_penghalang(403, h, b"", self.BASE))
         self.assertTrue(gs.pesan_penghalang(503, h, b"", self.BASE))
