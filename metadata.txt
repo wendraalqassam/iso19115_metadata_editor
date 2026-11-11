@@ -4,7 +4,7 @@ qgisMinimumVersion=3.0
 qgisMaximumVersion=4.99
 description=Metadata Editor: Editor Metadata Spasial ISO 19115-3 dan ISO 19139 Standar
 about=GeoMDB - Metadata Editor adalah plugin QGIS untuk membuat, mengedit, memvalidasi kelengkapan per tahapan, menyimpan draft (Save / Save As), dan mengekspor XML metadata spasial berbasis standar ISO 19115-3 dan ISO 19139, serta mengambil dan memperbarui metadata dataset GeoNode dengan akun GeoNode masing-masing. Dikembangkan untuk memudahkan pengelola Simpul Jaringan Informasi Geospasial
-version=1.1.6
+version=1.1.0
 author=Wendra, Hari Kurniadi, Andre Bejo
 email=wendraedogawa@gmail.com
 tags=ISO 19115-3, ISO 19139, Metadata Geospasial Editor, JIGN, Simpul Jaringan, GeoNode, CSW
@@ -16,13 +16,11 @@ supportsQt6=True
 homepage=https://github.com/wendraalqassam/iso19115_metadata_editor
 tracker=https://github.com/wendraalqassam/iso19115_metadata_editor/issues
 repository=https://github.com/wendraalqassam/iso19115_metadata_editor
-changelog=1.1.6: Fix: quantitative data-quality results (value and unit) are exported to ISO 19139 instead of an empty result. Opening an ISO 19139 file keeps each data-quality report's type and its result type (they all became the first type of the list), including quantitative values and units. XML downloaded from GeoNode and opened with "Buka XML Metadata..." is recognised and cleaned like "Ambil dari GeoNode": GeoNode filler text ("None", "No abstract provided", "No information provided") and GeoNode role labels are not carried into the form.
-    1.1.5: Bot-check message: the fix is on the server's Cloudflare side (exclude the plugin's paths or allow the network); switching networks is not presented as a solution any more.
-    1.1.4:The "Send to GeoNode" dialog lists datasets like the catalogue (cards with thumbnails or a sortable list, search, paging; the form's source dataset is marked; double-click never sends). Requests stopped in front of GeoNode by a bot check (e.g. Cloudflare challenge) or a firewall are reported as such instead of "wrong username/password". Long messages no longer widen the catalogue dialog.
-    1.1.3: GeoNode dialogs refresh automatically when the authentication is changed or removed (no list of the previous login left on screen).
-    1.1.2: Fix username/password login (GeoNode 5 returns user groups as a list).
-    1.1.1: Login with a GeoNode username/password (enough for published datasets; non-public datasets need OAuth2). Fix: QGIS crash in the GeoNode catalogue when several datasets share the same thumbnail; GeoNode actions no longer run concurrently.
-    1.1.0: GeoNode integration - pull metadata from a GeoNode catalogue (card/list view with WMS map preview) and update it back with each user's own GeoNode account (OAuth2), GeoNode 4.2.3 - 5.x with version detection; preserve mode for patched servers with detection of unpatched ones; automatic backup and restore; wrong-target safeguards. Valid ISO 19139 export (XSD), including raster; ISO 19115-3 output valid (XSD + Schematron) when "Kompatibel Sistem BIG" is off; notes on values outside ISO codelists. New fields: data identifier (DOI), supplemental information, multiple legal constraints.
+changelog=1.1.0: GeoNode integration and a valid ISO 19139 export.
+    - ISO 19139 (gmd) export valid against the official XSD, including raster, without example values from the template (contact, placeholders, links); quantitative data-quality results are exported. The "Export ISO 19139 (gmd)" button is a menu: Palapa / CSW (no <?xml?> declaration) or GeoNode - Upload Metadata (first line <?xml version="1.0"?>, file ..._geonode.xml).
+    - ISO 19139 import keeps the data-quality report and result types with quantitative values and units; XML downloaded from GeoNode is recognised and its filler text ("None", "No abstract provided", "No information provided") and role labels are not carried into the form.
+    - ISO 19115-3 output valid (XSD + Schematron) when "Kompatibel Sistem BIG" is off; notes on values outside ISO codelists. New fields: data identifier (DOI), supplemental information, multiple legal constraints.
+    - GeoNode 4.2.3 - 5.x: pull metadata from a catalogue (cards or list, WMS map preview) and update it back with the user's own GeoNode account (OAuth2 or username/password); version detection; preserve mode for patched servers; automatic backup and restore; wrong-target safeguards; requests stopped by a bot check (e.g. Cloudflare) are reported as such.
     1.0.5: Add QGIS 4 / Qt6 compatibility support (qgisMaximumVersion=4.99).
     1.0.4: Native security validation with inline annotations (0 warnings, no external config files).
     1.0.3: Flake8 code quality optimization and clean packaging.
