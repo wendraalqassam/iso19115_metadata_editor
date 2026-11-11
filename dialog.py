@@ -844,10 +844,15 @@ class EditorDialog(QDialog):
         """)
         self.b_save_as.clicked.connect(self.save_file_as)
 
-        b_export_gmd = QPushButton("🌐 Export ISO 19139 (gmd)...")
-        b_export_gmd.setToolTip("Ekspor isian metadata saat ini ke berkas XML standar ISO 19139 (namespace http://www.isotc211.org/2005/gmd)")
+        # Satu isi XML, dua tujuan: Palapa/CSW menolak baris deklarasi <?xml?>, GeoNode (Upload Metadata) mewajibkannya
+        b_export_gmd = QToolButton()
+        b_export_gmd.setText("🌐 Export ISO 19139 (gmd) ▾")
+        b_export_gmd.setPopupMode(QToolButton.ToolButtonPopupMode.InstantPopup)
+        b_export_gmd.setToolTip("Ekspor isian metadata saat ini ke berkas XML standar ISO 19139 (namespace http://www.isotc211.org/2005/gmd):\n"
+                                "• untuk Palapa / CSW: tanpa baris deklarasi <?xml ...?>\n"
+                                "• untuk GeoNode (Edit → Upload Metadata): baris pertama <?xml version=\"1.0\"?>, yang diwajibkan GeoNode")
         b_export_gmd.setStyleSheet("""
-            QPushButton {
+            QPushButton, QToolButton {
                 background-color: #ecfdf5;
                 color: #047857;
                 font-weight: bold;
@@ -856,13 +861,18 @@ class EditorDialog(QDialog):
                 border: 1px solid #6ee7b7;
                 font-size: 12px;
             }
-            QPushButton:hover {
+            QPushButton:hover, QToolButton:hover {
                 background-color: #d1fae5;
                 border-color: #10b981;
                 color: #065f46;
             }
         """)
-        b_export_gmd.clicked.connect(self.export_iso19139)
+        menu_ekspor = QMenu(b_export_gmd)
+        menu_ekspor.addAction("Untuk Palapa / CSW (tanpa deklarasi XML)...").triggered.connect(
+            lambda _=False: self.export_iso19139())
+        menu_ekspor.addAction("Untuk GeoNode – Upload Metadata (dengan deklarasi XML)...").triggered.connect(
+            lambda _=False: self.export_iso19139(untuk_geonode=True))
+        b_export_gmd.setMenu(menu_ekspor)
 
         b_geonode = QPushButton("☁ Kirim ke GeoNode...")
         b_geonode.setToolTip("Kirim metadata ini (ISO 19139) ke dataset GeoNode dengan akun GeoNode Anda; CSW GeoNode ikut terbarui")
@@ -2397,8 +2407,10 @@ class EditorDialog(QDialog):
             path += ".xml"
         self._write_xml_to_path(path)
 
-    def export_iso19139(self):
-        """Ekspor isian metadata saat ini ke berkas XML standar ISO 19139 (namespace http://www.isotc211.org/2005/gmd)."""
+    def export_iso19139(self, untuk_geonode=False):
+        """Ekspor isian metadata saat ini ke berkas XML standar ISO 19139 (namespace http://www.isotc211.org/2005/gmd).
+        untuk_geonode=True: baris pertama <?xml version="1.0"?> (wajib untuk Upload Metadata di GeoNode); bawaan tanpa
+        deklarasi (Palapa / CSW)."""
         if self.root is None:
             QMessageBox.information(self, TITLE, "Belum ada metadata yang dimuat untuk diekspor.")
             return
@@ -2423,13 +2435,13 @@ class EditorDialog(QDialog):
         if not clean_id:
             clean_id = "metadata"
         date_str = datetime.datetime.now().strftime("%Y%m%d")
-        filename = f"{clean_id}_{date_str}_iso19139.xml"
+        filename = f"{clean_id}_{date_str}_iso19139{'_geonode' if untuk_geonode else ''}.xml"
         base_dir = os.path.dirname(self.src) if self.src else os.path.expanduser("~")
         default_path = os.path.join(base_dir, filename)
 
         path, _ = QFileDialog.getSaveFileName(
             self,
-            "Ekspor XML Metadata Standar ISO 19139 (gmd)",
+            "Ekspor XML Metadata Standar ISO 19139 (gmd)" + (" untuk GeoNode" if untuk_geonode else " untuk Palapa / CSW"),
             default_path,
             "XML Metadata ISO 19139 (*.xml);;Semua file (*)"
         )
@@ -2441,7 +2453,7 @@ class EditorDialog(QDialog):
         catatan, tidak_standar = [], []
         try:
             gmd_tree = gmd_exporter.export_to_gmd(self.root, catatan=catatan, tidak_standar=tidak_standar)
-            gmd_exporter.save_gmd_to_file(gmd_tree, path)
+            gmd_exporter.save_gmd_to_file(gmd_tree, path, deklarasi=untuk_geonode)
         except Exception as e:
             QMessageBox.warning(self, TITLE, "Gagal mengekspor XML ISO 19139:\n%s" % e)
             return
@@ -2453,7 +2465,14 @@ class EditorDialog(QDialog):
             )
         pesan = ("Berkas metadata berhasil diekspor dengan standar <b>ISO 19139</b> "
                  "(namespace <code>http://www.isotc211.org/2005/gmd</code>):<br><br>"
-                 f"<b>Lokasi:</b> {html.escape(path)}")
+                 f"<b>Lokasi:</b> {html.escape(path)}<br><br>")
+        if untuk_geonode:
+            pesan += ("<b>Untuk GeoNode:</b> baris pertama <code>%s</code> sudah ditambahkan. Unggah lewat "
+                      "<b>Edit → Upload Metadata</b> pada dataset yang sama di GeoNode."
+                      % html.escape(gmd_exporter.DEKLARASI_GEONODE))
+        else:
+            pesan += ("<b>Untuk Palapa / CSW:</b> tanpa baris deklarasi <code>&lt;?xml ...?&gt;</code>. Untuk "
+                      "Upload Metadata di GeoNode, pilih <b>Untuk GeoNode</b> pada tombol Export.")
         isi = kesesuaian.html([
             ("Tidak kompatibel ISO 19139 — tidak diekspor (tetap tersimpan di berkas ISO 19115-3)", catatan),
             ("Diekspor, tetapi nilai daftar kodenya di luar ISO 19139 — katalog berbasis ISO 19139 "

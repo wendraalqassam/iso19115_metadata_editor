@@ -4,6 +4,7 @@ yang dibuka lewat "Buka XML Metadata..." — tanpa QGIS.
     python -m unittest discover -s iso19115_metadata_editor/tests -t .
 """
 import os
+import tempfile
 import unittest
 import xml.etree.ElementTree as ET  # nosec B405
 
@@ -108,6 +109,31 @@ class LaporanKualitas(unittest.TestCase):
         # bolak-balik: formulir dari hasil ekspor = formulir semula
         balik = gmd_importer.convert_gmd_to_iso3(g, TEMPLATE)
         self.assertEqual(laporan_formulir(balik), laporan_formulir(self.root))
+
+
+class EksporBerkas(unittest.TestCase):
+    """Satu isi, dua tujuan: Palapa/CSW tanpa deklarasi; GeoNode (Upload Metadata) wajib deklarasi tanpa encoding."""
+
+    def simpan(self, **kw):
+        root, _ = model.load(os.path.join(HERE, "contoh_lengkap.xml"))
+        g = gmd_exporter.export_to_gmd(root, catatan=[])
+        with tempfile.TemporaryDirectory() as tmp:
+            f = os.path.join(tmp, "hasil.xml")
+            gmd_exporter.save_gmd_to_file(g, f, **kw)
+            with open(f, encoding="utf-8") as fh:
+                return fh.read()
+
+    def test_palapa_tanpa_deklarasi(self):
+        self.assertTrue(self.simpan().startswith("<gmd:MD_Metadata"))
+
+    def test_geonode_dengan_deklarasi_tanpa_encoding(self):
+        teks = self.simpan(deklarasi=True)
+        baris1, sisa = teks.split("\n", 1)
+        self.assertEqual(baris1, '<?xml version="1.0"?>')
+        self.assertTrue(sisa.startswith("<gmd:MD_Metadata"))
+        # GeoNode yang mem-parse unggahan sebagai teks: teks berdeklarasi encoding ditolak lxml/ElementTree
+        ET.fromstring(teks)  # nosec B314
+        self.assertEqual(sisa, self.simpan())
 
 
 class XmlGeoNode(unittest.TestCase):

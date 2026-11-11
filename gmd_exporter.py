@@ -1599,8 +1599,15 @@ def export_to_gmd(iso3_root, template_path=None, catatan=None, tidak_standar=Non
     return gmd_root
 
 
-def save_gmd_to_file(gmd_root, output_path):
-    """Menyimpan berkas XML ISO 19139 tanpa deklarasi <?xml...?> agar kompatibel dengan CSW Transaction pycsw/Palapa."""
+# Baris pertama berkas untuk "Upload Metadata" di GeoNode. GeoNode ≥ 5.1.0 memeriksa jenis berkas (libmagic) dan
+# menolak .xml tanpa deklarasi ("Detected content type 'text/plain'"); atribut encoding sengaja tidak ditulis karena
+# sebagian GeoNode mem-parse unggahan sebagai teks dan lxml menolak teks berdeklarasi encoding. Tanpa encoding = UTF-8.
+DEKLARASI_GEONODE = '<?xml version="1.0"?>'
+
+
+def save_gmd_to_file(gmd_root, output_path, deklarasi=False):
+    """Menyimpan berkas XML ISO 19139. Bawaan tanpa deklarasi <?xml...?> agar kompatibel dengan CSW Transaction
+    pycsw/Palapa; deklarasi=True (unggah lewat GeoNode) menulis DEKLARASI_GEONODE di baris pertama."""
     register_gmd_namespaces()
     # Indentasi rapi
     if hasattr(ET, "indent"):
@@ -1609,6 +1616,8 @@ def save_gmd_to_file(gmd_root, output_path):
     text = raw.decode("utf-8")
     # Hapus deklarasi <?xml ...?> jika ada agar saat diunggah ke Palapa / pycsw tidak menimbulkan error sintaks
     text = re.sub(r"<\?xml[^>]*\?>\s*", "", text).strip() + "\n"
+    if deklarasi:
+        text = DEKLARASI_GEONODE + "\n" + text
     with open(output_path, "w", encoding="utf-8") as f:
         f.write(text)
     return output_path
