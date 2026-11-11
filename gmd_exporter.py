@@ -546,16 +546,19 @@ def _deskripsi_cakupan(opt, kelas, catatan):
 _DQ_19139 = {"DQ_NonQuantitativeAttributeCorrectness": "DQ_NonQuantitativeAttributeAccuracy"}
 
 
-def _laporan_dq(inst, catatan):
+def _laporan_dq(inst, catatan, nomor=1):
     """gmd:report dari satu laporan kualitas formulir, dengan struktur DQ_Element ISO 19139:
     nameOfMeasure, measureDescription, evaluationMethodType, evaluationMethodDescription,
-    dateTime, result (DQ_ConformanceResult: specification, explanation, pass)."""
+    dateTime, result (DQ_ConformanceResult: specification, explanation, pass; atau
+    DQ_QuantitativeResult: valueType, valueUnit, value)."""
     rep_d = _collect_dict_from_nodes(inst.nodes)
-    hasil = []
+    hasil = []  # [(kelas hasil, isian)]
     for r_node in inst.nodes:
         if isinstance(r_node, layout.BList) and getattr(r_node, "path", "") == "result":
-            hasil += [_collect_dict_from_nodes(ri.nodes) for ri in r_node.instances]
-    hasil = [h for h in hasil if any(h.values())]
+            for ri in r_node.instances:
+                d = _collect_dict_from_nodes(ri.nodes)
+                if any(d.values()):
+                    hasil.append((next((_lokal(c.tag) for c in ri.el), "DQ_ConformanceResult"), d))
     if not any(rep_d.values()) and not hasil:
         return None
 
@@ -572,11 +575,17 @@ def _laporan_dq(inst, catatan):
     _set_code(dq_el, "evaluationMethodType", "DQ_EvaluationMethodTypeCode", rep_d.get("evaluationMethodType"))
     _set_char(dq_el, "evaluationMethodDescription", rep_d.get("evaluationMethodDescription"))
     # ISO 19139 mencatat waktu evaluasi di DQ_Element, bukan di hasil
-    waktu = next((h["dateTime"] for h in hasil if h.get("dateTime")), "")
+    waktu = next((h["dateTime"] for _, h in hasil if h.get("dateTime")), "")
     if waktu:
         dt = ET.SubElement(dq_el, _q(GMD, "dateTime"))
         ET.SubElement(dt, _q(GCO, "DateTime")).text = _datetime(waktu)
-    for h in hasil:
+    for k, (kelas_hasil, h) in enumerate(hasil, 1):
+        if kelas_hasil == "DQ_QuantitativeResult":
+            _hasil_kuantitatif(dq_el, h, "satuan-laporan-%d-%d" % (nomor, k))
+            continue
+        if kelas_hasil != "DQ_ConformanceResult":
+            catatan.append(f"Hasil kualitas {kelas_hasil} (laporan {nomor}) tidak ada di ISO 19139 — tidak diekspor.")
+            continue
         res = ET.SubElement(ET.SubElement(dq_el, _q(GMD, "result")), _q(GMD, "DQ_ConformanceResult"))
         if h.get("specificationTitle") or h.get("specificationAlternate"):
             spec = _anak(res, "specification", "CI_Citation")
@@ -587,6 +596,32 @@ def _laporan_dq(inst, catatan):
             ps = ET.SubElement(res, _q(GMD, "pass"))
             ET.SubElement(ps, _q(GCO, "Boolean")).text = str(h["pass"]).strip().lower()
     return wrap
+
+
+def _hasil_kuantitatif(dq_el, h, gml_id):
+    """gmd:result/DQ_QuantitativeResult: valueType, valueUnit (wajib), value (wajib, gco:Record).
+    Satuan: URI (mis. http://www.opengis.net/def/uom/OGC/1.0/percent) → rujukan xlink:href; selain itu
+    gml:UnitDefinition dengan identifier = kode satuan (atau namanya) dan name = nama satuan."""
+    res = ET.SubElement(ET.SubElement(dq_el, _q(GMD, "result")), _q(GMD, "DQ_QuantitativeResult"))
+    if h.get("quantitativeValueType"):
+        vt = ET.SubElement(res, _q(GMD, "valueType"))
+        ET.SubElement(vt, _q(GCO, "RecordType")).text = h["quantitativeValueType"]
+    nama, kode = (h.get("quantitativeUnit") or "").strip(), (h.get("quantitativeUnitCode") or "").strip()
+    vu = ET.SubElement(res, _q(GMD, "valueUnit"))
+    if kode.startswith(("http://", "https://", "urn:")):
+        vu.set(_q(XLINK, "href"), kode)
+    elif nama or kode:
+        ud = ET.SubElement(vu, _q(GML, "UnitDefinition"))
+        ud.set(_q(GML, "id"), gml_id)
+        idf = ET.SubElement(ud, _q(GML, "identifier"))
+        idf.set("codeSpace", "GeoMDB")
+        idf.text = kode or nama
+        if nama:
+            ET.SubElement(ud, _q(GML, "name")).text = nama
+    else:
+        vu.set(_q(GCO, "nilReason"), "missing")
+    if h.get("quantitativeValue"):
+        ET.SubElement(ET.SubElement(res, _q(GMD, "value")), _q(GCO, "Record")).text = h["quantitativeValue"]
 
 
 # Pemetaan properti batasan ISO 19139 → kunci formulir, untuk batasan sumber daya & metadata.
@@ -1276,7 +1311,8 @@ def export_to_gmd(iso3_root, template_path=None, catatan=None, tidak_standar=Non
                 _set_dq_scope(dq, d7["qualityScope"], timpa=True)
             for n in s7.nodes:
                 if isinstance(n, layout.BList) and "report" in getattr(n, "path", ""):
-                    laporan = [r for r in (_laporan_dq(inst, catatan) for inst in n.instances) if r is not None]
+                    laporan = [r for r in (_laporan_dq(inst, catatan, i) for i, inst in enumerate(n.instances, 1))
+                               if r is not None]
                     _ganti_semua(dq, "report", laporan)
 
     # =========================================================================

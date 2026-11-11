@@ -922,9 +922,15 @@ class EditorDialog(QDialog):
         is_gmd_format = False
         if gmd_importer.is_gmd(root):
             try:
-                root = gmd_importer.convert_gmd_to_iso3(root, TEMPLATE)
+                # XML unduhan GeoNode: sama dengan "Ambil dari GeoNode" — hanya data GeoNode yang masuk formulir
+                geonode = gmd_importer.buatan_geonode(root)
+                root = gmd_importer.convert_gmd_to_iso3(root, TEMPLATE, bersih=geonode)
                 is_gmd_format = True
                 fixes.append("Berkas XML standar ISO 19139 (gmd) berhasil dideteksi dan diimpor penuh ke form GeoMDB.")
+                if geonode:
+                    fixes.append("XML ini buatan GeoNode: teks pengisi GeoNode (\"None\", \"No abstract provided\", "
+                                 "\"No information provided\") dikosongkan, label peran GeoNode diganti kode ISO, "
+                                 "dan nilai contoh template tidak ikut ke formulir.")
             except Exception as e:
                 QMessageBox.warning(self, TITLE, "Gagal mengonversi XML ISO 19139 ke ISO 19115-3:\n%s" % e)
                 return

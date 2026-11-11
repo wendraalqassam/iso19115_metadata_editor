@@ -44,6 +44,38 @@ def is_gmd(root_or_path):
     return False
 
 
+def _lokal(tag):
+    return tag.rsplit("}", 1)[-1]
+
+
+XLINK = "http://www.w3.org/1999/xlink"
+
+# Kelas hasil kualitas ISO 19139 → snippet formulir (layout.RESULT_SNIPS).
+HASIL_DQ = {"DQ_ConformanceResult": "res_conformance", "DQ_QuantitativeResult": "res_quantitative"}
+# Kelas laporan ISO 19139 yang namanya berbeda di ISO 19157 (formulir); kebalikan gmd_exporter._DQ_19139.
+_DQ_19157 = {"DQ_NonQuantitativeAttributeAccuracy": "DQ_NonQuantitativeAttributeCorrectness"}
+
+
+def _hasil_kuantitatif(res):
+    """Isian formulir dari gmd:DQ_QuantitativeResult: nilai (gco:Record, beberapa digabung "; "), satuan
+    (gml:UnitDefinition name/identifier GML 3.1 atau 3.2, atau rujukan xlink:href), tipe nilai."""
+    nilai = [(r.text or "").strip() for r in res.iter(_q(GCO, "Record")) if (r.text or "").strip()]
+    out = {"quantitativeValue": "; ".join(nilai),
+           "quantitativeValueType": get_text(res, _q(GMD, "valueType"))}
+    vu = res.find(_q(GMD, "valueUnit"))
+    if vu is not None:
+        ud = next(iter(vu), None)
+        if ud is not None:
+            for ns in (GML32, GML):
+                out["quantitativeUnit"] = out.get("quantitativeUnit") or (ud.findtext(_q(ns, "name")) or "").strip()
+                out["quantitativeUnitCode"] = (out.get("quantitativeUnitCode")
+                                               or (ud.findtext(_q(ns, "identifier")) or "").strip())
+            if out["quantitativeUnitCode"] == out["quantitativeUnit"]:
+                out["quantitativeUnitCode"] = ""
+        out["quantitativeUnitCode"] = out.get("quantitativeUnitCode") or (vu.get(_q(XLINK, "href")) or "").strip()
+    return {k: v for k, v in out.items() if v}
+
+
 def get_text(parent, path):
     if parent is None:
         return ""
@@ -691,6 +723,7 @@ def extract_gmd_plan(gmd_root_or_path):
                         exp = get_text(res, f".//{_q(GMD, 'explanation')}")
                         pass_v = get_text(res, f".//{_q(GMD, 'pass')}")
                         res_item = {
+                            "__snippet__": HASIL_DQ.get(_lokal(res.tag)),
                             "dateTime": r_dt,
                             "resultScope": r_sc,
                             "specificationTitle": spec_t,
@@ -698,8 +731,11 @@ def extract_gmd_plan(gmd_root_or_path):
                             "explanation": exp,
                             "pass": pass_v
                         }
+                        if _lokal(res.tag) == "DQ_QuantitativeResult":
+                            res_item.update(_hasil_kuantitatif(res))
                         res_list.append({k: v for k, v in res_item.items() if v})
                 rep_item = {
+                    "__snippet__": "report_" + _DQ_19157.get(_lokal(rep.tag), _lokal(rep.tag)),
                     "measure": meas,
                     "description": desc,
                     "evaluationMethodDescription": eval_desc,
@@ -934,7 +970,21 @@ def bersihkan_template(iso3_root):
 # Teks pengisi template CSW GeoNode (catalogue/full_metadata.xml), bukan data: nilai kosong (Python None)
 # tercetak "None" (nama kontak, tujuan, pernyataan riwayat, ...) dan abstrak kosong menjadi "No abstract
 # provided". Bila ikut terambil, saat Perbarui teks itu tersimpan ke basis data GeoNode sebagai isian sungguhan.
-PENGISI_GEONODE = ("None", "No abstract provided")
+PENGISI_GEONODE = ("None", "No abstract provided", "No information provided")
+# "No information provided" = bawaan GeoNode untuk supplemental_information (enumerations.DEFAULT_SUPPLEMENTAL_INFORMATION).
+
+# Ciri XML ISO buatan template CSW GeoNode (catalogue/full_metadata.xml, 4.2 s.d. master): deskripsi tautan profil
+# kontak, atau label peran tampilan GeoNode di CI_RoleCode.
+_CIRI_GEONODE = "GeoNode profile page"
+
+
+def buatan_geonode(gmd_root):
+    """True bila XML gmd ini keluaran GeoNode (unduhan ISO / CSW GeoNode)."""
+    if any((cs.text or "").strip() == _CIRI_GEONODE for cs in gmd_root.iter(_q(GCO, "CharacterString"))):
+        return True
+    return any(" " in (el.get("codeListValue") or "") and
+               " ".join((el.get("codeListValue") or "").split()).lower() in PERAN_GEONODE
+               for el in gmd_root.iter(_q(GMD, "CI_RoleCode")))
 
 
 # Peran kontak GeoNode (geonode/people Roles) → CI_RoleCode ISO. Template CSW GeoNode menulis LABEL tampilannya
@@ -1034,6 +1084,19 @@ def convert_gmd_to_iso3(gmd_root_or_path, template_path, bersih=False):
                 model.add_block(iso3_root, bl.container, src)
             count += 1
 
+    def _isi_jenis(bl, insts):
+        """Daftar yang itemnya membawa jenis ("__snippet__", mis. laporan DQ_CompletenessOmission atau hasil
+        kuantitatif): entri bawaan dibuang lalu dibuat ulang berurutan sesuai jenis tiap item. False bila
+        daftar ini tidak berjenis (penambahan biasa lewat _ensure_count)."""
+        jenis = [src[1] for _, src in bl.options if isinstance(src, tuple)]
+        if not jenis or not any(it.get("__snippet__") in jenis for it in insts):
+            return False
+        for inst in list(bl.instances):
+            model.remove_block(bl.container, inst.el)
+        for it in insts:
+            model.add_snippet(iso3_root, bl.container, it["__snippet__"] if it.get("__snippet__") in jenis else jenis[0])
+        return True
+
     # 1) Aktifkan blok opsional
     for sid, snip in plan["optionals"]:
         st = _stages().get(sid)
@@ -1045,7 +1108,7 @@ def convert_gmd_to_iso3(gmd_root_or_path, template_path, bersih=False):
     for sid, path, insts in plan["lists"]:
         st = _stages().get(sid)
         bl = st and _find_list(st.nodes, path)
-        if bl is not None:
+        if bl is not None and not _isi_jenis(bl, insts):
             _ensure_count(bl, len(insts))
 
     # 3) Tambah entri daftar bersarang
@@ -1057,7 +1120,7 @@ def convert_gmd_to_iso3(gmd_root_or_path, template_path, bersih=False):
         for ip, inst in zip(insts, bl.instances):
             for npath, sub in ip.get("__lists__", {}).items():
                 nbl = _find_list(inst.nodes, npath)
-                if nbl is not None:
+                if nbl is not None and not _isi_jenis(nbl, sub):
                     _ensure_count(nbl, len(sub))
             # Bagian opsional di dalam entri daftar (mis. "Sumber Masukan Proses" pada tahap proses)
             for snip in ip.get("__opsional__", {}):
