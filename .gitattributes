@@ -1,8 +1,10 @@
-# Berkas berikut tidak ikut ZIP plugin (git archive): panduan, test, dan berkas git
+# Berkas berikut tidak ikut ZIP plugin (git archive): panduan, test, konfigurasi linter, dan berkas git
 /docs export-ignore
 /tests export-ignore
 /.gitattributes export-ignore
 /.gitignore export-ignore
+/.flake8 export-ignore
+/.bandit export-ignore
 
 # Dokumen biner: jangan diubah akhir barisnya
 *.pptx binary

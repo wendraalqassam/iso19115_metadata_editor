@@ -4,7 +4,7 @@ qgisMinimumVersion=3.0
 qgisMaximumVersion=4.99
 description=Metadata Editor: Editor Metadata Spasial ISO 19115-3 dan ISO 19139 Standar
 about=GeoMDB - Metadata Editor adalah plugin QGIS untuk membuat, mengedit, memvalidasi kelengkapan per tahapan, menyimpan draft (Save / Save As), dan mengekspor XML metadata spasial berbasis standar ISO 19115-3 dan ISO 19139, serta mengambil dan memperbarui metadata dataset GeoNode dengan akun GeoNode masing-masing. Dikembangkan untuk memudahkan pengelola Simpul Jaringan Informasi Geospasial
-version=1.1.0
+version=1.1.1
 author=Wendra, Hari Kurniadi, Andre Bejo
 email=wendraedogawa@gmail.com
 tags=ISO 19115-3, ISO 19139, Metadata Geospasial Editor, JIGN, Simpul Jaringan, GeoNode, CSW
@@ -15,7 +15,8 @@ deprecated=False
 homepage=https://github.com/wendraalqassam/iso19115_metadata_editor
 tracker=https://github.com/wendraalqassam/iso19115_metadata_editor/issues
 repository=https://github.com/wendraalqassam/iso19115_metadata_editor
-changelog=1.1.0: GeoNode integration and a valid ISO 19139 export.
+changelog=1.1.1: Exclude linter config file (.flake8) from release ZIP for native Validated status on plugins.qgis.org.
+    1.1.0: GeoNode integration and a valid ISO 19139 export.
     - ISO 19139 (gmd) export valid against the official XSD, including raster, without example values from the template (contact, placeholders, links); quantitative data-quality results are exported. The "Export ISO 19139 (gmd)" button is a menu: Palapa 5.0 / CSW (no <?xml?> declaration) or GeoNode - Upload Metadata (first line <?xml version="1.0"?>, file ..._geonode.xml). Palapa 5.1 takes ISO 19115-3 only: the file from Save with "Kompatibel Sistem BIG" checked.
     - ISO 19139 import keeps the data-quality report and result types with quantitative values and units; XML downloaded from GeoNode is recognised and its filler text ("None", "No abstract provided", "No information provided") and role labels are not carried into the form.
     - ISO 19115-3 output valid (XSD + Schematron) when "Kompatibel Sistem BIG" is off; notes on values outside ISO codelists. New fields: data identifier (DOI), supplemental information, multiple legal constraints.
