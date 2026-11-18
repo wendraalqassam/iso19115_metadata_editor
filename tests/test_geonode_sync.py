@@ -94,10 +94,6 @@ class BantuAPI(unittest.TestCase):
         self.assertFalse(gs.boleh_ubah(dataset()))  # perms anonim: view & download
         self.assertTrue(gs.boleh_ubah(dataset(perms=["view_resourcebase", "change_resourcebase_metadata"])))
 
-    def test_userinfo_tanpa_access_token(self):
-        info = gs.bersihkan_userinfo({"preferred_username": "u", "access_token": "rahasia"})
-        self.assertNotIn("access_token", info)
-
     def test_form_unggah_multipart(self):
         xml = gs.xml_bytes(gs.siapkan_xml(contoh(), dataset()))
         body, tipe = gs.form_unggah(3, xml, "geonode:umkm")

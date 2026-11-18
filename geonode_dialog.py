@@ -418,7 +418,7 @@ class DialogGeoNode(QDialog):
                 return
             # Login username/password: CSW GeoNode menganggapnya anonim → record dataset tidak publik tak terlihat
             csw_bisa = not (self.panel.basic() and not k.terlihat_publik(pk))
-            alasan_csw = "" if csw_bisa else "dataset tidak publik + login username/password; perlu OAuth2"
+            alasan_csw = "" if csw_bisa else "dataset belum dipublikasikan; CSW GeoNode tidak mengenali login username/password"
             preserve = self._pakai_preserve()
             g, catatan, tidak_standar = self._siapkan(ds, preserve)
             beda = gs.bandingkan_cakupan(g, ds)

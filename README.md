@@ -22,7 +22,7 @@
   13. Ekstensi Metadata
 
 - **Ekstraksi Otomatis dari Layer QGIS Aktif**:
-  - Judul layer, format (Vektor/Raster), sistem koordinat (EPSG code & codeSpace), resolusi/skala spasial, tipe geometri/topologi, dan batas wilayah (Bounding Box BBOX) dapat langsung ditarik otomatis dari layer yang sedang aktif di QGIS canvas.
+  - Judul, abstrak, kata kunci, kontak (dari metadata layer QGIS), format, sistem koordinat (EPSG code & codeSpace), tipe & jumlah geometri, ukuran berkas, dan batas wilayah (Bounding Box, otomatis ke WGS 84) dapat langsung ditarik dari layer vektor yang dipilih di QGIS.
 
 - **Dua Standar Ekspor XML**:
   - **ISO 19115-3 (Namespace mdb)**: Format standar terbaru untuk integrasi sistem dan validasi profil nasional.
@@ -57,37 +57,33 @@
 ## 📖 Cara Penggunaan
 
 1. Klik ikon **GeoMDB** pada toolbar QGIS atau menu **Plugins** > **GeoMDB - Metadata Editor**.
-2. Klik tombol **Ambil Data Layer Aktif** jika ingin mengekstrak informasi bounding box dan proyeksi dari peta layer yang sedang dibuka.
+2. Klik tombol **Ambil Metadata dari Layer Aktif** untuk mengisi otomatis judul, cakupan wilayah, sistem koordinat, geometri, format, dan isian lain dari layer **vektor** yang dipilih (layer raster diisi manual).
 3. Lengkapi formulir metadata pada masing-masing seksi (Tahap 1 hingga Tahap 13).
-4. Klik **Validasi** untuk memastikan elemen wajib telah terisi dengan benar.
-5. Ekspor metadata menggunakan tombol:
-   - **Simpan / Ekspor ISO 19115-3** (format xml mdb).
-   - **Ekspor ISO 19139 (GMD)** (format xml gmd untuk pycsw / Geoportal).
+4. Klik **✓ Validasi Isian** untuk melihat isian yang masih kosong per tahapan.
+5. Simpan dan ekspor:
+   - **💾 Simpan** / **📁 Simpan Sebagai...**: berkas kerja ISO 19115-3 (mdb).
+   - **🌐 Export ISO 19139 (gmd) ▾**: *Untuk Palapa / CSW* (pycsw / Geoportal) atau *Untuk GeoNode – Upload Metadata*.
+
+**Panduan lengkap** (instalasi sampai contoh pengisian berbagai kondisi, per sesi): [docs/panduan](docs/panduan/README.md).
 
 ## ☁️ Sinkronisasi dengan GeoNode
 
 Metadata dataset GeoNode bisa diambil ke formulir, disunting, lalu dikirim balik (ISO 19139) dengan akun
 GeoNode masing-masing pengguna; CSW GeoNode ikut terbarui.
 
-**Dua cara login** (keduanya tersimpan terenkripsi di Authentication Manager QGIS):
+**Login:** username & password akun GeoNode masing-masing, tersimpan terenkripsi di Authentication Manager QGIS.
+Tidak perlu persiapan admin; cukup beri group/pengguna izin *ubah metadata* hanya pada dataset miliknya.
 
-| | Username/password | OAuth2 (disarankan) |
-|---|---|---|
-| Persiapan admin | tidak ada | daftarkan aplikasi OAuth2 sekali (lihat di bawah) |
-| Dataset yang sudah dipublikasikan | ambil, perbarui, cadangan, pemeriksaan CSW | sama |
-| Dataset tidak publik | hanya perbarui (CSW GeoNode tidak mengenali login ini, jadi ambil, cadangan & pemeriksaan CSW tidak bisa) | semua fungsi |
-| Akun SSO/LDAP tanpa password lokal | tidak bisa | bisa |
+| Dataset | Yang bisa dilakukan |
+|---|---|
+| Sudah dipublikasikan | ambil, perbarui, cadangan, pemeriksaan CSW |
+| Belum dipublikasikan | hanya perbarui. CSW GeoNode tidak mengenali login username/password, jadi ambil, cadangan & pemeriksaan CSW tidak bisa. Gantinya: unduh XML dataset lewat *Download → ISO Metadata* di browser (sambil login GeoNode) lalu buka dengan **Buka XML Metadata...** |
 
-**Persiapan admin GeoNode untuk OAuth2 (sekali):** Django admin → *Django OAuth Toolkit* → *Applications* → tambah:
-Client type `Public` (disarankan) atau `Confidential`, Authorization grant type `Authorization code`,
-Redirect URIs `http://127.0.0.1:7070/`. Bagikan **Client ID** (dan Client secret bila `Confidential`) ke
-pengguna. Apa pun cara loginnya, beri group/pengguna izin *ubah metadata* hanya pada dataset miliknya.
+Akun SSO/LDAP yang tidak punya password lokal GeoNode tidak bisa dipakai.
 
 **Pengguna:**
-1. Klik **Ambil dari GeoNode...** di bagian atas editor dan isi URL GeoNode. Lalu pilih salah satu:
-   **Login username/password…** (username & password akun GeoNode), atau **Buat konfigurasi OAuth2…** (Client ID,
-   dan secret bila ada; PKCE dipakai pada QGIS ≥ 3.34). Klik **Masuk & muat dataset**; untuk OAuth2 browser
-   terbuka untuk login GeoNode.
+1. Klik **Ambil dari GeoNode...** di bagian atas editor dan isi URL GeoNode. Klik **Login username/password…**
+   (username & password akun GeoNode), lalu **Masuk & muat dataset**.
 2. Telusuri katalog dalam mode **Kartu** (thumbnail) atau **Daftar** (tabel, bisa diurutkan). Memilih dataset
    menampilkan pratinjau peta dari layanan WMS-nya di atas peta dasar OpenStreetMap. Dataset yang tidak boleh
    diubah akun Anda ditandai *Hanya lihat*.
@@ -129,7 +125,7 @@ karena GeoNode mengisi tanggal dataset dari `dateStamp` (tanggalnya jadi tidak b
 - Bila cakupan/sistem referensi formulir berbeda dengan GeoNode saat ini, plugin menanyakan nilai mana yang dikirim.
 - *Ambil Metadata dari Layer Aktif* pada formulir tertaut memperingatkan bahwa isiannya ikut terkirim ke dataset itu.
 
-**Versi GeoNode** dideteksi otomatis dari URL (tanpa login, juga saat membuat konfigurasi OAuth2) atau dipilih manual:
+**Versi GeoNode** dideteksi otomatis dari URL (tanpa login) atau dipilih manual:
 
 | Versi | Ambil | Perbarui | Preserve |
 |---|---|---|---|
@@ -140,7 +136,7 @@ karena GeoNode mengisi tanggal dataset dari `dateStamp` (tanggalnya jadi tidak b
 **GeoNode di balik Cloudflare / WAF:** cek bot (mis. Cloudflare *Managed Challenge*, *Bot Fight Mode*, *I'm Under
 Attack*) bisa menolak permintaan QGIS sebelum sampai ke GeoNode, padahal situsnya terbuka di browser. Plugin
 mengenalinya dan menampilkan "dihadang cek bot", bukan "password salah". Solusinya ada di pengelola Cloudflare
-server: kecualikan path `/api/`, `/o/token/`, `/catalogue/csw`, dan `/geoserver/` dari cek bot (path ini juga
+server: kecualikan path `/api/`, `/catalogue/csw`, dan `/geoserver/` dari cek bot (path ini juga
 dipakai klien WMS dan harvester CSW, mis. Ina-Geoportal), atau izinkan jaringan tertentu (*IP Access Rules →
 Allow*, mis. per ASN). Berpindah jaringan tidak bisa diandalkan.
 

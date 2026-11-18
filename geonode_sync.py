@@ -25,7 +25,6 @@ from .gmd_exporter import GCO, GMD, _anak, _build_online_resource_element, _q, _
 IZIN_UBAH = ("change_resourcebase_metadata", "change_resourcebase")
 
 ALAMAT = {
-    "userinfo": "/api/o/v4/userinfo/",
     "datasets": "/api/v2/datasets",
     "dataset": "/api/v2/datasets/{pk}",
     "resource": "/api/v2/resources/{pk}",
@@ -91,13 +90,6 @@ def url_dasar(url):
 def boleh_ubah(dataset):
     """`perms` di respons API berisi izin pengguna yang sedang login pada dataset itu."""
     return any(p in (dataset.get("perms") or []) for p in IZIN_UBAH)
-
-
-def bersihkan_userinfo(info):
-    """userinfo GeoNode ikut memuat access_token pengguna — jangan pernah disimpan/ditampilkan."""
-    info = dict(info or {})
-    info.pop("access_token", None)
-    return info
 
 
 def tautan_dataset(dataset):
@@ -492,14 +484,15 @@ SARAN_CSW_RUSAK = ("Biasanya karena metadata dataset ini tersimpan rusak di GeoN
                    % URL_ALAT_TAMBAL)
 
 
-SARAN_BASIC_PRIVAT = ("Dataset ini tidak publik. CSW GeoNode hanya mengenali login OAuth2, sehingga dengan login "
-                      "username/password record ISO dataset tidak publik tidak bisa dibaca (ambil, cadangan, dan "
-                      "pemeriksaan CSW). Pakai konfigurasi OAuth2 («Buat konfigurasi OAuth2…»), atau publikasikan "
-                      "datasetnya dulu.")
+SARAN_BASIC_PRIVAT = ("Dataset ini belum dipublikasikan. CSW GeoNode tidak mengenali login username/password, "
+                      "sehingga plugin tidak bisa membaca record ISO dataset ini (ambil, cadangan, dan pemeriksaan "
+                      "CSW). Gantinya: login GeoNode di browser, unduh XML dataset lewat Download → ISO Metadata "
+                      "(buka dengan «Buka XML Metadata…»; berkasnya sekaligus menjadi cadangan), atau minta "
+                      "Walidata mempublikasikan datasetnya dulu.")
 
 
-# Path GeoNode yang dipakai plugin (API, token OAuth2, CSW, WMS GeoServer) — harus lolos dari cek bot di depan GeoNode.
-PATH_PLUGIN = ("/api/", "/o/token/", "/catalogue/csw", "/geoserver/")
+# Path GeoNode yang dipakai plugin (API, CSW, WMS GeoServer) — harus lolos dari cek bot di depan GeoNode.
+PATH_PLUGIN = ("/api/", "/catalogue/csw", "/geoserver/")
 
 
 def pesan_penghalang(status, header, isi, base="", harap_json=False):

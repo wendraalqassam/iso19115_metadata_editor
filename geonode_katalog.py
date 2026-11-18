@@ -196,7 +196,7 @@ class DialogKatalogGeoNode(QDialog):
         uri.setParam("dpiMode", "7")
         uri.setParam("contextualWMSLegend", "0")
         authcfg = self._klien.authcfg_untuk(url) if self._klien else ""
-        if authcfg:  # dataset privat: GeoServer GeoNode menerima token OAuth2 yang sama
+        if authcfg:  # dataset privat: login yang sama dikirim ke GeoServer GeoNode (host sama)
             uri.setAuthConfigId(authcfg)
         return QgsRasterLayer(bytes(uri.encodedUri()).decode(), judul, "wms")
 

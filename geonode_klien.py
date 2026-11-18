@@ -1,7 +1,7 @@
 """Klien API GeoNode lewat jaringan QGIS (proxy & SSL mengikuti pengaturan QGIS).
 
 Kredensial tidak pernah dipegang plugin: header Authorization disisipkan Authentication Manager
-QGIS dari konfigurasi `authcfg` (OAuth2 / Basic), yang tersimpan terenkripsi di qgis-auth.db.
+QGIS dari konfigurasi `authcfg` (username/password, HTTP Basic), yang tersimpan terenkripsi di qgis-auth.db.
 """
 import json
 
@@ -99,13 +99,9 @@ class KlienGeoNode:
             raise GeoNodeError("Respons bukan JSON (HTTP %s) — periksa URL GeoNode." % status, status)
 
     # ------------------------------------------------------------------ API
-    def userinfo(self):
-        """Profil pengguna yang sedang login (OAuth2); GeoNodeError(status=401) bila belum login."""
-        return gs.bersihkan_userinfo(self._json("GET", gs.ALAMAT["userinfo"]))
-
     def info_pengguna_basic(self, username):
-        """Profil untuk login username/password: /api/o/v4/userinfo hanya mengenali OAuth2, jadi dipakai API pengguna
-        (/api/v2/users, wajib login). Password salah → GeoNodeError(status=401). Bentuk hasil seperti userinfo()."""
+        """Profil pengguna yang login dengan username/password, dari API pengguna (/api/v2/users, wajib login).
+        Password salah → GeoNodeError(status=401). Hasil: {"preferred_username", "name", "groups"}."""
         j = self._json("GET", "/api/v2/users", kueri={"filter{username}": username, "page_size": 1})
         u = (j.get("users") or [{}])[0]
         grup = []

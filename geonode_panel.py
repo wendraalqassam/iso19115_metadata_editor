@@ -51,7 +51,7 @@ class PanelKoneksi(QWidget):
         self.catat = catat
         self._terdeteksi = {}  # url dasar → generasi GeoNode (None = tak dapat dipastikan)
         self._diblokir = set()  # url dasar yang permintaannya dihadang lapisan di depan GeoNode saat deteksi
-        self.metode = ""  # metode login authcfg saat Masuk: "OAuth2" | "Basic" | "" (anonim / lainnya)
+        self.metode = ""  # metode login authcfg saat Masuk: "Basic" | "" (anonim)
         s = QgsSettings()
         self.e_url = QLineEdit(s.value(KUNCI + "url", "", type=str))
         self.e_url.setPlaceholderText("https://geoportal.contoh.go.id")
@@ -70,12 +70,9 @@ class PanelKoneksi(QWidget):
         self.lbl_versi.setStyleSheet("color: #475569;")
         self.sel_auth = QgsAuthConfigSelect(self)
         self.sel_auth.setConfigId(s.value(KUNCI + "authcfg", "", type=str))
-        b_oauth = QPushButton("Buat konfigurasi OAuth2…")
-        b_oauth.setToolTip("Buat konfigurasi login OAuth2 GeoNode dari Client ID aplikasi yang didaftarkan admin GeoNode.")
-        b_oauth.clicked.connect(self.buat_oauth2)
         b_basic = QPushButton("Login username/password…")
-        b_basic.setToolTip("Login dengan username & password akun GeoNode (tanpa mendaftarkan aplikasi OAuth2). Cukup "
-                           "untuk dataset yang sudah dipublikasikan; dataset tidak publik perlu OAuth2.")
+        b_basic.setToolTip("Login dengan username & password akun GeoNode. Dataset yang belum dipublikasikan bisa "
+                           "diperbarui, tetapi tidak bisa diambil (CSW GeoNode tidak mengenali login ini).")
         b_basic.clicked.connect(self.buat_basic)
         self.b_masuk = QPushButton("Masuk && muat dataset")  # && = karakter & (bukan pintasan)
         self.b_masuk.clicked.connect(self.masuk)
@@ -92,7 +89,6 @@ class PanelKoneksi(QWidget):
         baris_auth = QHBoxLayout()
         baris_auth.addWidget(self.sel_auth, 1)
         baris_auth.addWidget(b_basic)
-        baris_auth.addWidget(b_oauth)
         form.addRow("Autentikasi", baris_auth)
         lay = QVBoxLayout(self)
         lay.setContentsMargins(0, 0, 0, 0)
@@ -183,32 +179,10 @@ class PanelKoneksi(QWidget):
         s = QgsSettings()
         s.setValue(KUNCI + "url", url)
         s.setValue(KUNCI + "authcfg", self.sel_auth.configId())
+        salah = geonode_auth.periksa_authcfg(self.sel_auth.configId())
+        if salah:  # mis. konfigurasi OAuth2 buatan versi lama: jangan dipakai diam-diam
+            raise GeoNodeError(salah)
         return KlienGeoNode(url, self.sel_auth.configId())
-
-    def buat_oauth2(self):
-        url = gs.url_dasar(self.e_url.text())
-        if not url:
-            QMessageBox.information(self, self.judul, "Isi URL GeoNode terlebih dahulu.")
-            return
-        v = self.deteksi()  # sebelum login: endpoint yang dipakai publik
-        info = ("GeoNode terdeteksi: %s\n\n" % gs.VERSI[v]["label"]) if v else \
-            "Versi GeoNode belum dapat dideteksi dari URL ini (periksa URL-nya).\n\n"
-        cid, ok = QInputDialog.getText(self, self.judul, info + "Client ID aplikasi OAuth2 GeoNode\n(dari admin "
-                                       "GeoNode; redirect URI: http://127.0.0.1:%d/)" % geonode_auth.PORT)
-        if not ok or not cid.strip():
-            return
-        secret, ok = QInputDialog.getText(self, self.judul, "Client secret (kosongkan bila aplikasi bertipe Public)\n"
-                                          "Disimpan terenkripsi di Authentication Manager QGIS.",
-                                          QLineEdit.EchoMode.Password)
-        if not ok:
-            return
-        try:
-            self.sel_auth.setConfigId(geonode_auth.buat_authcfg(url, cid, secret))
-            alur = ("Authorization Code + client secret" if secret.strip()
-                    else "PKCE" if geonode_auth.dukung_pkce() else "Authorization Code")
-            self.catat("Konfigurasi OAuth2 dibuat (%s). Saat masuk, QGIS membuka browser untuk login GeoNode." % alur)
-        except Exception as e:
-            QMessageBox.warning(self, self.judul, str(e))
 
     def buat_basic(self):
         url = gs.url_dasar(self.e_url.text())
@@ -237,26 +211,22 @@ class PanelKoneksi(QWidget):
             k = self.klien()
             self.catat("Menghubungi %s …" % k.base)
             self.metode, username = geonode_auth.info_authcfg(k.authcfg)
-            try:
-                if self.basic():
+            if self.basic():
+                try:
                     info = k.info_pengguna_basic(username)
-                else:
-                    info = k.userinfo()
+                except GeoNodeError as e:
+                    if not isinstance(e, GeoNodeDiblokir) and e.status in (401, 403):  # Diblokir: bukan soal password
+                        raise GeoNodeError("Username atau password GeoNode salah (konfigurasi «%s»)." % k.authcfg,
+                                           e.status)
+                    raise
                 grup = ", ".join(info.get("groups") or []) or "-"
-                self.lbl_user.setText("Masuk sebagai <b>%s</b> (grup: %s)%s" % (
-                    html.escape(info.get("preferred_username") or info.get("name") or "?"), html.escape(grup),
-                    " — login username/password: cukup untuk dataset yang sudah dipublikasikan; dataset tidak "
-                    "publik perlu OAuth2." if self.basic() else ""))
-            except GeoNodeError as e:
-                if isinstance(e, GeoNodeDiblokir):  # belum sampai ke GeoNode: bukan soal password
-                    raise
-                if self.basic() and e.status in (401, 403):
-                    raise GeoNodeError("Username atau password GeoNode salah (konfigurasi «%s»)." % k.authcfg, e.status)
-                if e.status in (401, 403):
-                    self.lbl_user.setText("Belum masuk — pilih/buat konfigurasi autentikasi. Dataset publik tetap "
-                                          "tampil, tetapi tidak bisa diubah.")
-                else:
-                    raise
+                self.lbl_user.setText("Masuk sebagai <b>%s</b> (grup: %s) — dataset yang belum dipublikasikan bisa "
+                                      "diperbarui, tetapi tidak bisa diambil." % (
+                                          html.escape(info.get("preferred_username") or info.get("name") or "?"),
+                                          html.escape(grup)))
+            else:
+                self.lbl_user.setText("Belum masuk — buat atau pilih login username/password. Dataset publik tetap "
+                                      "tampil, tetapi tidak bisa diubah.")
             if not self.deteksi(diam=True):  # 4.x tanpa dataset publik: ulangi dengan akun yang login
                 self.deteksi(klien=k, diam=True, paksa=True)
         except GeoNodeError as e:
