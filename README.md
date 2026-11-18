@@ -64,7 +64,7 @@
    - **💾 Simpan** / **📁 Simpan Sebagai...**: berkas kerja ISO 19115-3 (mdb).
    - **🌐 Export ISO 19139 (gmd) ▾**: *Untuk Palapa / CSW* (pycsw / Geoportal) atau *Untuk GeoNode – Upload Metadata*.
 
-**Panduan lengkap** (instalasi sampai contoh pengisian berbagai kondisi, per sesi): [docs/panduan](docs/panduan/README.md).
+**Panduan lengkap** (PowerPoint, 18 sesi: instalasi sampai contoh pengisian berbagai kondisi): [docs/Panduan-GeoMDB-Metadata-Editor.pptx](docs/Panduan-GeoMDB-Metadata-Editor.pptx).
 
 ## ☁️ Sinkronisasi dengan GeoNode
 

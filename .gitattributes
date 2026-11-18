@@ -1,2 +1,5 @@
 # Panduan pengguna tidak ikut ZIP plugin (git archive)
 docs/** export-ignore
+
+# Dokumen biner: jangan diubah akhir barisnya
+*.pptx binary
