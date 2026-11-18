@@ -25,8 +25,8 @@
   - Judul, abstrak, kata kunci, kontak (dari metadata layer QGIS), format, sistem koordinat (EPSG code & codeSpace), tipe & jumlah geometri, ukuran berkas, dan batas wilayah (Bounding Box, otomatis ke WGS 84) dapat langsung ditarik dari layer vektor yang dipilih di QGIS.
 
 - **Dua Standar Ekspor XML**:
-  - **ISO 19115-3 (Namespace mdb)**: Format standar terbaru untuk integrasi sistem dan validasi profil nasional. Sudah diterima **Geoportal Palapa 5.1** (berkas hasil **Simpan**); Palapa 5.0 belum mendukungnya.
-  - **ISO 19139 (Namespace gmd)**: Format standar interoperabilitas katalog OGC CSW dan siap diimpor ke **pycsw / Geoportal Palapa Simpul Jaringan** (wajib untuk Palapa 5.0).
+  - **ISO 19115-3 (Namespace mdb)**: Format standar terbaru untuk integrasi sistem dan validasi profil nasional. Format yang diterima **Geoportal Palapa 5.1** (berkas hasil **Simpan** dengan **Kompatibel Sistem BIG** dicentang); Palapa 5.0 belum mendukungnya.
+  - **ISO 19139 (Namespace gmd)**: Format standar interoperabilitas katalog OGC CSW dan siap diimpor ke **pycsw / Geoportal Palapa Simpul Jaringan** (untuk Palapa 5.0; Palapa 5.1 tidak menerima ISO 19139).
 
 - **Validasi Kelengkapan Data**:
   - Pengecekan atribut wajib, format tanggal (ISO 8601), struktur kontak penanggung jawab/walidata, dan status pengisian per seksi secara visual.
