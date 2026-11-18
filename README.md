@@ -25,8 +25,8 @@
   - Judul, abstrak, kata kunci, kontak (dari metadata layer QGIS), format, sistem koordinat (EPSG code & codeSpace), tipe & jumlah geometri, ukuran berkas, dan batas wilayah (Bounding Box, otomatis ke WGS 84) dapat langsung ditarik dari layer vektor yang dipilih di QGIS.
 
 - **Dua Standar Ekspor XML**:
-  - **ISO 19115-3 (Namespace mdb)**: Format standar terbaru untuk integrasi sistem dan validasi profil nasional.
-  - **ISO 19139 (Namespace gmd)**: Format standar interoperabilitas katalog OGC CSW dan siap diimpor ke **pycsw / Geoportal Palapa Simpul Jaringan**.
+  - **ISO 19115-3 (Namespace mdb)**: Format standar terbaru untuk integrasi sistem dan validasi profil nasional. Sudah diterima **Geoportal Palapa 5.1** (berkas hasil **Simpan**); Palapa 5.0 belum mendukungnya.
+  - **ISO 19139 (Namespace gmd)**: Format standar interoperabilitas katalog OGC CSW dan siap diimpor ke **pycsw / Geoportal Palapa Simpul Jaringan** (wajib untuk Palapa 5.0).
 
 - **Validasi Kelengkapan Data**:
   - Pengecekan atribut wajib, format tanggal (ISO 8601), struktur kontak penanggung jawab/walidata, dan status pengisian per seksi secara visual.
@@ -62,7 +62,7 @@
 4. Klik **✓ Validasi Isian** untuk melihat isian yang masih kosong per tahapan.
 5. Simpan dan ekspor:
    - **💾 Simpan** / **📁 Simpan Sebagai...**: berkas kerja ISO 19115-3 (mdb).
-   - **🌐 Export ISO 19139 (gmd) ▾**: *Untuk Palapa / CSW* (pycsw / Geoportal) atau *Untuk GeoNode – Upload Metadata*.
+   - **🌐 Export ISO 19139 (gmd) ▾**: *Untuk Palapa / CSW* (pycsw / Geoportal Palapa 5.0) atau *Untuk GeoNode – Upload Metadata*.
 
 **Panduan lengkap** (PowerPoint, 18 sesi: instalasi sampai contoh pengisian berbagai kondisi): [docs/Panduan-GeoMDB-Metadata-Editor.pptx](docs/Panduan-GeoMDB-Metadata-Editor.pptx).
 
