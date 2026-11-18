@@ -197,7 +197,7 @@ class DialogGeoNode(QDialog):
         elif t:
             teks = ("Formulir diambil dari <b>%s</b> (#%s), tetapi tujuan dibuka: mengirim ke dataset lain wajib "
                     "konfirmasi dengan mengetik nama layer tujuan." % (html.escape(str(t["title"])),
-                                                                    html.escape(str(t["pk"]))))
+                                                                       html.escape(str(t["pk"]))))
         else:
             teks = ("Formulir ini tidak diambil dari GeoNode — pengiriman wajib konfirmasi dengan mengetik nama layer "
                     "tujuan. Untuk menyunting metadata dataset yang sudah ada, ambil dulu lewat «Ambil dari GeoNode...».")

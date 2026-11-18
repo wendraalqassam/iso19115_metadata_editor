@@ -1,0 +1,4 @@
+[flake8]
+# Gaya kode proyek memakai baris panjang (sekitar 120 karakter, string HTML/stylesheet Qt lebih panjang).
+extend-ignore = E501
+max-line-length = 120

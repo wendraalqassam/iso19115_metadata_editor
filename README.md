@@ -62,7 +62,7 @@
 4. Klik **✓ Validasi Isian** untuk melihat isian yang masih kosong per tahapan.
 5. Simpan dan ekspor:
    - **💾 Simpan** / **📁 Simpan Sebagai...**: berkas kerja ISO 19115-3 (mdb).
-   - **🌐 Export ISO 19139 (gmd) ▾**: *Untuk Palapa / CSW* (pycsw / Geoportal Palapa 5.0) atau *Untuk GeoNode – Upload Metadata*.
+   - **🌐 Export ISO 19139 (gmd) ▾**: *Untuk Palapa 5.0 / CSW* (pycsw / Geoportal Palapa 5.0) atau *Untuk GeoNode – Upload Metadata*.
 
 **Panduan lengkap** (PowerPoint, 18 sesi: instalasi sampai contoh pengisian berbagai kondisi): [docs/Panduan-GeoMDB-Metadata-Editor.pptx](docs/Panduan-GeoMDB-Metadata-Editor.pptx).
 

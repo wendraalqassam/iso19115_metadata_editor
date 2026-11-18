@@ -9,7 +9,7 @@ import os
 import re
 
 from . import kesesuaian, model
-from .model import Field, local, VALUE_TYPES, ENUM_TEXT, MULTILINE
+from .model import Field, local, ENUM_TEXT, MULTILINE
 
 with open(os.path.join(os.path.dirname(__file__), "big_assets.json"), encoding="utf-8") as _fh:
     ASSETS = json.load(_fh)
@@ -98,7 +98,7 @@ def COVERAGE():
         F("coverageProcessingLevelCode", "Kode Processing Level", "processingLevelCode/code"),
         F("coverageProcessingLevelDescription", "Deskripsi Processing Level", "processingLevelCode/description"),
         L("Grup Atribut", "attributeGroup", [F("contentType", "Content Type", "contentType"),
-                                              L("Band", "attribute", BAND())]),
+                                             L("Band", "attribute", BAND())]),
     ]
 
 
@@ -159,8 +159,8 @@ def GEOREF():
         F("rasterGCPCollectionCRS", "Kode CRS", c + "coordinateReferenceSystem/referenceSystemIdentifier/code"),
         F("rasterGCPCollectionCRSSpace", "CRS Space", c + "coordinateReferenceSystem/referenceSystemIdentifier/codeSpace"),
         L("GCP", c + "gcp", [F("lat", "Latitude", "geographicCoordinates/pos#0"),
-                            F("lon", "Longitude", "geographicCoordinates/pos#1"),
-                            F("accuracyReport", "Laporan Akurasi", "accuracyReport/result/statement")]),
+                             F("lon", "Longitude", "geographicCoordinates/pos#1"),
+                             F("accuracyReport", "Laporan Akurasi", "accuracyReport/result/statement")]),
     ]
 
 

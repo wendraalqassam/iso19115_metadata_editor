@@ -13,6 +13,7 @@ NS_GCO = "http://standards.iso.org/iso/19115/-3/gco/1.0"
 with open(os.path.join(os.path.dirname(__file__), "repeatable.json"), encoding="utf-8") as _fh:
     REPEATABLE = {k: set(v) for k, v in json.load(_fh).items()}
 
+
 def _load_json(name):
     with open(os.path.join(os.path.dirname(__file__), name), encoding="utf-8") as fh:
         return json.load(fh)

@@ -18,7 +18,6 @@ try:  # Qt6 / QGIS 4
     from qgis.PyQt.QtGui import QShortcut
 except ImportError:  # Qt5 / QGIS 3
     from qgis.PyQt.QtWidgets import QShortcut
-from qgis.core import QgsCoordinateReferenceSystem, QgsCoordinateTransform, QgsProject
 
 from . import model, layout, big_compat, gmd_exporter, gmd_importer, kesesuaian
 
@@ -844,13 +843,16 @@ class EditorDialog(QDialog):
         """)
         self.b_save_as.clicked.connect(self.save_file_as)
 
-        # Satu isi XML, dua tujuan: Palapa/CSW menolak baris deklarasi <?xml?>, GeoNode (Upload Metadata) mewajibkannya
+        # Satu isi XML, dua tujuan: Palapa 5.0/CSW menolak baris deklarasi <?xml?>, GeoNode (Upload Metadata) mewajibkannya.
+        # Palapa 5.1 tidak menerima ISO 19139 (hanya ISO 19115-3 dari Simpan dengan "Kompatibel Sistem BIG").
         b_export_gmd = QToolButton()
         b_export_gmd.setText("🌐 Export ISO 19139 (gmd) ▾")
         b_export_gmd.setPopupMode(QToolButton.ToolButtonPopupMode.InstantPopup)
         b_export_gmd.setToolTip("Ekspor isian metadata saat ini ke berkas XML standar ISO 19139 (namespace http://www.isotc211.org/2005/gmd):\n"
-                                "• untuk Palapa / CSW: tanpa baris deklarasi <?xml ...?>\n"
-                                "• untuk GeoNode (Edit → Upload Metadata): baris pertama <?xml version=\"1.0\"?>, yang diwajibkan GeoNode")
+                                "• untuk Palapa 5.0 / CSW: tanpa baris deklarasi <?xml ...?>\n"
+                                "• untuk GeoNode (Edit → Upload Metadata): baris pertama <?xml version=\"1.0\"?>, yang diwajibkan GeoNode\n"
+                                "Palapa 5.1 tidak menerima ISO 19139: unggah berkas ISO 19115-3 dari Simpan "
+                                "(opsi \"Kompatibel Sistem BIG\" dicentang).")
         b_export_gmd.setStyleSheet("""
             QPushButton, QToolButton {
                 background-color: #ecfdf5;
@@ -868,7 +870,7 @@ class EditorDialog(QDialog):
             }
         """)
         menu_ekspor = QMenu(b_export_gmd)
-        menu_ekspor.addAction("Untuk Palapa / CSW (tanpa deklarasi XML)...").triggered.connect(
+        menu_ekspor.addAction("Untuk Palapa 5.0 / CSW (tanpa deklarasi XML)...").triggered.connect(
             lambda _=False: self.export_iso19139())
         menu_ekspor.addAction("Untuk GeoNode – Upload Metadata (dengan deklarasi XML)...").triggered.connect(
             lambda _=False: self.export_iso19139(untuk_geonode=True))
@@ -1492,6 +1494,7 @@ class EditorDialog(QDialog):
                 border-color: #f87171;
             }
         """)
+
         def delete_selected():
             cur = list_w.currentItem()
             if not cur:
@@ -2268,6 +2271,7 @@ class EditorDialog(QDialog):
                 background-color: #0369a1;
             }
         """)
+
         def _save_from_val():
             dlg.accept()
             self.save_file()
@@ -2410,7 +2414,7 @@ class EditorDialog(QDialog):
     def export_iso19139(self, untuk_geonode=False):
         """Ekspor isian metadata saat ini ke berkas XML standar ISO 19139 (namespace http://www.isotc211.org/2005/gmd).
         untuk_geonode=True: baris pertama <?xml version="1.0"?> (wajib untuk Upload Metadata di GeoNode); bawaan tanpa
-        deklarasi (Palapa / CSW)."""
+        deklarasi (Palapa 5.0 / CSW)."""
         if self.root is None:
             QMessageBox.information(self, TITLE, "Belum ada metadata yang dimuat untuk diekspor.")
             return
@@ -2441,7 +2445,7 @@ class EditorDialog(QDialog):
 
         path, _ = QFileDialog.getSaveFileName(
             self,
-            "Ekspor XML Metadata Standar ISO 19139 (gmd)" + (" untuk GeoNode" if untuk_geonode else " untuk Palapa / CSW"),
+            "Ekspor XML Metadata Standar ISO 19139 (gmd)" + (" untuk GeoNode" if untuk_geonode else " untuk Palapa 5.0 / CSW"),
             default_path,
             "XML Metadata ISO 19139 (*.xml);;Semua file (*)"
         )
@@ -2471,8 +2475,10 @@ class EditorDialog(QDialog):
                       "<b>Edit → Upload Metadata</b> pada dataset yang sama di GeoNode."
                       % html.escape(gmd_exporter.DEKLARASI_GEONODE))
         else:
-            pesan += ("<b>Untuk Palapa / CSW:</b> tanpa baris deklarasi <code>&lt;?xml ...?&gt;</code>. Untuk "
-                      "Upload Metadata di GeoNode, pilih <b>Untuk GeoNode</b> pada tombol Export.")
+            pesan += ("<b>Untuk Palapa 5.0 / CSW:</b> tanpa baris deklarasi <code>&lt;?xml ...?&gt;</code>. Untuk "
+                      "Upload Metadata di GeoNode, pilih <b>Untuk GeoNode</b> pada tombol Export.<br><br>"
+                      "<b>Palapa 5.1</b> tidak menerima ISO 19139: unggah berkas ISO 19115-3 hasil <b>Simpan</b> dengan "
+                      "opsi <b>Kompatibel Sistem BIG</b> dicentang.")
         isi = kesesuaian.html([
             ("Tidak kompatibel ISO 19139 — tidak diekspor (tetap tersimpan di berkas ISO 19115-3)", catatan),
             ("Diekspor, tetapi nilai daftar kodenya di luar ISO 19139 — katalog berbasis ISO 19139 "

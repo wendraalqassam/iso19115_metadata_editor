@@ -3,8 +3,6 @@
 Mengambil data metadata aktif (ISO 19115-3) dari EditorDialog/model dan
 menghasilkan XML berbasis standar ISO 19139 menggunakan template gmd_template.xml.
 """
-import copy
-import datetime
 import json
 import os
 import re
@@ -1607,14 +1605,14 @@ DEKLARASI_GEONODE = '<?xml version="1.0"?>'
 
 def save_gmd_to_file(gmd_root, output_path, deklarasi=False):
     """Menyimpan berkas XML ISO 19139. Bawaan tanpa deklarasi <?xml...?> agar kompatibel dengan CSW Transaction
-    pycsw/Palapa; deklarasi=True (unggah lewat GeoNode) menulis DEKLARASI_GEONODE di baris pertama."""
+    pycsw/Palapa 5.0; deklarasi=True (unggah lewat GeoNode) menulis DEKLARASI_GEONODE di baris pertama."""
     register_gmd_namespaces()
     # Indentasi rapi
     if hasattr(ET, "indent"):
         ET.indent(gmd_root, space="  ")
     raw = ET.tostring(gmd_root, encoding="utf-8")
     text = raw.decode("utf-8")
-    # Hapus deklarasi <?xml ...?> jika ada agar saat diunggah ke Palapa / pycsw tidak menimbulkan error sintaks
+    # Hapus deklarasi <?xml ...?> jika ada agar saat diunggah ke Palapa 5.0 / pycsw tidak menimbulkan error sintaks
     text = re.sub(r"<\?xml[^>]*\?>\s*", "", text).strip() + "\n"
     if deklarasi:
         text = DEKLARASI_GEONODE + "\n" + text

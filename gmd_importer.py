@@ -6,9 +6,7 @@ melalui tombol 'Buka XML Metadata...', sehingga seluruh form (Tahap 1-13)
 terisi penuh tanpa ada isian yang hilang/kosong.
 """
 import copy
-import datetime
 import os
-import re
 import xml.etree.ElementTree as ET  # nosec B405
 
 from . import layout, model

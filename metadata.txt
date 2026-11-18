@@ -12,12 +12,11 @@ category=Web
 icon=icon.png
 experimental=False
 deprecated=False
-supportsQt6=True
 homepage=https://github.com/wendraalqassam/iso19115_metadata_editor
 tracker=https://github.com/wendraalqassam/iso19115_metadata_editor/issues
 repository=https://github.com/wendraalqassam/iso19115_metadata_editor
 changelog=1.1.0: GeoNode integration and a valid ISO 19139 export.
-    - ISO 19139 (gmd) export valid against the official XSD, including raster, without example values from the template (contact, placeholders, links); quantitative data-quality results are exported. The "Export ISO 19139 (gmd)" button is a menu: Palapa / CSW (no <?xml?> declaration) or GeoNode - Upload Metadata (first line <?xml version="1.0"?>, file ..._geonode.xml).
+    - ISO 19139 (gmd) export valid against the official XSD, including raster, without example values from the template (contact, placeholders, links); quantitative data-quality results are exported. The "Export ISO 19139 (gmd)" button is a menu: Palapa 5.0 / CSW (no <?xml?> declaration) or GeoNode - Upload Metadata (first line <?xml version="1.0"?>, file ..._geonode.xml). Palapa 5.1 takes ISO 19115-3 only: the file from Save with "Kompatibel Sistem BIG" checked.
     - ISO 19139 import keeps the data-quality report and result types with quantitative values and units; XML downloaded from GeoNode is recognised and its filler text ("None", "No abstract provided", "No information provided") and role labels are not carried into the form.
     - ISO 19115-3 output valid (XSD + Schematron) when "Kompatibel Sistem BIG" is off; notes on values outside ISO codelists. New fields: data identifier (DOI), supplemental information, multiple legal constraints.
     - GeoNode 4.2.3 - 5.x: pull metadata from a catalogue (cards or list, WMS map preview) and update it back with the user's own GeoNode account (username/password); version detection; preserve mode for patched servers; automatic backup and restore; wrong-target safeguards; requests stopped by a bot check (e.g. Cloudflare) are reported as such.
