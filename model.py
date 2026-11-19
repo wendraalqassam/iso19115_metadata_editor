@@ -370,6 +370,9 @@ def remove_block(parent, el):
 
 
 # ---------------------------------------------------------------- muat / simpan
+AKAR_METADATA = ("MD_Metadata", "MI_Metadata")     # akar dokumen metadata (mdb/gmd, 19115-2 gmi)
+
+
 def load(path):
     with open(path, "rb") as fh:
         data = fh.read()
@@ -393,6 +396,13 @@ def load(path):
                     pass
         elif root is None:
             root = d
+    if local(root.tag) not in AKAR_METADATA:
+        isi = [e for e in root.iter() if local(e.tag) in AKAR_METADATA]
+        if isi:
+            fixes.append("Berkas ini %s (respons CSW), bukan metadata lepas. Yang dimuat adalah %s di dalamnya; "
+                         "pembungkus CSW tidak ikut disimpan." % (local(root.tag), local(isi[0].tag))
+                         + (" Berkas berisi %d record; hanya record pertama yang dimuat." % len(isi) if len(isi) > 1 else ""))
+            root = isi[0]
     return root, fixes
 
 

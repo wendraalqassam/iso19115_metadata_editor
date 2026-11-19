@@ -641,7 +641,7 @@ class EditorDialog(QDialog):
         self.scrolls = []
         self.items = []          # (Field, widget)
         self.page_keys = []
-        self.built_big_pages = set()
+        self.built_pages = set()
         self.setWindowTitle(TITLE)
         if os.path.exists(ICON_PATH):
             self.setWindowIcon(QIcon(ICON_PATH))
@@ -980,8 +980,7 @@ class EditorDialog(QDialog):
     def on_nav_changed(self, row):
         if row < 0 or row >= self.nav.count():
             return
-        if self.mode == "big":
-            self.ensure_big_page(row)
+        self.ensure_page(row)
         self.stack.setCurrentIndex(row)
 
     # ---------- bangun ulang (mempertahankan posisi) ----------
@@ -1034,9 +1033,8 @@ class EditorDialog(QDialog):
                 if getattr(sec, "el", None) is select_el:
                     row, snap = r, None
         self.nav.setCurrentRow(row)
-        if self.mode == "big":
-            self.ensure_big_page(row)
-            self.stack.setCurrentIndex(row)
+        self.ensure_page(row)
+        self.stack.setCurrentIndex(row)
         if snap and snap["row"] == row:
             page = self.stack.widget(row)
             if page is not None:
@@ -1058,10 +1056,10 @@ class EditorDialog(QDialog):
             self.stack.removeWidget(w)
             w.deleteLater()
         self.items, self.page_secs, self.scrolls, self.page_keys = [], [], [], []
-        self.built_big_pages = set()
+        self.built_pages = set()
 
     # =====================================================================
-    #  MODE FORM BIG (Lazy Loading: muat bertahap sesuai kebutuhan)
+    #  MODE FORM BIG (halaman dibangun saat dibuka, lihat ensure_page)
     # =====================================================================
     def build_big(self):
         self.reset_pages()
@@ -1076,14 +1074,18 @@ class EditorDialog(QDialog):
             self.nav.addItem("%d. %s" % (s.id, s.label))
             self.nav.item(self.nav.count() - 1).setToolTip(s.caption)
 
-    def ensure_big_page(self, row):
+    def ensure_page(self, row):
+        """Bangun halaman `row` saat pertama kali dibuka (kedua mode); sebelumnya berupa placeholder kosong."""
         if not (0 <= row < len(self.page_secs)):
             return
-        if row in self.built_big_pages:
+        if row in self.built_pages:
             return
-        self.built_big_pages.add(row)
+        self.built_pages.add(row)
         s = self.page_secs[row]
-        page, first_scroll = self._build_single_big_page(s)
+        if self.mode == "big":
+            page, first_scroll = self._build_single_big_page(s)
+        else:
+            page, first_scroll = self._build_single_all_page(s)
         self.scrolls[row] = first_scroll
         old_w = self.stack.widget(row)
         self.stack.removeWidget(old_w)
@@ -1570,56 +1572,62 @@ class EditorDialog(QDialog):
     #  MODE SEMUA ELEMEN ISO
     # =====================================================================
     def build_all(self):
+        # berkas besar (mis. puluhan contentInfo) = ratusan isian: halaman dibangun saat dibuka, lihat ensure_page
         self.reset_pages()
         self.sections = model.build_sections(self.root)
         for sec in self.sections:
             if not sec.fields:
                 continue
-            page = QWidget()
-            page.setStyleSheet("background-color: #ffffff;")
-            pl = QVBoxLayout(page)
-            pl.setContentsMargins(14, 12, 14, 12)
-            pl.setSpacing(10)
-            pl.addLayout(self.section_header(sec))
-            inner = QWidget()
-            inner.setStyleSheet("background-color: #ffffff;")
-            form = QFormLayout(inner)
-            form.setRowWrapPolicy(QFormLayout.RowWrapPolicy.WrapLongRows)
-            form.setFieldGrowthPolicy(QFormLayout.FieldGrowthPolicy.AllNonFixedFieldsGrow)
-            form.setLabelAlignment(Qt.AlignmentFlag.AlignLeft | Qt.AlignmentFlag.AlignTop)
-            form.setFormAlignment(Qt.AlignmentFlag.AlignLeft | Qt.AlignmentFlag.AlignTop)
-            form.setSpacing(10)
-            for it in sec.items:
-                if isinstance(it, model.Field):
-                    w = self.make_widget(it)
-                    lab = QLabel(it.label)
-                    lab.setWordWrap(True)
-                    lab.setMinimumWidth(185)
-                    lab.setMaximumWidth(215)
-                    lab.setAlignment(Qt.AlignmentFlag.AlignLeft | Qt.AlignmentFlag.AlignVCenter)
-                    lab.setStyleSheet("color: #1e293b; font-weight: 600; background: transparent; border: none; padding-top: 4px;")
-                    form.addRow(lab, w)
-                    self.items.append((it, w))
-                elif isinstance(it, model.Block):
-                    form.addRow(self.block_header(it))
-                else:
-                    lab = QLabel(" › ".join(it.trail))
-                    lab.setWordWrap(True)
-                    lab.setMinimumWidth(185)
-                    lab.setMaximumWidth(215)
-                    lab.setAlignment(Qt.AlignmentFlag.AlignLeft | Qt.AlignmentFlag.AlignVCenter)
-                    lab.setStyleSheet("color: #475569; font-weight: 600; background: transparent; border: none;")
-                    form.addRow(lab, self.add_button(it.name, it.parent, it.options, False))
-            scroll = QScrollArea()
-            scroll.setStyleSheet("QScrollArea { border: none; background-color: #ffffff; } QScrollArea > QWidget > QWidget { background-color: #ffffff; }")
-            scroll.setWidgetResizable(True)
-            scroll.setWidget(inner)
-            pl.addWidget(scroll, 1)
-            self.stack.addWidget(page)
-            self.scrolls.append(scroll)
+            placeholder = QWidget()
+            placeholder.setStyleSheet("background-color: #ffffff;")
+            self.stack.addWidget(placeholder)
+            self.scrolls.append(None)
             self.page_secs.append(sec)
             self.page_keys.append(("all", sec.name, sec.idx))
             self.nav.addItem(sec.title)
+
+    def _build_single_all_page(self, sec):
+        page = QWidget()
+        page.setStyleSheet("background-color: #ffffff;")
+        pl = QVBoxLayout(page)
+        pl.setContentsMargins(14, 12, 14, 12)
+        pl.setSpacing(10)
+        pl.addLayout(self.section_header(sec))
+        inner = QWidget()
+        inner.setStyleSheet("background-color: #ffffff;")
+        form = QFormLayout(inner)
+        form.setRowWrapPolicy(QFormLayout.RowWrapPolicy.WrapLongRows)
+        form.setFieldGrowthPolicy(QFormLayout.FieldGrowthPolicy.AllNonFixedFieldsGrow)
+        form.setLabelAlignment(Qt.AlignmentFlag.AlignLeft | Qt.AlignmentFlag.AlignTop)
+        form.setFormAlignment(Qt.AlignmentFlag.AlignLeft | Qt.AlignmentFlag.AlignTop)
+        form.setSpacing(10)
+        for it in sec.items:
+            if isinstance(it, model.Field):
+                w = self.make_widget(it)
+                lab = QLabel(it.label)
+                lab.setWordWrap(True)
+                lab.setMinimumWidth(185)
+                lab.setMaximumWidth(215)
+                lab.setAlignment(Qt.AlignmentFlag.AlignLeft | Qt.AlignmentFlag.AlignVCenter)
+                lab.setStyleSheet("color: #1e293b; font-weight: 600; background: transparent; border: none; padding-top: 4px;")
+                form.addRow(lab, w)
+                self.items.append((it, w))
+            elif isinstance(it, model.Block):
+                form.addRow(self.block_header(it))
+            else:
+                lab = QLabel(" › ".join(it.trail))
+                lab.setWordWrap(True)
+                lab.setMinimumWidth(185)
+                lab.setMaximumWidth(215)
+                lab.setAlignment(Qt.AlignmentFlag.AlignLeft | Qt.AlignmentFlag.AlignVCenter)
+                lab.setStyleSheet("color: #475569; font-weight: 600; background: transparent; border: none;")
+                form.addRow(lab, self.add_button(it.name, it.parent, it.options, False))
+        scroll = QScrollArea()
+        scroll.setStyleSheet("QScrollArea { border: none; background-color: #ffffff; } QScrollArea > QWidget > QWidget { background-color: #ffffff; }")
+        scroll.setWidgetResizable(True)
+        scroll.setWidget(inner)
+        pl.addWidget(scroll, 1)
+        return page, scroll
 
     def section_header(self, sec):
         row = QHBoxLayout()
